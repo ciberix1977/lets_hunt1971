@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Let’s Hunt · Aventuras Urbanas con Premios Reales</title>
+  <meta name="description" content="Resuelve pistas, completa desafíos en vivo y compite por premios individuales y por equipo. ¿Llegarás al top del ranking?" />
+
+  <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="styles.css"></noscript>
+
+  <link rel="manifest" href="manifest.json">
+
+  <!-- ✅ CORRECCIÓN: Estilos mínimos para que el logo aparezca tras intro -->
+
+</head>
+<body>
+
+  <script>
+  // ✅ INTRO: carga fiable en todos los navegadores
+  window.addEventListener('load', () => {
+    const introScreen = document.getElementById('intro-screen');
+    const introVideo = document.getElementById('intro-video');
+
+    const hideIntro = () => {
+      if (!introScreen) return;
+      introScreen.style.opacity = '0';
+      setTimeout(() => {
+        introScreen.remove();
+        // ✅ Asegura que el logo sea visible tras intro
+        document.querySelector('.hero-content')?.classList.add('ready');
+      }, 400);
+    };
+
+    // ✅ Reproducir apenas el video esté listo
+    introVideo?.addEventListener('loadeddata', () => {
+      introVideo.play().catch(() => hideIntro());
+    }, { once: true });
+
+    // ✅ Fallback seguro (7.5s máximo)
+    setTimeout(hideIntro, 7500);
+
+    // ✅ Permitir skip
+    introScreen?.addEventListener('click', hideIntro, { once: true });
+  });
+  </script>
+
+  <main>
+    <section class="hero" role="banner">
+     <header class="hero-content centered">
+          <div class="logo-container">
+  <!-- ✅ RADAR ANIMADO — visible detrás del logo -->
+  <div class="logo-radar" aria-hidden="true">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="25" fill="none" stroke="#0f0" stroke-width="0.8" opacity="0.5">
+        <animate attributeName="r" values="25;30;25" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="50" cy="50" r="35" fill="none" stroke="#0f0" stroke-width="0.6" opacity="0.4">
+        <animate attributeName="r" values="35;40;35" dur="3.5s" repeatCount="indefinite" begin="0.3s"/>
+        <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3.5s" repeatCount="indefinite" begin="0.3s"/>
+      </circle>
+      <circle cx="50" cy="50" r="45" fill="none" stroke="#0f0" stroke-width="0.4" opacity="0.3">
+        <animate attributeName="r" values="45;50;45" dur="4s" repeatCount="indefinite" begin="0.6s"/>
+        <animate attributeName="opacity" values="0.1;0.4;0.1" dur="4s" repeatCount="indefinite" begin="0.6s"/>
+      </circle>
+    </svg>
+  </div>
+  <!-- ✅ LOGO — encima del radar -->
+  <div class="logo-wrapper">
+    <img src="./logo.webp" alt="Let’s Hunt" loading="eager">
+  </div>
+</div>
+        <div id="typewriter" class="typewriter-text">Resuelve pistas. Acepta desafíos. Entra al ranking. ¿Ganarás los premios?</div>
+        <p class="tension-tag">⚠️ Solo el 12% de los jugadores completa las 3 misiones.</p>
+  <!-- ❌ ELIMINADO: hero-cta aquí (queda solo al final) -->
+        <div class="counter-banner">
+        <div class="pulse-dot"></div>
+    🟢 <span id="live-count">27</span> jugadores activos ahora
+     </div>
+   </header>
+    </section>
+    
+    <section class="intro-section" aria-labelledby="intro-title">
+      <div class="container">
+        <h2 id="intro-title" class="section-title">Tu Misión, si la Aceptas</h2>
+        <div class="about-summary">
+          <p>
+            <strong>Let’s Hunt</strong> es una aventura urbana en el Gran Buenos Aires donde combinas inteligencia, coraje y velocidad. 
+            Resuelve pistas históricas en la ciudad, <strong>y activa desafíos en vivo por WhatsApp</strong> para ganar coordenadas antes que los demás.
+          </p>
+          <p class="tension-line"><strong>🧠 Cada error te cuesta tiempo. Y el tiempo… no se recarga.</strong></p>
+          <div class="free-callout">
+            <h4>¿Y lo mejor de todo?</h4>
+            <p><strong>Es 100% gratuito participar.</strong> y no descargas nada. Solo necesitas curiosidad, un telefono movil y ganas de ganar. Cargas la mision o desafio y puedes jugarlo con o sin coneccion, hasta cargar el nueva mision/desafio</p>
+          </div>
+          <div class="prizes-callout">
+            <h4>🏆 Premios reales, ranking real</h4>
+            <p><strong>Los primeros puestos del ranking —individuales y por equipo— se llevan premios reales:</strong> 
+            tecnología, experiencias urbanas exclusivas y reconocimiento en la comunidad Let’s Hunt.</p>
+          </div>
+        </div>
+        <div class="live-players" style="margin-top: 2.5rem; padding: 1.5rem; background: rgba(0, 170, 255, 0.08); border-radius: 12px; border: 1px solid rgba(0, 170, 255, 0.2);">
+          <h3 style="color: #4fc3f7; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="background:#00aaff; width:12px; height:12px; border-radius:50%; display:inline-block; animation: pulse 2s infinite;"></span>
+            🟢 Jugadores activos ahora
+          </h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center;">
+            <div style="background: rgba(0, 170, 255, 0.15); padding: 0.6rem 1rem; border-radius: 20px; font-size: 0.95rem;">
+              hunter_0041 • CABA
+            </div>
+            <div style="background: rgba(0, 170, 255, 0.15); padding: 0.6rem 1rem; border-radius: 20px; font-size: 0.95rem;">
+              hunter_0109 • Avellaneda
+            </div>
+            <div style="background: rgba(0, 170, 255, 0.15); padding: 0.6rem 1rem; border-radius: 20px; font-size: 0.95rem;">
+              hunter_0073 • Lanús
+            </div>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: #94a3b8;">
+            ⏱️ Actualizado hace 24 segundos
+          </p>
+        </div>
+
+        <style>
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+        </style>
+  
+   
+
+
+    <!-- ✅ NUEVA SECCIÓN #1: Cómo se juega -->
+   <!-- ✅ SECCIÓN: Cómo se juega — Rediseñada -->
+<section id="como-jugar" class="how-to-play" aria-labelledby="how-to-play-title">
+  <div class="container">
+    <h2 id="how-to-play-title" class="section-title">🧭 Cómo se juega Let’s Hunt</h2>
+    <div class="steps-grid">
+      <div class="step-card" data-step="1">
+        <div class="step-badge">
+          <span class="step-number">1</span>
+          <span class="step-label">Entrada</span>
+        </div>
+        <h3 class="step-title">🔐 Te registrás</h3>
+        <p class="step-desc">
+          Gratis. Sin tarjetas. Elegís jugar <strong>solo o en equipo</strong>.
+          Tu identidad: <code>hunter_XXXX</code>.
+        </p>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-badge">
+          <span class="step-number">2</span>
+          <span class="step-label">Operación</span>
+        </div>
+        <h3 class="step-title">🎯 Resolvés pistas</h3>
+        <p class="step-desc">
+          En la ciudad. Si suena el WhatsApp… <strong>¡es un desafío en vivo!</strong>
+          Aceptalo y ganá coordenadas bonus.
+        </p>
+      </div>
+      <div class="step-card" data-step="3">
+        <div class="step-badge">
+          <span class="step-number">3</span>
+          <span class="step-label">Extracción</span>
+        </div>
+        <h3 class="step-title">🏆 Subís al ranking</h3>
+        <p class="step-desc">
+          Los primeros puestos se llevan <strong>premios reales</strong>:
+          tecnología, experiencias urbanas, gloria.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+       <!-- ✅ SECCIÓN: Patrocinadores — Full width, alianzas estratégicas -->
+<section class="sponsors-section" aria-labelledby="sponsors-title">
+  <div class="sponsors-hero">
+    <h2 id="sponsors-title" class="sponsors-title">🤝 Alianzas Estratégicas</h2>
+    <p class="sponsors-lead">
+      Let’s Hunt es posible gracias a socios que aportan capacidades críticas al ecosistema.
+    </p>
+  </div>
+
+  <div class="sponsors-grid-container">
+    <div class="sponsors-grid">
+      <article class="sponsor-card" data-tier="platinum">
+        <div class="sponsor-badge">Conectividad Global</div>
+        <img src="./sponsor-nexus.webp" alt="Nexus Comm" loading="lazy">
+        <h3 class="sponsor-name">Nexus Comm</h3>
+        <p class="sponsor-role">Red segura para transmisión en tiempo real</p>
+      </article>
+
+      <article class="sponsor-card" data-tier="platinum">
+        <div class="sponsor-badge">Tecnología Inmersiva</div>
+        <img src="./sponsor-aqua.webp" alt="Aqua Labs" loading="lazy">
+        <h3 class="sponsor-name">Aqua Labs</h3>
+        <p class="sponsor-role">AR y sensores para pistas en el mundo real</p>
+      </article>
+
+      <article class="sponsor-card" data-tier="gold">
+        <div class="sponsor-badge">Exploración Urbana Segura</div>
+        <img src="./sponsor-enterprecios.webp" alt="Enterprecios" loading="lazy">
+        <h3 class="sponsor-name">Enterprecios</h3>
+        <p class="sponsor-role">Mapeo ético y acceso a espacios históricos</p>
+      </article>
+
+      <article class="sponsor-card" data-tier="gold">
+        <div class="sponsor-badge">Narrativa Inmersiva</div>
+        <img src="./sponsor-zenith.webp" alt="Zenith Games" loading="lazy">
+        <h3 class="sponsor-name">Zenith Games</h3>
+        <p class="sponsor-role">Diseño de misiones con tensión narrativa real</p>
+      </article>
+    </div>
+  </div>
+
+  <div class="sponsors-cta">
+    <p class="sponsors-cta-text">
+      ✦ ¿Querés formar parte de la próxima temporada como aliado estratégico?
+    </p>
+    <a href="mailto:contacto@letshunt.ar" class="btn-outline">
+      📩 Contacto para patrocinios
+    </a>
+  </div>
+</section>
+
+
+
+
+
+    <!-- ✅ NUEVA SECCIÓN #3: ¿Quién juega? -->
+    <!-- ✅ SECCIÓN: ¿Quién juega? — Rediseñada -->
+<section id="quien-juega" class="who-plays" aria-labelledby="who-plays-title">
+  <div class="container">
+    <h2 id="who-plays-title" class="section-title">👤 Los Cuatro Perfiles del Cazador</h2>
+    <div class="avatars-grid">
+      <div class="avatar-card" data-profile="explorador">
+        <div class="avatar-icon">🗺️</div>
+        <h3 class="avatar-title">El Explorador Urbano</h3>
+        <p class="avatar-desc">
+          Camina la ciudad como si fuera un mapa vivo.  
+          <strong>Para él, Recoleta no es un barrio: es un acertijo de mármol y sombras.</strong>
+        </p>
+      </div>
+     
+      <div class="avatar-card" data-profile="equipo">
+        <div class="avatar-icon">👯</div>
+        <h3 class="avatar-title">El Equipo de Amigos</h3>
+        <p class="avatar-desc">
+          3 o 4 que se juntan “para hacer algo distinto”.  
+          <strong>Sin apps de pago, sin salidas caras: solo inteligencia, risas y un WhatsApp encendido.</strong>
+        </p>
+      </div>
+      <div class="avatar-card" data-profile="competitivo">
+        <div class="avatar-icon">🏆</div>
+        <h3 class="avatar-title">El Competitivo sin Tarjeta</h3>
+        <p class="avatar-desc">
+          Quiere ganar… pero no quiere gastar.  
+          <strong>Su arma no es la billetera: es la velocidad, el ingenio y saber cuándo aceptar un desafío loco por voz.</strong>
+        </p>
+      </div>
+    </div>
+    <p class="identity-closer">
+      ¿Te reconocés en alguno? Probablemente… en <span class="highlight">más de uno</span>.
+    </p>
+  </div>
+</section>
+   <!-- ✅ SECCIÓN: Misiones — Rediseñada en fila -->
+<section id="misiones" class="missions-section" aria-labelledby="misiones-title">
+  <div class="container">
+    <h2 id="misiones-title" class="section-title">🎯 Misiones, Desafíos y el Camino al Ranking</h2>
+    <div class="missions-grid">
+      <article class="mission-card" data-type="mision">
+        <div class="mission-header">
+          <span class="mission-icon">🦁</span>
+          <span class="mission-badge nivel-N2">Nivel 2</span>
+        </div>
+        <h3 class="mission-title">Misión 1: El Guardián de Bronce</h3>
+        <p class="mission-desc">
+          Busca la estatua ecuestre del General Belgrano frente al Congreso.  
+          Resuelve el acertijo oculto en su base.
+        </p>
+        <div class="mission-reward">
+          📍 <strong>Coordenada A</strong> del mapa final.
+        </div>
+      </article>
+
+      <article class="mission-card" data-type="desafio">
+        <div class="mission-header">
+          <span class="mission-icon">⚡</span>
+          <span class="mission-badge nivel-N3">Nivel 3</span>
+        </div>
+        <h3 class="mission-title">Desafío Bonus (WhatsApp)</h3>
+        <p class="mission-desc">
+          El Vigilante te llama. Aceptá y realizá un desafío en vivo.  
+          <strong>Si lo completás, obtenés la coordenada al instante.</strong>
+        </p>
+        <div class="mission-reward">
+          ⚡ <strong>Coordenada A</strong> sin resolver la pista.
+        </div>
+        <div class="mission-risk">
+          ⚠️ Solo 30 segundos para aceptar.
+        </div>
+      </article>
+
+      <article class="mission-card" data-type="ranking">
+        <div class="mission-header">
+          <span class="mission-icon">🏆</span>
+          <span class="mission-badge nivel-N4">Nivel 4</span>
+        </div>
+        <h3 class="mission-title">El Ranking Final</h3>
+        <p class="mission-desc">
+          Quienes completen las 3 misiones entran al ranking.  
+          <strong>Los primeros lugares se llevan premios reales.</strong>
+        </p>
+        <div class="mission-reward">
+          🎁 Tecnología, experiencias y gloria urbana.
+        </div>
+        <div class="mission-risk">
+          ⚠️ Solo los primeros <strong>50</strong> entran al ranking final.
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+    <section class="register-section" aria-labelledby="register-title">
+      <div class="container">
+        <h2 id="register-title" class="section-title">¿Listo para la cacería urbana?</h2>
+
+        <!-- ✅ NUEVO BLOQUE #5: Ranking visible -->
+        <div class="ranking-preview">
+          <h3 style="
+            color: #4fc3f7;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+          ">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"></polygon>
+            </svg>
+            Ranking actual — Temporada Buenos Aires
+          </h3>
+
+          <div class="top-list" style="text-align: left; margin: 0 auto; max-width: 400px;">
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+              <span style="
+                background: #ffd700; color: #1a202c; width: 28px; height: 28px; border-radius: 50%;
+                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
+              ">1</span>
+              <span style="flex: 1; font-weight: 600; color: #ffd700;">elcazadordel9</span>
+              <span style="color: #94a3b8; font-size: 0.9rem;">CABA • 2,840 pts</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+              <span style="
+                background: #c0c0c0; color: #1a202c; width: 28px; height: 28px; border-radius: 50%;
+                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
+              ">2</span>
+              <span style="flex: 1; font-weight: 600; color: #c0c0c0;">team_recoleta</span>
+              <span style="color: #94a3b8; font-size: 0.9rem;">Recoleta • 2,310 pts</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+              <span style="
+                background: #cd7f32; color: #1a202c; width: 28px; height: 28px; border-radius: 50%;
+                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
+              ">3</span>
+              <span style="flex: 1; font-weight: 600; color: #cd7f32;">pistayfuego</span>
+              <span style="color: #94a3b8; font-size: 0.9rem;">Avellaneda • 1,980 pts</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+              <span style="
+                background: rgba(255,255,255,0.12); color: #e2e8f0; width: 28px; height: 28px; border-radius: 50%;
+                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
+              ">4</span>
+              <span style="flex: 1; font-weight: 500; color: #e2e8f0;">sanjose_squad</span>
+              <span style="color: #94a3b8; font-size: 0.9rem;">San José • 1,620 pts</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0;">
+              <span style="
+                background: rgba(255,255,255,0.12); color: #e2e8f0; width: 28px; height: 28px; border-radius: 50%;
+                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
+              ">5</span>
+              <span style="flex: 1; font-weight: 500; color: #e2e8f0;">la_radarista</span>
+              <span style="color: #94a3b8; font-size: 0.9rem;">Lanús • 1,450 pts</span>
+            </div>
+          </div>
+
+          <p style="
+            margin-top: 1.2rem;
+            font-weight: 600;
+            color: #64b5f6;
+            font-size: 1.05rem;
+          ">
+            🎯 Vos podés estar acá. Solo falta empezar.
+          </p>
+        </div>
+
+        <p class="urgency-note">⏳ Las misiones se cierran cuando los primeros 10 llegan. ¿Vas a ser uno de ellos?</p>
+        <a href="registro.html" class="btn-hero">✅ REGISTRARME Y ENTRAR AL RANKING</a>
+
+        <!-- ✅ NUEVO CTA EMOCIONAL (variante #2) -->
+        <a href="registro.html" class="cta-emocional" style="margin-top: 1.2rem; display: inline-block;">
+          🗺️ Comenzar mi primera misión
+        </a>
+
+        <div class="consent-section" style="margin: 1.8rem auto 0; max-width: 600px; text-align: center;">
+          <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+            Al continuar, aceptas nuestra 
+            <a href="politicas.html#privacidad" target="_blank" rel="noopener">Política de Privacidad</a>
+            y los 
+            <a href="politicas.html#terminos" target="_blank" rel="noopener">Términos y Condiciones</a>.
+          </p>
+        </div>
+
+       <!-- ✅ CONSENTIMIENTO: Separado y con peso ritual -->
+<div class="consent-section">
+  <div class="consent-box">
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    </svg>
+    <p>
+      Al continuar, aceptas nuestra 
+      <a href="politicas.html#privacidad" target="_blank" rel="noopener">Política de Privacidad</a>
+      y los 
+      <a href="politicas.html#terminos" target="_blank" rel="noopener">Términos y Condiciones</a>.
+    </p>
+  </div>
+</div>
+
+<!-- ✅ FEATURES: Rediseñado con coherencia -->
+<section class="features-section" aria-labelledby="features-title">
+  <div class="container">
+    <h2 id="features-title" class="section-title">¿Qué obtenés al registrarte?</h2>
+    <div class="features-grid">
+      <div class="feature-card" data-type="whatsapp">
+        <div class="feature-icon">📱</div>
+        <h3 class="feature-title">Notificaciones por WhatsApp</h3>
+        <p class="feature-desc">Desafíos en vivo aleatorios. Acepta, cumple, gana ventaja.</p>
+      </div>
+      <div class="feature-card" data-type="geo">
+        <div class="feature-icon">📍</div>
+        <h3 class="feature-title">Geolocalización precisa</h3>
+        <p class="feature-desc">Las pistas se activan cuando estás en el lugar correcto.</p>
+      </div>
+      <div class="feature-card" data-type="ranking">
+        <div class="feature-icon">📊</div>
+        <h3 class="feature-title">Ranking público</h3>
+        <p class="feature-desc">Ve tu posición en tiempo real. ¿Top 10? Los premios te esperan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+  </main>
+
+
+
+   <footer class="footer" role="contentinfo">
+  <div class="footer-main">
+    <div class="footer-brand">
+      <img src="./logo.webp" alt="Let’s Hunt" width="160" height="48" loading="lazy">
+      <p>Aventuras Urbanas en el Gran Buenos Aires</p>
+    </div>
+
+    <div class="footer-legal">
+      <p class="disclaimer">
+        ℹ️ <strong>Let’s Hunt</strong> es un proyecto independiente. 
+        No está afiliado a marcas o series con nombre similar.
+      </p>
+      
+      <div class="footer-bottom">
+        <p>&copy; <span id="year">2025</span> Let’s Hunt. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ REDES: siempre centradas, fuera del flujo de contenido -->
+  <div class="footer-social-section">
+    <div class="footer-social">
+      <h3 class="sr-only">Síguenos en redes sociales</h3>
+      <ul class="social-list" role="list">
+        <li>
+          <a href="https://facebook.com" target="_blank" rel="noopener" 
+             aria-label="Let’s Hunt en Facebook" class="social-link">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://instagram.com" target="_blank" rel="noopener" 
+             aria-label="Let’s Hunt en Instagram" class="social-link">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.163a9.847 9.847 0 0 0-6.934 2.844A9.847 9.847 0 0 0 2.163 12c0 2.722 1.07 5.18 2.843 6.934A9.847 9.847 0 0 0 12 21.837a9.847 9.847 0 0 0 6.934-2.844A9.847 9.847 0 0 0 21.837 12a9.847 9.847 0 0 0-2.843-6.934A9.847 9.847 0 0 0 12 2.163zm0 17.674a7.847 7.847 0 1 1 0-15.694 7.847 7.847 0 0 1 0 15.694zm6.495-9.03a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 0 0 2.5 0zm-6.495 4.28a4.95 4.95 0 1 0 0-9.9 4.95 4.95 0 0 0 0 9.9zm0-8.2a3.25 3.25 0 1 1 0 6.5 3.25 3.25 0 0 1 0-6.5z"/>
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://x.com" target="_blank" rel="noopener" 
+             aria-label="Let’s Hunt en X" class="social-link">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.205 2.25h3.308l-7.227 8.26 8.502 11.24H16.13l-5.214-6.817L4.94 21.75H1.63l7.724-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://tiktok.com" target="_blank" rel="noopener" 
+             aria-label="Let’s Hunt en TikTok" class="social-link">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.59 8.09a1.49 1.49 0 0 0-1.43-.99c-.84 0-1.69.33-2.29 1.01v8.42a4.5 4.5 0 0 1-4.5-4.5v-4.1a5 5 0 0 0 5-5c0-.27-.02-.53-.05-.79h1.83a1.5 1.5 0 0 1 1.49 1.63v11.04a1.5 1.5 0 0 1-1.5 1.5h-6.79a1.5 1.5 0 0 1-1.5-1.5v-4.24a4.5 4.5 0 0 1 4.5-4.5h4.29z"/>
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+   
+</footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // ✅ VOZ DE BIENVENIDA OSCURA (masculina, grave, con eco)
+    function playWelcomeVoice() {
+      // Evitar repetición
+      if (localStorage.getItem('lh_welcome_played')) return;
+      
+      const text = "Bienvenidos a LET'S HUNT, a una aventura urbana en el Gran Buenos Aires donde combinas inteligencia, coraje y velocidad. Resuelve pistas históricas en la ciudad, y activa desafíos en vivo por WhatsApp para ganar coordenadas antes que los demás.";
+      
+      speechSynthesis.getVoices();
+      const voices = speechSynthesis.getVoices();
+      const voice = voices.find(v => 
+        v.lang.includes('es') && 
+        (v.name === 'Juan' || v.name === 'Diego' || v.name.includes('male'))
+      ) || voices.find(v => v.lang.includes('es')) || null;
+
+      const u = new SpeechSynthesisUtterance(text);
+      if (voice) u.voice = voice;
+      u.rate = 0.60;
+      u.pitch = 0.42;
+      u.volume = 0.95;
+
+      // Eco ligero (0.8s, 30% vol)
+      u.onstart = () => {
+        if (window.AudioContext) {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const delay = ctx.createDelay(1.5);
+            delay.delayTime.value = 0.8;
+            const feedback = ctx.createGain();
+            feedback.gain.value = 0.3;
+            delay.connect(feedback);
+            feedback.connect(delay);
+            setTimeout(() => ctx.close(), 3000);
+          } catch (e) {}
+        }
+      };
+
+      u.onend = () => {
+        localStorage.setItem('lh_welcome_played', '1');
+      };
+
+      speechSynthesis.speak(u);
+    }
+
+    // ✅ Typewriter
+    const typewriterText = "Resuelve pistas. Acepta desafíos. Entra al ranking. ¿Ganarás los premios?";
+    const typewriterEl = document.getElementById('typewriter');
+    const ctaEl = document.getElementById('hero-cta');
+    let i = 0;
+    const type = () => {
+      if (i < typewriterText.length) {
+        typewriterEl.textContent = typewriterText.substring(0, i + 1);
+        i++;
+        setTimeout(type, 60 + Math.random() * 40);
+      } else {
+        ctaEl.classList.add('visible');
+        // Activar voz tras typewriter (en escritorio) o en primer toque (en móvil)
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          document.body.addEventListener('touchstart', playWelcomeVoice, { once: true });
+        } else {
+          setTimeout(playWelcomeVoice, 800);
+        }
+      }
+    };
+    type();
+
+    // ✅ Animación de fondo
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+      let x = 0, y = 0;
+      
+      function animateBg() {
+        x = (x + 0.12) % 100;
+        y = (y + 0.11) % 100;
+        body.style.backgroundPosition = `${x}% ${y}%`;
+        requestAnimationFrame(animateBg);
+      }
+      
+      const img = new Image();
+      img.src = './fondo-hero.png';
+      img.onload = animateBg;
+    });
+
+    // ✅ CONTADOR DE JUGADORES ACTIVOS EN TIEMPO REAL (simulado)
+    function updatePlayerCounter() {
+      const base = 20;
+      const fluctuation = Math.floor(Math.random() * 10) - 2; // -2 a +7
+      const count = base + fluctuation;
+      
+      const counterEl = document.querySelector('.live-counter span');
+      if (counterEl) {
+        counterEl.textContent = count;
+      }
+      
+      setTimeout(updatePlayerCounter, 4000);
+    }
+
+    if (document.querySelector('.live-counter')) {
+      updatePlayerCounter();
+    }
+  </script>
+  
+</body>
+</html>

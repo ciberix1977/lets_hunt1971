@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro · Let’s Hunt</title>
+  <meta name="description" content="Únete a la cacería urbana en el Gran Buenos Aires. Gratis. Inmersivo. Real." />
+  
+  <!-- ✅ PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="index.html" class="back-link" aria-label="Volver a la página principal">
+    ← Volver a Inicio
+  </a>
+
+  <div class="form-card mission-card" data-type="registro">
+    <div class="logo-container centered">
+      <img src="logo.webp" alt="Let’s Hunt">
+    </div>
+
+    <h1 class="section-title">Regístrate para comenzar</h1>
+    <p class="subtitle">
+      Elige tu modo de caza: solo o en equipo.
+    </p>
+
+    <form id="registroForm">
+      <div class="form-group">
+        <label for="nombre">Nombre completo *</label>
+        <input 
+          type="text" 
+          id="nombre" 
+          name="nombre"
+          required
+          autocomplete="name"
+          placeholder="Ej: Ana López">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          required
+          autocomplete="email"
+          placeholder="tu@email.com">
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono móvil (10 dígitos) *</label>
+        <input 
+          type="tel" 
+          id="telefono" 
+          name="telefono"
+          required
+          autocomplete="tel"
+          inputmode="numeric"
+          pattern="[0-9]{10}"
+          placeholder="1112345678"
+          title="Solo 10 dígitos. Ej: 1112345678">
+        <p class="privacy-note">Usamos WhatsApp para enviar pistas. Nunca compartimos tu número.</p>
+      </div>
+
+      <!-- ✅ Modo de juego -->
+      <div class="form-group">
+        <label>¿Cómo querés jugar? *</label>
+        <div class="modo-radio-group">
+          <label>
+            <input type="radio" name="modo" value="individual" checked required>
+            🧍‍♂️ Solo (3 misiones)
+          </label>
+          <label>
+            <input type="radio" name="modo" value="equipo" required>
+            👥 Equipo (4+ misiones)
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group equipo-info">
+        <label for="codigo-equipo">Código de equipo (opcional)</label>
+        <input 
+          type="text" 
+          id="codigo-equipo" 
+          name="codigo_equipo"
+          placeholder="Ej: ALPHA7"
+          maxlength="7"
+          pattern="[A-Z]{4}[0-9]{3}"
+          title="4 letras mayúsculas + 3 números. Ej: HUNT245">
+        <p class="privacy-note">¿No tenés código? ¡Podés crear un equipo nuevo después del registro!</p>
+      </div>
+
+      <div class="form-group">
+        <label for="zona">Zona de juego *</label>
+        <select id="zona" name="zona" required>
+          <option value="">Selecciona tu zona...</option>
+          <option value="CABA">📍 Ciudad de Buenos Aires (CABA)</option>
+          <option value="AVELLANEDA">🚂 Avellaneda (incluye Dock Sud, Wilde, Sarandí)</option>
+          <option value="LANUS">🌳 Lanús (incluye Remedios de Escalada, Valentín Alsina)</option>
+          <option value="LOMAS">🏘️ Lomas de Zamora (incluye Banfield, Temperley, Llavallol)</option>
+        </select>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input 
+            type="checkbox" 
+            id="consent" 
+            required>
+          Acepto los <a href="politicas.html#terminos" target="_blank" rel="noopener">Términos</a> y la 
+          <a href="politicas.html#privacidad" target="_blank" rel="noopener">Política de Privacidad</a> *
+        </label>
+      </div>
+
+      <!-- Línea divisoria sutil -->
+      <div class="form-divider"></div>
+
+      <button type="submit" class="btn-hero" id="submitBtn">
+        🔒 Registrarme y comenzar la cacería
+      </button>
+
+      <p class="terms">
+        Al registrarte, aceptas recibir pistas por WhatsApp. Puedes darte de baja en cualquier momento.
+      </p>
+    </form>
+  </div>
+
+  <script>
+  // Mostrar/ocultar campo de equipo
+  document.querySelectorAll('input[name="modo"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const equipoInfo = document.querySelector('.equipe-info');
+      if (radio.value === 'equipo') {
+        equipoInfo.classList.add('show');
+      } else {
+        equipoInfo.classList.remove('show');
+      }
+    });
+  });
+
+  // Generar código único
+  function generarCodigoEquipo() {
+    const letras = "BCDFGHJKMNPQRSTVWXYZ";
+    const nums = "23456789";
+    let codigo = "";
+    for (let i = 0; i < 4; i++) 
+      codigo += letras.charAt(Math.floor(Math.random() * letras.length));
+    for (let i = 0; i < 3; i++) 
+      codigo += nums.charAt(Math.floor(Math.random() * nums.length));
+    return codigo;
+  }
+
+  // Manejar envío
+  document.getElementById('registroForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const nombre = document.getElementById('nombre').value.trim();
+    const email = document.getElementById('email').value.trim();
+    let telefonoRaw = document.getElementById('telefono').value.trim().replace(/\D/g, '');
+    const zona = document.getElementById('zona').value;
+    const modo = document.querySelector('input[name="modo"]:checked').value;
+    const codigoIngresado = modo === 'equipo' 
+      ? document.getElementById('codigo-equipo').value.trim().toUpperCase() 
+      : null;
+
+    if (telefonoRaw.length !== 10) {
+      alert('⚠️ El número debe tener 10 dígitos (sin código de país). Ej: 1112345678');
+      return;
+    }
+
+    // Generar hunterId
+    let lastId = parseInt(localStorage.getItem('lastHunterId') || '0');
+    let newId = lastId + 1;
+    let hunterId = `hunter_${String(newId).padStart(4, '0')}`;
+    localStorage.setItem('lastHunterId', newId);
+
+    // Gestionar equipo
+    let equipo = null;
+    if (modo === 'equipo') {
+      if (!codigoIngresado) {
+        equipo = generarCodigoEquipo();
+      } else if (/^[A-Z]{4}[0-9]{3}$/.test(codigoIngresado)) {
+        equipo = codigoIngresado;
+      } else {
+        alert('⚠️ Código inválido. Debe ser 4 letras + 3 números. Ej: HUNT245');
+        return;
+      }
+    }
+
+    // Guardar en localStorage
+    const jugador = { id: hunterId, nombre, email, telefono: `+549${telefonoRaw}`, zona, modo, equipo };
+    localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+
+    // ✅ Enviar a Vercel Function
+   const response = await fetch('/api/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    hunterId,
+    nombre,
+    email,
+    telefono: `+549${telefonoRaw}`,
+    zona,
+    modo,
+    equipo
+  })
+});
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Feedback emocional
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Activando caza…';
+
+        const container = document.querySelector('.form-card');
+        const successMsg = document.createElement('div');
+        successMsg.className = 'registration-ritual';
+        successMsg.innerHTML = `
+          🔊 <span style="color: #64b5f6;">Cazador identificado.</span><br>
+          <span style="font-size: 1.4rem; margin: 0.4rem 0; display: block; color: #fff;">${hunterId.toUpperCase()}</span>
+          <span style="font-size: 0.95rem; opacity: 0.85; display: block; margin-top: 0.5rem;">
+            Tu zona <strong>${zona}</strong> está activa.<br>
+            🟢 <span id="live-count-ritual">24</span> cazadores en el GBA ahora.
+          </span>
+        `;
+        container.insertBefore(successMsg, btn.parentNode);
+
+        // Simular contador
+        function updateRitualCounter() {
+          const base = 20;
+          const fluctuation = Math.floor(Math.random() * 8);
+          document.getElementById('live-count-ritual').textContent = base + fluctuation;
+        }
+        updateRitualCounter();
+        setInterval(updateRitualCounter, 3000);
+
+        // Redirigir
+        setTimeout(() => {
+          window.location.href = result.redirectUrl;
+        }, 1200);
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('⚠️ Error al registrar. Inténtalo de nuevo.');
+    }
+  );
+  }
+</script>
+</body>
+</html>

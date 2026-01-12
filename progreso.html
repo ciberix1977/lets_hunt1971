@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Let’s Hunt · Progreso</title>
+  <meta name="description" content="Tu progreso y el de otros cazadores" />
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>📊 Tu Progreso</h1>
+  </header>
+
+  <main>
+    <div class="section">
+      <h2 class="section-title">👤 Tu perfil</h2>
+      <div class="stat-grid">
+        <div class="stat-card" id="hunter-id-card">
+          <div class="stat-value" id="hunter-id">hunter_0000</div>
+          <div class="stat-label">ID</div>
+        </div>
+        <div class="stat-card" id="misiones-card">
+          <div class="stat-value" id="misiones">0</div>
+          <div class="stat-label">Misiones</div>
+        </div>
+        <div class="stat-card" id="desafios-card">
+          <div class="stat-value" id="desafios">0</div>
+          <div class="stat-label">Desafíos</div>
+        </div>
+        <div class="stat-card" id="ciudad-card">
+          <div class="stat-value" id="ciudad">CABA</div>
+          <div class="stat-label">Zona</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">📍 Jugadores activos (misma zona)</h2>
+      
+      <div class="counter-banner">
+        <div class="pulse-dot"></div>
+        <span id="player-count">0</span> jugadores activos ahora
+      </div>
+
+      <div id="live-map">
+        <div class="radar-bg">
+          <div class="radar-sweep"></div>
+        </div>
+      </div>
+
+      <div class="connection-status">
+        <span class="status-dot"></span>
+        Conectado en tiempo real
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">🏆 Ranking (top 5)</h2>
+      <ul id="ranking-list" class="ranking-list">
+        <!-- Se llena dinámicamente -->
+      </ul>
+    </div>
+  </main>
+
+  <nav class="mobile-nav">
+    <a href="app.html"><i>📍</i>Explorar</a>
+    <a href="app.html#misiones"><i>🎯</i>Misiones</a>
+    <a href="app.html#scan"><i>🔍</i>Escanear</a>
+    <a href="progreso.html" class="active"><i>📊</i>Progreso</a>
+  </nav>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // ✅ DATOS DEL JUGADOR
+    const hunterId = localStorage.getItem('currentHunterId') || 'hunter_0000';
+    const jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`)) || { zona: 'CABA' };
+    const progreso = JSON.parse(localStorage.getItem(`progreso_${hunterId}`)) || {
+      misiones: 0,
+      desafios: 0,
+      zona: jugador.zona
+    };
+
+    // ✅ ACTUALIZAR UI DEL JUGADOR
+    document.getElementById('hunter-id').textContent = hunterId;
+    document.getElementById('misiones').textContent = progreso.misiones;
+    document.getElementById('desafios').textContent = progreso.desafios;
+    document.getElementById('ciudad').textContent = progreso.zona;
+
+    // ✅ CONEXIÓN WEBSOCKET REAL
+    let ws;
+    const players = new Map();
+    const ranking = [];
+
+    function initWebSocket() {
+      const wsUrl = window.location.hostname === 'localhost' 
+        ? 'ws://localhost:8080'
+        : `wss://${window.location.hostname}/ws`;
+      
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        console.log('✅ Conectado al servidor de progreso');
+        ws.send(JSON.stringify({ type: 'join', id: hunterId, zone: progreso.zona }));
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        
+        switch (data.type) {
+          case 'players':
+            players.clear();
+            data.players.forEach(p => players.set(p.id, p));
+            renderMap();
+            document.getElementById('player-count').textContent = players.size;
+            break;
+            
+          case 'ranking':
+            ranking.length = 0;
+            ranking.push(...data.ranking);
+            renderRanking();
+            break;
+            
+          case 'update':
+            if (data.id === hunterId) {
+              progreso.misiones = data.missions;
+              progreso.desafios = data.challenges;
+              localStorage.setItem(`progreso_${hunterId}`, JSON.stringify(progreso));
+              document.getElementById('misiones').textContent = data.missions;
+              document.getElementById('desafios').textContent = data.challenges;
+            }
+            players.set(data.id, data);
+            renderMap();
+            break;
+        }
+      };
+
+      ws.onclose = () => {
+        console.log('⚠️ Desconectado. Reintentando en 3s...');
+        document.querySelector('.status-dot').style.background = '#f44336';
+        setTimeout(initWebSocket, 3000);
+      };
+    }
+
+    // ✅ RENDERIZAR MAPA
+    function renderMap() {
+      const radarContainer = document.querySelector('.radar-bg');
+      document.querySelectorAll('.player-marker').forEach(m => m.remove());
+      
+      players.forEach((p, id) => {
+        const marker = document.createElement('div');
+        marker.className = `player-marker ${id === hunterId ? 'self' : ''}`;
+        const x = p.x || Math.random() * 80 + 10;
+        const y = p.y || Math.random() * 80 + 10;
+        marker.style.left = `${x}%`;
+        marker.style.top = `${y}%`;
+        marker.textContent = id === hunterId ? 'TÚ' : id.slice(-2);
+        marker.title = `${id} • ${p.mission || 'M1'}`;
+        radarContainer.appendChild(marker);
+      });
+    }
+
+    // ✅ RENDERIZAR RANKING
+    function renderRanking() {
+      const list = document.getElementById('ranking-list');
+      list.innerHTML = '';
+      
+      ranking.slice(0, 5).forEach((p, i) => {
+        const li = document.createElement('li');
+        li.className = 'ranking-item';
+        li.dataset.rank = (i + 1).toString(); // ✅ para medallas
+        li.innerHTML = `
+          <span class="hunter-name ${p.id === hunterId ? 'self-rank' : ''}">${p.id}</span>
+          <span class="hunter-stats">${p.missions}M · ${p.challenges}D</span>
+        `;
+        if (p.id === hunterId) {
+          li.style.background = 'rgba(255, 215, 0, 0.1)';
+          li.style.borderRadius = '8px';
+        }
+        list.appendChild(li);
+      });
+      
+      // Asegurar que tú estés en la lista si no estás en top 5
+      if (!ranking.some(p => p.id === hunterId)) {
+        const myData = players.get(hunterId) || { missions: progreso.misiones, challenges: progreso.desafios };
+        const li = document.createElement('li');
+        li.className = 'ranking-item';
+        li.dataset.rank = (ranking.length + 1).toString();
+        li.innerHTML = `
+          <span class="hunter-name self-rank">${hunterId}</span>
+          <span class="hunter-stats">${myData.missions}M · ${myData.challenges}D</span>
+        `;
+        li.style.background = 'rgba(255, 215, 0, 0.1)';
+        li.style.borderRadius = '8px';
+        list.appendChild(li);
+      }
+    }
+
+    // ✅ INICIAR
+    document.addEventListener('DOMContentLoaded', () => {
+      initWebSocket();
+      setTimeout(() => {
+        if (players.size === 0) {
+          players.set(hunterId, { id: hunterId, mission: 'M1', missions: progreso.misiones, challenges: progreso.desafios });
+          renderMap();
+          document.getElementById('player-count').textContent = '1';
+        }
+      }, 1000);
+    });
+
+    // ✅ INTERACCIÓN CON MARCADORES (sin alert)
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('player-marker')) {
+        const id = e.target.textContent === 'TÚ' ? hunterId : `hunter_${e.target.textContent.padStart(4, '0')}`;
+        const player = players.get(id) || { mission: 'M1', missions: 0, challenges: 0 };
+        showToast(`🔍 ${id} • 🎯 ${player.missions}M • ⚡ ${player.challenges}D`);
+      }
+    });
+
+    // ✅ TOAST (reutilizable)
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
+</html>
