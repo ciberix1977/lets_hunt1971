@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Let’s Hunt · App</title>
+  <meta name="description" content="Tu cacería urbana en el Gran Buenos Aires" />
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- ✅ jsQR corregido (sin espacios) -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #00aaff;
+      --primary-dark: #0088dd;
+      --secondary: #a855f7;
+      --bg-dark: #0a0a12;
+      --text: #f1f5f9;
+      --surface: rgba(30, 41, 59, 0.9);
+      --surface-border: rgba(255, 255, 255, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Exo 2', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 70px;
+      max-width: 500px;
+      margin: 0 auto;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .logo-container img {
+      max-width: 160px;
+      height: auto;
+      filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    }
+
+    .hunter-id {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0, 170, 255, 0.15);
+      color: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      border: 1px solid rgba(0, 170, 255, 0.3);
+    }
+
+    .modo-equipo .hunter-id {
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--secondary);
+      border-color: rgba(168, 85, 247, 0.3);
+    }
+
+    /* ✅ Tensión narrativa: contador */
+    .tension-bar {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(255, 69, 58, 0.15);
+      color: #ff7961;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 69, 58, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .mission-card {
+      background: var(--surface);
+      margin: 1rem;
+      padding: 1.4rem;
+      border-radius: 16px;
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(8px);
+    }
+
+    .mission-card.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 170, 255, 0.2);
+    }
+
+    .modo-equipo .mission-card.active {
+      border-color: var(--secondary);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+    }
+
+    .mission-title {
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .mission-title .icon {
+      color: var(--primary);
+    }
+
+    .modo-equipo .mission-title .icon {
+      color: var(--secondary);
+    }
+
+    .status {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status.pending { background: rgba(255, 170, 51, 0.15); color: #ffaa33; }
+    .status.active { background: rgba(0, 170, 255, 0.15); color: var(--primary); }
+
+    .modo-equipo .status.active {
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--secondary);
+    }
+
+    /* ✅ Niveles de dificultad */
+    .status.nivel-N1 { background: rgba(50, 200, 50, 0.15); color: #32c832; border: 1px solid rgba(50,200,50,0.3); }
+    .status.nivel-N2 { background: rgba(0, 170, 255, 0.15); color: var(--primary); border: 1px solid rgba(0,170,255,0.3); }
+    .status.nivel-N3 { background: rgba(255, 150, 0, 0.15); color: #ff9600; border: 1px solid rgba(255,150,0,0.3); }
+    .status.nivel-N4 { background: rgba(200, 50, 50, 0.15); color: #c83232; border: 1px solid rgba(200,50,50,0.3); }
+    .modo-equipo .status.nivel-N1 { color: #50e050; }
+    .modo-equipo .status.nivel-N2 { color: var(--secondary); }
+    .modo-equipo .status.nivel-N3 { color: #ffb44d; }
+    .modo-equipo .status.nivel-N4 { color: #ff6666; }
+    .nivel-icon::before { margin-right: 0.3rem; font-weight: bold; }
+    .nivel-N1 .nivel-icon::before { content: "🟢"; }
+    .nivel-N2 .nivel-icon::before { content: "🔵"; }
+    .nivel-N3 .nivel-icon::before { content: "🟠"; }
+    .nivel-N4 .nivel-icon::before { content: "🔴"; }
+
+    .pista {
+      background: rgba(0, 170, 255, 0.08);
+      padding: 1rem;
+      border-radius: 12px;
+      margin: 1rem 0;
+      font-style: italic;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .modo-equipo .pista {
+      background: rgba(168, 85, 247, 0.08);
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 120px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #00ccff);
+      color: white;
+    }
+
+    .modo-equipo .btn-primary {
+      background: linear-gradient(135deg, var(--secondary), #8b5cf6);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+      background: linear-gradient(135deg, var(--primary-dark), #00aaff);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 170, 255, 0.3);
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    .modo-equipo .btn-primary:hover,
+    .modo-equipo .btn-primary:focus {
+      background: linear-gradient(135deg, #7c3aed, var(--secondary));
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+      outline-color: var(--secondary);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--surface-border);
+      color: var(--text);
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #000;
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem 0;
+      border-top: 1px solid var(--surface-border);
+    }
+
+    nav a {
+      color: #94a3b8;
+      text-align: center;
+      text-decoration: none;
+      flex: 1;
+      font-size: 0.75rem;
+      line-height: 1.2;
+      cursor: pointer;
+    }
+
+    nav a i {
+      display: block;
+      font-size: 1.6rem;
+      margin-bottom: 0.2rem;
+    }
+
+    nav a.active,
+    nav a:hover,
+    nav a:focus {
+      color: var(--primary);
+    }
+
+    .modo-equipo nav a.active,
+    .modo-equipo nav a:hover,
+    .modo-equipo nav a:focus {
+      color: var(--secondary);
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 1000;
+      max-width: 90%;
+      word-break: break-word;
+    }
+
+    .modo-equipo #toast {
+      background: var(--secondary);
+    }
+
+    #toast.show {
+      opacity: 1;
+    }
+
+    #mapSection {
+      display: none;
+      width: 100%;
+      height: 70vh;
+      margin: 1rem 0;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 300px; /* ✅ Evita colapso si falla */
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #mapHint {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 170, 255, 0.85);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      max-width: 90%;
+      text-align: center;
+      z-index: 1000;
+    }
+
+    .modo-equipo #mapHint {
+      background: rgba(168, 85, 247, 0.85);
+    }
+
+    .offline-fallback {
+      padding: 2rem;
+      text-align: center;
+      color: #64748b;
+    }
+
+    #inviteModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #inviteModal > div {
+      background: rgba(10, 10, 20, 0.95);
+      border-radius: 16px;
+      padding: 1.8rem;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(8px);
+    }
+
+    #codigoInvitacion {
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--secondary);
+      font-weight: 800;
+      font-size: 1.4rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      letter-spacing: 2px;
+      margin: 0.5rem 0;
+    }
+
+    /* ✅ Botón de narración flotante */
+    #narration-toggle {
+      position: fixed;
+      bottom: 1.4rem;
+      right: 1.4rem;
+      background: rgba(0, 170, 255, 0.2);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      cursor: pointer;
+      z-index: 1000;
+      transition: all 0.2s;
+    }
+    #narration-toggle:hover {
+      background: rgba(0, 170, 255, 0.3);
+      transform: scale(1.05);
+    }
+    .modo-equipo #narration-toggle {
+      border-color: var(--secondary);
+      color: var(--secondary);
+    }
+    .modo-equipo #narration-toggle:hover {
+      background: rgba(168, 85, 247, 0.3);
+    }
+
+    #recovery-code {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #a0aec0;
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(0, 170, 255, 0.05);
+      border-radius: 6px;
+    }
+    .modo-equipo #recovery-code {
+      background: rgba(168, 85, 247, 0.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="logo.webp" alt="Let’s Hunt">
+      <div class="hunter-id" id="hunterIdDisplay">ID: hunter0000</div>
+      <!-- ✅ Tensión: contador regresivo -->
+      <div class="tension-bar" id="tension-bar">
+        ⏳ <span id="timer">90:00</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="missionSectionIndividual">
+      <!-- Se llena dinámicamente -->
+    </div>
+
+    <div id="missionSectionEquipo" style="display:none;">
+      <div class="mission-card active">
+        <div class="mission-title">
+          <span class="icon">👁️</span>
+          <span id="mission-title-text">...</span>
+          <span id="mission-level-badge" class="status active nivel-N2">
+            <span class="nivel-icon">N2</span>
+          </span>
+        </div>
+        <div class="pista" id="mission-pista">Cargando...</div>
+        <div class="actions">
+          <button class="btn btn-primary" id="accept-mission-btn">
+            ✅ Aceptar misión
+          </button>
+          <button class="btn btn-outline" id="scan-btn">
+            🔍 Escanear QR
+          </button>
+        </div>
+        <div id="recovery-code"></div>
+      </div>
+    </div>
+
+    <div id="mapSection">
+      <div id="map"></div>
+      <div id="mapHint">Cargando ubicación...</div>
+    </div>
+
+    <div id="inviteModal">
+      <div>
+        <h3 style="margin:0 0 1rem; color:var(--secondary);">👥 Invitar a tu equipo</h3>
+        <p style="margin-bottom:1.2rem;">Compartí este código para que otros se unan:</p>
+        <div id="codigoInvitacion">CARGANDO...</div>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin:1rem 0;">
+          <button id="copyCodeBtn" class="btn btn-outline" style="flex:1; font-size:0.9rem;">📋 Copiar código</button>
+          <button id="shareWaBtn" class="btn btn-primary" style="flex:1; font-size:0.9rem;">💬 WhatsApp</button>
+        </div>
+        <button id="closeModalBtn" style="margin-top:1.2rem; background:transparent; border:none; color:#94a3b8; font-size:0.9rem;">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- ✅ Escáner QR -->
+    <div id="scannerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; padding:20px; box-sizing:border-box;">
+      <div style="position:relative; width:100%; max-width:400px; margin:0 auto;">
+        <h3 style="color:white; text-align:center; margin-bottom:1rem;">🔍 Escanea el Código QR</h3>
+        <video id="scannerVideo" style="width:100%; border-radius:12px; display:block; background:black;" autoplay playsinline></video>
+        <canvas id="scannerCanvas" style="display:none;"></canvas>
+        
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:240px; height:240px; border:2px solid #00aaff; border-radius:8px; box-shadow:0 0 0 999px rgba(0,0,0,0.5); pointer-events:none;">
+          <div style="position:absolute; top:-2px; left:-2px; width:20px; height:20px; border-top:2px solid #00aaff; border-left:2px solid #00aaff;"></div>
+          <div style="position:absolute; top:-2px; right:-2px; width:20px; height:20px; border-top:2px solid #00aaff; border-right:2px solid #00aaff;"></div>
+          <div style="position:absolute; bottom:-2px; left:-2px; width:20px; height:20px; border-bottom:2px solid #00aaff; border-left:2px solid #00aaff;"></div>
+          <div style="position:absolute; bottom:-2px; right:-2px; width:20px; height:20px; border-bottom:2px solid #00aaff; border-right:2px solid #00aaff;"></div>
+        </div>
+
+        <div style="display:flex; gap:0.75rem; margin-top:1.2rem;">
+          <button id="closeScannerBtn" class="btn btn-outline" style="flex:1;">❌ Cancelar</button>
+          <button id="manualInputBtn" class="btn btn-primary" style="flex:1;">⌨️ Ingresar manualmente</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav>
+    <a href="#explorar" class="active"><i>📍</i>Explorar</a>
+    <a href="#misiones"><i>🎯</i>Misiones</a>
+    <a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
+    <a href="progreso.html"><i>📊</i>Progreso</a>
+  </nav>
+
+  <!-- ✅ Botón de narración -->
+  <button id="narration-toggle" title="Activar/Desactivar narración">🔊</button>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // ✅ ZONA_CONFIG
+    const ZONA_CONFIG = {
+      'CABA': {
+        misionId: 'M1',
+        titulo: 'Misión 1: El Guardián de Bronce',
+        pista: 'Busca al guardián de bronce frente al Congreso.',
+        hint: '🔍 Frente al Congreso, busca la estatua ecuestre del General Belgrano.',
+        coords: [-34.6034, -58.3845],
+        nivel: 'N2'
+      },
+      'AVELLANEDA': {
+        misionId: 'M2',
+        titulo: 'Misión 2: El Eco de Sarandí',
+        pista: 'En la estación que lleva el nombre de un pueblo olvidado, busca el mural que cuenta la historia del lugar.',
+        hint: '🔍 Estación Sarandí, hall mural histórico en andén norte.',
+        coords: [-34.6620, -58.3660],
+        nivel: 'N2'
+      },
+      'LANUS': {
+        misionId: 'M3',
+        titulo: 'Misión 3: El Secreto del Parque',
+        pista: 'Bajo la sombra del árbol centenario, una placa recuerda al fundador. ¿Qué año dice?',
+        hint: '🔍 Parque Juan de Garay, junto a la fuente central.',
+        coords: [-34.7100, -58.3900],
+        nivel: 'N2'
+      },
+      'LOMAS': {
+        misionId: 'M4',
+        titulo: 'Misión 4: La Clave de la Plaza',
+        pista: 'En la plaza donde los niños juegan y los ancianos recuerdan, busca el reloj de sol. ¿Qué hora marca siempre?',
+        hint: '🔍 Plaza Manuel Belgrano, junto al monumento al fundador.',
+        coords: [-34.7520, -58.4100],
+        nivel: 'N2'
+      }
+    };
+
+    // ✅ INICIALIZACIÓN
+    if (!localStorage.getItem('lastHunterId')) {
+      localStorage.setItem('lastHunterId', '0');
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId') || 'hunter0000';
+    let ciudadFromURL = (urlParams.get('zona') || '').trim().toUpperCase();
+
+    let jugador;
+    if (hunterId === 'hunter0000') {
+      const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
+      hunterId = `hunter_${String(nextId).padStart(4, '0')}`;
+      localStorage.setItem('lastHunterId', nextId);
+      
+      const ciudad = ciudadFromURL || 'CABA';
+      jugador = {
+        id: hunterId,
+        nombre: 'Jugador de Prueba',
+        telefono: '+5491112345678',
+        zona: ciudad,
+        modo: 'individual'
+      };
+      localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+    } else {
+      jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`)) || {
+        id: hunterId,
+        zona: 'CABA',
+        modo: 'individual'
+      };
+      
+      jugador.zona = (jugador.zona || 'CABA').trim().toUpperCase();
+      if (ciudadFromURL && jugador.zona !== ciudadFromURL) {
+        jugador.zona = ciudadFromURL;
+        localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+      }
+    }
+
+    if (!ZONA_CONFIG[jugador.zona]) {
+      jugador.zona = 'CABA';
+      localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+    }
+
+    localStorage.setItem('currentHunterId', hunterId);
+    const isTeam = jugador.modo === 'equipo';
+
+    const progreso = JSON.parse(localStorage.getItem(`progreso_${hunterId}`)) || {
+      misiones: 0,
+      desafios: 0,
+      zona: jugador.zona
+    };
+
+    const config = ZONA_CONFIG[jugador.zona] || ZONA_CONFIG['CABA'];
+
+    // ✅ Aplicar modo
+    if (isTeam) {
+      document.body.classList.add('modo-equipo');
+      document.getElementById('missionSectionIndividual').style.display = 'none';
+      document.getElementById('missionSectionEquipo').style.display = 'block';
+      
+      document.getElementById('mission-title-text').textContent = config.titulo;
+      document.getElementById('mission-pista').textContent = config.pista;
+      actualizarNivelEnPanel(config.nivel);
+      document.getElementById('hunterIdDisplay').textContent = `👥 ${jugador.equipo || hunterId}`;
+    } else {
+      const section = document.getElementById('missionSectionIndividual');
+      section.innerHTML = `
+        <div class="mission-card ${jugador.zona === 'CABA' ? 'active' : ''}">
+          <div class="mission-title">
+            <span class="icon">🦁</span>
+            Misión 1: El Guardián de Bronce
+            <span class="status ${jugador.zona === 'CABA' ? 'active' : 'pending'}">${jugador.zona === 'CABA' ? 'ACTIVA' : 'BLOQUEADA'}</span>
+          </div>
+          <div class="pista">Busca al guardián de bronce frente al Congreso.</div>
+          <div class="actions">
+            <button class="btn ${jugador.zona === 'CABA' ? 'btn-primary' : 'btn-outline'}" ${jugador.zona !== 'CABA' ? 'disabled' : ''}>
+              ${jugador.zona === 'CABA' ? '✅ Aceptar' : '🔒 Bloqueada'}
+            </button>
+          </div>
+        </div>
+      `;
+      document.querySelector('.btn').addEventListener('click', () => {
+        if (jugador.zona === 'CABA') acceptMission();
+        else showToast(`🔒 Misión bloqueada. Tu zona: ${jugador.zona}`);
+      });
+    }
+
+    // ✅ Tensión narrativa: contador + señal de vida
+    let timeLeft = 90 * 60; // 90 minutos
+    const timerEl = document.getElementById('timer');
+    
+    const updateTimer = () => {
+      if (timeLeft <= 0) {
+        timerEl.textContent = "⏰ Caducada";
+        document.getElementById('tension-bar').style.background = 'rgba(100,100,100,0.2)';
+        return;
+      }
+      const mins = Math.floor(timeLeft / 60);
+      const secs = timeLeft % 60;
+      timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+      timeLeft--;
+    };
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // ✅ Simular "cazadores activos"
+    function updateCazadores() {
+      const base = { CABA: 22, AVELLANEDA: 14, LANUS: 11, LOMAS: 9 }[jugador.zona] || 15;
+      const fluctuation = Math.floor(Math.random() * 5) - 1;
+      const count = base + fluctuation;
+      showToast(`🟢 ${count} cazadores activos en ${jugador.zona}`);
+    }
+    updateCazadores();
+    setInterval(updateCazadores, 18000);
+
+    // ✅ Narración
+    function playNarration(text) {
+      if (localStorage.getItem('lh_narration_off') === '1') return;
+      
+      speechSynthesis.getVoices();
+      const voices = speechSynthesis.getVoices();
+      const voice = voices.find(v => 
+        v.lang.includes('es') && 
+        (v.name.includes('Male') || v.name === 'Diego' || v.name === 'Juan')
+      ) || voices.find(v => v.lang.includes('es')) || null;
+
+      const u = new SpeechSynthesisUtterance(text);
+      if (voice) u.voice = voice;
+      u.rate = 0.62;
+      u.pitch = 0.4;
+      u.volume = 0.95;
+
+      // Eco ligero
+      u.onstart = () => {
+        if (window.AudioContext) {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const delay = ctx.createDelay(1.5);
+            delay.delayTime.value = 0.7;
+            const feedback = ctx.createGain();
+            feedback.gain.value = 0.25;
+            delay.connect(feedback);
+            feedback.connect(delay);
+            setTimeout(() => ctx.close(), 4000);
+          } catch (e) {}
+        }
+      };
+
+      speechSynthesis.speak(u);
+    }
+
+    // ✅ Botón de narración
+    document.getElementById('narration-toggle').addEventListener('click', function() {
+      const isOff = localStorage.getItem('lh_narration_off') === '1';
+      localStorage.setItem('lh_narration_off', isOff ? '0' : '1');
+      this.textContent = isOff ? '🔊' : '🔇';
+      showToast(isOff ? '✅ Narración activada' : '🔇 Narración desactivada');
+    });
+
+    // ✅ Cargar mapa (CORREGIDA)
+    function loadMapByZone() {
+      const leafletCss = document.createElement('link');
+      leafletCss.rel = 'stylesheet';
+      leafletCss.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; // ✅ sin espacios
+      document.head.appendChild(leafletCss);
+      
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; // ✅ sin espacios
+      script.onload = () => {
+        try {
+          const coords = config.coords || [-34.6034, -58.3845];
+          const map = L.map('map').setView(coords, 17);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+          }).addTo(map);
+          
+          // ✅ Forzar redimensionamiento (clave para contenedores que estuvieron ocultos)
+          setTimeout(() => {
+            map.invalidateSize(true);
+            const missionIcon = L.divIcon({
+              html: `<div style="width:32px;height:32px;background:${isTeam?'var(--secondary)':'var(--primary)'};border:2px solid white;border-radius:50%;box-shadow:0 0 12px ${isTeam?'var(--secondary)':'var(--primary)'},0 0 20px rgba(0,170,255,0.5);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:16px;">📍</div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            });
+            L.marker(coords, { icon: missionIcon })
+              .addTo(map)
+              .bindPopup(`<strong>${config.titulo}</strong><br>${config.hint}`);
+          }, 100);
+          
+          document.getElementById('mapHint').textContent = config.hint;
+        } catch (e) {
+          document.getElementById('map').innerHTML = `<div class="offline-fallback">📶 Error de mapa<br><small>${e.message}</small></div>`;
+          document.getElementById('mapHint').textContent = "Error al cargar mapa";
+        }
+      };
+      script.onerror = () => {
+        document.getElementById('map').innerHTML = `<div class="offline-fallback">❌ Leaflet no cargó</div>`;
+        document.getElementById('mapHint').textContent = "Error de red";
+      };
+      document.head.appendChild(script);
+    }
+
+    // ✅ Guardar progreso
+    function guardarProgreso(misionId = null, desafioId = null) {
+      const key = `progreso_${hunterId}`;
+      let data = JSON.parse(localStorage.getItem(key) || '{}');
+      if (!data.misiones) data.misiones = 0;
+      if (!data.desafios) data.desafios = 0;
+      if (!data.zona) data.zona = jugador.zona;
+      
+      if (misionId) {
+        const misionesKey = `misiones_aceptadas_${hunterId}`;
+        let misiones = JSON.parse(localStorage.getItem(misionesKey) || '[]');
+        if (!misiones.includes(misionId)) {
+          misiones.push(misionId);
+          localStorage.setItem(misionesKey, JSON.stringify(misiones));
+          data.misiones = misiones.length;
+        }
+      }
+      if (desafioId) {
+        const desafiosKey = `desafios_completados_${hunterId}`;
+        let desafios = JSON.parse(localStorage.getItem(desafiosKey) || '[]');
+        if (!desafios.includes(desafioId)) {
+          desafios.push(desafioId);
+          localStorage.setItem(desafiosKey, JSON.stringify(desafios));
+          data.desafios = desafios.length;
+        }
+      }
+      data.zona = jugador.zona;
+      data.lastUpdate = Date.now();
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    // ✅ Generar código de recuperación único
+    function generarRecoveryCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'LH';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    // ✅ Aceptar misión (CORREGIDA: mapa siempre aparece)
+    function acceptMission() {
+      const mision = config;
+      const recoveryCode = generarRecoveryCode();
+      localStorage.setItem(`recovery_${hunterId}`, recoveryCode);
+      
+      // Mostrar código de recuperación
+      const recDiv = document.getElementById('recovery-code') || 
+        document.querySelector('.mission-card').insertAdjacentHTML('beforeend', `<div id="recovery-code"></div>`) && document.getElementById('recovery-code');
+      if (recDiv) {
+        recDiv.innerHTML = `🔑 <strong>Código de recuperación:</strong> <code>${recoveryCode}</code><br><small>Guárdalo. Si pierdes el celular, lo necesitas.</small>`;
+      }
+
+      // Narración al aceptar
+      playNarration(`Cazador ${hunterId.replace('hunter_', '')}. La misión ha comenzado. Tu tiempo corre.`);
+      
+      showToast(`🔥 ¡${config.titulo} activada!`);
+      
+      // Generar QR
+      const now = Math.floor(Date.now() / 1000);
+      const raw = `${hunterId}-${mision.misionId}-${now}-${Math.random().toString(36).substr(2, 4)}`;
+      let hash = 0;
+      for (let i = 0; i < raw.length; i++) {
+        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+        hash = hash & hash;
+      }
+      const salt = Math.abs(hash).toString(36).substr(0, 4);
+      const qrCode = `LH-${mision.misionId}-${hunterId.split('_')[1]}-${salt}`.toUpperCase();
+      
+      localStorage.setItem('qrCodeEsperado', qrCode);
+      localStorage.setItem('misionActivaId', mision.misionId);
+      localStorage.setItem('qrTimestamp', now);
+      localStorage.setItem(`mision_${hunterId}`, JSON.stringify(mision));
+      
+      guardarProgreso(mision.misionId);
+      
+      // ✅ ✅ ✅ CORRECCIÓN CLAVE: mostrar mapa ANTES de cargar Leaflet
+      document.getElementById('missionSectionIndividual').style.display = 'none';
+      document.getElementById('missionSectionEquipo').style.display = 'none';
+      document.getElementById('mapSection').style.display = 'block'; // ← ¡ANTES!
+      document.getElementById('mapHint').style.zIndex = '1000';
+      document.getElementById('mapHint').textContent = "📍 Cargando mapa...";
+      
+      // ✅ Cargar mapa
+      loadMapByZone();
+      if (isTeam && mision.nivel) {
+        actualizarNivelEnPanel(mision.nivel);
+      }
+    }
+
+    // ✅ Actualizar badge de nivel
+    function actualizarNivelEnPanel(nivel = 'N2') {
+      const badge = document.getElementById('mission-level-badge');
+      if (!badge) return;
+      badge.className = 'status active nivel-' + nivel;
+      badge.innerHTML = `<span class="nivel-icon">${nivel}</span>`;
+    }
+
+    // ✅ Botón de aceptar (equipo)
+    document.getElementById('accept-mission-btn')?.addEventListener('click', acceptMission);
+
+    // ✅ Escáner QR
+    let scannerActive = false;
+    let stream = null;
+
+    async function openQRScanner() {
+      const qrExpected = localStorage.getItem('qrCodeEsperado');
+      if (!qrExpected) {
+        showToast("⚠️ Acepta una misión primero");
+        return;
+      }
+      const overlay = document.getElementById('scannerOverlay');
+      const video = document.getElementById('scannerVideo');
+      const canvas = document.getElementById('scannerCanvas');
+      const ctx = canvas.getContext('2d');
+      try {
+        const constraints = { video: { facingMode: { ideal: "environment" } } };
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        overlay.style.display = 'block';
+        scannerActive = true;
+        
+        const scanInterval = setInterval(() => {
+          if (!scannerActive || !video.videoWidth) return;
+          ctx.drawImage(video, 0, 0, canvas.width || 640, canvas.height || 480);
+          const imageData = ctx.getImageData(0, 0, canvas.width || 640, canvas.height || 480);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+          if (code && code.data) {
+            clearInterval(scanInterval);
+            stopScanner();
+            if (code.data.trim() === qrExpected) {
+              const misionActiva = localStorage.getItem('misionActivaId') || 'M1';
+              guardarProgreso(null, `${misionActiva}_desafio_1`);
+              
+              // ✅ Narración al completar
+              playNarration(`Confirmado. Has completado la misión. El ranking se actualiza ahora.`);
+              
+              showToast(`✅ ¡Código verificado!\n🔥 ¡Cazador ${hunterId} ha completado ${config.titulo}!`);
+              
+              // ✅ WhatsApp sin espacios
+              const mensaje = `*Let's Hunt*\nJugador: ${hunterId}\nCiudad: ${jugador.zona}\nMisión: ${config.misionId}\n📍 ${config.hint}`;
+              const adminWa = "+5491125082484";
+              window.open(`https://api.whatsapp.com/send?phone=${encodeURIComponent(adminWa)}&text=${encodeURIComponent(mensaje)}`, '_blank');
+            } else {
+              showToast("❌ Código incorrecto. ¿Estás en el lugar correcto?");
+              setTimeout(() => scannerActive && (overlay.style.display = 'block'), 1500);
+            }
+          }
+        }, 300);
+      } catch (err) {
+        stopScanner();
+        showToast("⚠️ Error de cámara. Usa ingreso manual.");
+      }
+    }
+
+    function stopScanner() {
+      scannerActive = false;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      document.getElementById('scannerOverlay').style.display = 'none';
+    }
+
+    document.getElementById('scan-btn')?.addEventListener('click', openQRScanner);
+    document.getElementById('closeScannerBtn')?.addEventListener('click', stopScanner);
+    document.getElementById('manualInputBtn')?.addEventListener('click', () => {
+      stopScanner();
+      const qrExpected = localStorage.getItem('qrCodeEsperado');
+      if (!qrExpected) return showToast("⚠️ Acepta una misión primero");
+      const input = prompt("Ingresa el código QR:", "");
+      if (!input) return;
+      if (input.trim() === qrExpected) {
+        const misionActiva = localStorage.getItem('misionActivaId') || 'M1';
+        guardarProgreso(null, `${misionActiva}_desafio_1`);
+        playNarration(`Confirmado. Has completado la misión.`);
+        showToast(`✅ ¡Código verificado!\n🔥 ¡Cazador ${hunterId} ha completado ${config.titulo}!`);
+        
+        // ✅ WhatsApp sin espacios
+        const mensaje = `*Let's Hunt*\nJugador: ${hunterId}\nCiudad: ${jugador.zona}\nMisión: ${config.misionId}\n📍 ${config.hint}`;
+        const adminWa = "+5491125082484";
+        window.open(`https://api.whatsapp.com/send?phone=${encodeURIComponent(adminWa)}&text=${encodeURIComponent(mensaje)}`, '_blank');
+      } else {
+        showToast("❌ Código inválido. ¿Estás en el lugar correcto?");
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && scannerActive) stopScanner();
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ✅ WebSocket (ligero)
+    let ws;
+    function connectWebSocket() {
+      const wsUrl = window.location.hostname === 'localhost' 
+        ? 'ws://localhost:8080'
+        : `wss://${window.location.hostname}/ws`;
+      try {
+        ws = new WebSocket(wsUrl);
+        ws.onopen = () => {
+          ws.send(JSON.stringify({ 
+            type: 'join', 
+            id: hunterId, 
+            zone: jugador.zona,
+            missions: progreso.misiones,
+            challenges: progreso.desafios
+          }));
+        };
+      } catch (e) {}
+    }
+
+    connectWebSocket();
+  </script>
+</body>
+</html>

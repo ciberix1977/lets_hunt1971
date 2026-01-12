@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Let’s Hunt · Activación</title>
+  <meta name="theme-color" content="#000000">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      color: white;
+      font-family: 'Exo 2', -apple-system, BlinkMacSystemFont, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 1rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ✅ Radar animado (más intenso que en index) */
+    .radar-container {
+      width: 220px;
+      height: 220px;
+      margin: 1.2rem auto;
+      position: relative;
+    }
+
+    .radar-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 12px rgba(0, 255, 0, 0.6));
+    }
+
+    .radar-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      background: #0f0;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #0f0, 0 0 24px rgba(0, 255, 0, 0.4);
+      animation: pulseCenter 2s infinite;
+    }
+
+    @keyframes pulseCenter {
+      0%, 100% { opacity: 1; box-shadow: 0 0 12px #0f0, 0 0 24px rgba(0, 255, 0, 0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 6px #0f0, 0 0 12px rgba(0, 255, 0, 0.2); }
+    }
+
+    .identity {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 0.4rem 0;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+    }
+
+    .zone {
+      font-size: 1.1rem;
+      opacity: 0.85;
+      margin-bottom: 0.3rem;
+    }
+
+    .sub {
+      font-size: 0.95rem;
+      opacity: 0.7;
+      margin-top: 0.3rem;
+      max-width: 400px;
+    }
+
+    /* ✅ Barra de progreso con brillo */
+    .progress {
+      width: 260px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      margin: 1.4rem auto;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00aaff, #00ffcc);
+      width: 0%;
+      animation: load 3.2s ease-out;
+      box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+    }
+
+    @keyframes load {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    /* ✅ Código de recuperación */
+    .recovery {
+      background: rgba(0, 170, 255, 0.1);
+      border: 1px solid rgba(0, 170, 255, 0.3);
+      border-radius: 8px;
+      padding: 0.6rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      max-width: 320px;
+    }
+    .recovery code {
+      font-family: monospace;
+      font-weight: bold;
+      color: #64b5f6;
+    }
+
+    /* ✅ Botón de silenciar (opcional, para control) */
+    #mute-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #94a3b8;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+    #mute-btn.active { color: #ff453a; }
+  </style>
+</head>
+<body>
+  <!-- ✅ Botón de silenciar -->
+  <button id="mute-btn" title="Silenciar narración">🔇</button>
+
+  <!-- ✅ Radar -->
+  <div class="radar-container">
+    <svg class="radar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="30" fill="none" stroke="#0f0" stroke-width="1" opacity="0.6">
+        <animate attributeName="r" values="0;40" dur="2.5s" fill="freeze"/>
+        <animate attributeName="opacity" values="0;0.6" dur="2.5s" fill="freeze"/>
+      </circle>
+      <circle cx="50" cy="50" r="20" fill="none" stroke="#0f0" stroke-width="0.8" opacity="0.4">
+        <animate attributeName="r" values="0;30" dur="3s" begin="0.2s" fill="freeze"/>
+        <animate attributeName="opacity" values="0;0.4" dur="3s" begin="0.2s" fill="freeze"/>
+      </circle>
+      <circle cx="50" cy="50" r="10" fill="none" stroke="#0f0" stroke-width="0.6" opacity="0.3">
+        <animate attributeName="r" values="0;25" dur="3.5s" begin="0.4s" fill="freeze"/>
+        <animate attributeName="opacity" values="0;0.3" dur="3.5s" begin="0.4s" fill="freeze"/>
+      </circle>
+    </svg>
+    <div class="radar-center"></div>
+  </div>
+
+  <!-- ✅ Identidad -->
+  <div class="identity" id="id-display">CARGANDO...</div>
+  <div class="zone" id="zone-display">...</div>
+  <div class="sub" id="live-count">...</div>
+
+  <!-- ✅ Código de recuperación -->
+  <div class="recovery" id="recovery-code">
+    🔑 <code id="code-text">CARGANDO...</code>
+  </div>
+
+  <!-- ✅ Barra de progreso -->
+  <div class="progress">
+    <div class="progress-fill"></div>
+  </div>
+
+  <script>
+    // ✅ Parsear parámetros
+    const url = new URL(location);
+    const id = url.searchParams.get('id') || 'hunter_0000';
+    const zona = url.searchParams.get('zona') || 'CABA';
+    const modo = url.searchParams.get('modo') || 'individual';
+
+    // ✅ Mostrar datos
+    document.getElementById('id-display').textContent = id.toUpperCase();
+    document.getElementById('zone-display').textContent = `Zona: ${zona}`;
+
+    // ✅ Simular "cazadores activos"
+    function updateLiveCount() {
+      const base = { CABA: 28, AVELLANEDA: 16, LANUS: 13, LOMAS: 11 }[zona] || 20;
+      const fluctuation = Math.floor(Math.random() * 6) - 2;
+      const count = base + fluctuation;
+      document.getElementById('live-count').textContent = `🟢 ${count} cazadores activos ahora`;
+    }
+    updateLiveCount();
+
+    // ✅ Generar código de recuperación único
+    function generarRecoveryCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'LH';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    const recoveryCode = generarRecoveryCode();
+    document.getElementById('code-text').textContent = recoveryCode;
+    localStorage.setItem(`recovery_${id}`, recoveryCode);
+
+    // ✅ Voz oscura (masculina, grave, con eco, sin distorsión)
+    let isMuted = false;
+    document.getElementById('mute-btn').addEventListener('click', function() {
+      isMuted = !isMuted;
+      this.textContent = isMuted ? '🔊' : '🔇';
+      this.classList.toggle('active', !isMuted);
+    });
+
+    function playActivationVoice() {
+      if (isMuted || localStorage.getItem('lh_narration_off') === '1') return;
+
+      // ✅ Texto épico (personalizado por ID y zona)
+      const text = `Cazador ${id.replace('hunter_', '')}. La ciudad es tu tablero. Tu zona ${zona} ha sido activada. Tu misión comienza… ahora.`;
+
+      speechSynthesis.getVoices();
+      const voices = speechSynthesis.getVoices();
+      const voice = voices.find(v => 
+        v.lang.includes('es') && 
+        (v.name.includes('Male') || v.name === 'Diego' || v.name === 'Juan')
+      ) || voices.find(v => v.lang.includes('es') && v.name.includes('male')) || null;
+
+      const u = new SpeechSynthesisUtterance(text);
+      if (voice) u.voice = voice;
+      u.rate = 0.60;   // lento, épico
+      u.pitch = 0.42;  // grave
+      u.volume = 0.95;
+
+      // ✅ Eco ligero (0.7s, 25% feedback) → oscuro pero no distorsionado
+      u.onstart = () => {
+        if (window.AudioContext) {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const delay = ctx.createDelay(1.5);
+            delay.delayTime.value = 0.7;
+            const feedback = ctx.createGain();
+            feedback.gain.value = 0.25;
+            delay.connect(feedback);
+            feedback.connect(delay);
+            setTimeout(() => ctx.close(), 5000);
+          } catch (e) {}
+        }
+      };
+
+      speechSynthesis.speak(u);
+    }
+
+    // ✅ Activar voz tras 600ms (dejar que cargue el radar)
+    setTimeout(playActivationVoice, 600);
+
+    // ✅ Redirigir a app.html tras activación
+    setTimeout(() => {
+      window.location.href = `app.html?id=${id}&zona=${zona}&modo=${modo}`;
+    }, 3600); // 3.6 segundos: suficiente para radar + voz + lectura
+  </script>
+</body>
+</html>
