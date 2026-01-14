@@ -9,15 +9,36 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   
-  <!-- ✅ jsQR corregido (sin espacios) -->
+  <!-- Librerías externas (sin espacios) -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   
   <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Estilo para el banner de instalación -->
+  <style>
+    #pwa-install-banner {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 41, 59, 0.95);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border: 1px solid var(--surface-border);
+      text-align: center;
+      max-width: 90%;
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="header-left">
-      <div class="tension-bar" id="tension-bar">⏳ <span id="timer">90:00</span></div>
+      <div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
     </div>
     <div class="header-center">
       <img src="logo.webp" alt="Let’s Hunt" class="app-logo">
@@ -28,92 +49,91 @@
   </header>
 
   <main>
-    <div id="missionSectionIndividual">
-      <!-- Se llena dinámicamente -->
-    </div>
-
-    <div id="missionSectionEquipo" style="display:none;">
-      <div class="mission-card active">
-        <div class="mission-title">
-          <span class="icon">👁️</span>
-          <span id="mission-title-text">...</span>
-          <span id="mission-level-badge" class="status active nivel-N2">
-            <span class="nivel-icon">N2</span>
-          </span>
-        </div>
-        <div class="pista" id="mission-pista">Cargando...</div>
-        <div class="actions">
-          <button class="btn btn-primary" id="accept-mission-btn">
-            ✅ Aceptar misión
-          </button>
-          <button class="btn btn-outline" id="scan-btn">
-            🔍 Escanear QR
-          </button>
-        </div>
-        <div id="recovery-code"></div>
+    <div class="container">
+      <!-- FASE 1: Consigna inicial -->
+      <div id="phase1-consigna" class="mission-phase">
+        <div class="mission-card"></div>
       </div>
-    </div>
 
-    <div id="mapSection" style="display:none;">
-      <div id="map"></div>
-      <div id="mapHint" class="counter-banner">
-        Cargando ubicación...
+      <!-- FASE 2: Mapa de aproximación -->
+      <div id="phase2-mapa" class="mission-phase" style="display: none;">
+        <div class="mission-card"></div>
       </div>
-    </div>
 
-    <div id="inviteModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3 style="margin:0 0 1rem; color:var(--secondary);">👥 Invitar a tu equipo</h3>
-        <p style="margin-bottom:1.2rem;">Compartí este código para que otros se unan:</p>
-        <div id="codigoInvitacion">CARGANDO...</div>
-        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin:1rem 0;">
-          <button id="copyCodeBtn" class="btn btn-outline" style="flex:1; font-size:0.9rem;">📋 Copiar código</button>
-          <button id="shareWaBtn" class="btn btn-primary" style="flex:1; font-size:0.9rem;">💬 WhatsApp</button>
-        </div>
-        <button id="closeModalBtn" style="margin-top:1.2rem; background:transparent; border:none; color:#94a3b8; font-size:0.9rem;">Cerrar</button>
+      <!-- FASE 3: Pista final + QR -->
+      <div id="phase3-pista" class="mission-phase" style="display: none;">
+        <div class="mission-card"></div>
       </div>
-    </div>
 
-    <!-- ✅ Escáner QR -->
-    <div id="scannerOverlay" class="modal-overlay">
-      <div style="position:relative; width:100%; max-width:400px; margin:0 auto;">
-        <h3 style="color:white; text-align:center; margin-bottom:1rem;">🔍 Escanea el Código QR</h3>
-        <video id="scannerVideo" style="width:100%; border-radius:12px; display:block; background:black;" autoplay playsinline></video>
-        <canvas id="scannerCanvas" style="display:none;"></canvas>
-        
-        <div class="scanner-frame">
-          <div class="scanner-corner tl"></div>
-          <div class="scanner-corner tr"></div>
-          <div class="scanner-corner bl"></div>
-          <div class="scanner-corner br"></div>
-        </div>
+      <!-- FASE 4: Misión completada -->
+      <div id="phase4-completed" class="mission-phase" style="display: none;">
+        <div class="mission-card"></div>
+      </div>
 
-        <div style="display:flex; gap:0.75rem; margin-top:1.2rem;">
-          <button id="closeScannerBtn" class="btn btn-outline" style="flex:1;">❌ Cancelar</button>
-          <button id="manualInputBtn" class="btn btn-primary" style="flex:1;">⌨️ Ingresar manualmente</button>
-        </div>
+      <!-- SECCIÓN PARA EQUIPOS -->
+      <div id="teamSection" class="mission-phase" style="display: none;">
+        <div class="mission-card"></div>
       </div>
     </div>
   </main>
 
+  <!-- Modal de invitación (equipo) -->
+  <div id="inviteModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>👥 Invitar a tu equipo</h3>
+      <p>Compartí este código para que otros se unan:</p>
+      <div id="codigoInvitacion">CARGANDO...</div>
+      <div class="modal-actions">
+        <button id="copyCodeBtn" class="btn btn-outline">📋 Copiar código</button>
+        <button id="shareWaBtn" class="btn btn-primary">💬 WhatsApp</button>
+      </div>
+      <button id="closeModalBtn" class="modal-close">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Escáner QR -->
+  <div id="scannerOverlay" class="modal-overlay">
+    <div class="scanner-container">
+      <h3>🔍 Escanea el Código QR</h3>
+      <video id="scannerVideo" autoplay playsinline></video>
+      <canvas id="scannerCanvas" style="display: none;"></canvas>
+      
+      <div class="scanner-frame">
+        <div class="scanner-corner tl"></div>
+        <div class="scanner-corner tr"></div>
+        <div class="scanner-corner bl"></div>
+        <div class="scanner-corner br"></div>
+      </div>
+
+      <div class="scanner-actions">
+        <button id="closeScannerBtn" class="btn btn-outline">❌ Cancelar</button>
+        <button id="manualInputBtn" class="btn btn-primary">⌨️ Ingresar manualmente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVEGACIÓN MÓVIL -->
   <nav class="mobile-nav">
-    <a href="#explorar" class="active"><i>📍</i>Explorar</a>
+    <a href="progreso.html#radar"><i>📡</i>Señal en vivo</a>
     <a href="#misiones"><i>🎯</i>Misiones</a>
     <a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
     <a href="progreso.html"><i>📊</i>Progreso</a>
   </nav>
 
-  <!-- ✅ Botón de narración -->
+  <!-- CONTROLES GLOBALES -->
   <button id="narration-toggle" title="Activar/Desactivar narración">🔊</button>
-
   <div id="toast" role="status" aria-live="polite"></div>
 
+  <!-- Contenedor del banner de instalación -->
+  <div id="pwa-install-banner"></div>
+
+  <!-- LÓGICA PRINCIPAL -->
   <script>
-    // ✅ ZONA_CONFIG (con zonaKey explícita)
+    // ========== CONFIGURACIÓN POR ZONA ==========
     const ZONA_CONFIG = {
       'CABA': {
         misionId: 'M1',
-        titulo: 'Misión 1: El Guardián de Bronce',
+        titulo: 'Misión 1: El León de Bronce',
         pista: 'Busca al guardián de bronce frente al Congreso.',
         hint: '🔍 Frente al Congreso, busca la estatua ecuestre del General Belgrano.',
         coords: [-34.6034, -58.3845],
@@ -145,7 +165,7 @@
       }
     };
 
-    // ✅ INICIALIZACIÓN
+    // ========== INICIALIZACIÓN ==========
     if (!localStorage.getItem('lastHunterId')) {
       localStorage.setItem('lastHunterId', '0');
     }
@@ -153,6 +173,13 @@
     const urlParams = new URLSearchParams(window.location.search);
     let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId') || 'hunter0000';
     let ciudadFromURL = (urlParams.get('zona') || '').trim().toUpperCase();
+
+    // Redirigir a registro si no hay sesión válida
+    if (!hunterId || hunterId === 'hunter0000') {
+      if (!urlParams.has('id')) {
+        window.location.href = 'registro.html';
+      }
+    }
 
     let jugador;
     if (hunterId === 'hunter0000') {
@@ -176,7 +203,6 @@
         modo: 'individual'
       };
       
-      // ✅ Normalizar zona: priorizar URL, luego localStorage
       let zonaFinal = 'CABA';
       if (ciudadFromURL && ZONA_CONFIG[ciudadFromURL]) {
         zonaFinal = ciudadFromURL;
@@ -194,82 +220,230 @@
 
     localStorage.setItem('currentHunterId', hunterId);
     const isTeam = jugador.modo === 'equipo';
-
     const progreso = JSON.parse(localStorage.getItem(`progreso_${hunterId}`)) || {
       misiones: 0,
       desafios: 0,
       zona: jugador.zona
     };
-
     const config = ZONA_CONFIG[jugador.zona] || ZONA_CONFIG['CABA'];
 
-    // ✅ Aplicar modo
-    if (isTeam) {
-      document.body.classList.add('modo-equipo');
-      document.getElementById('missionSectionIndividual').style.display = 'none';
-      document.getElementById('missionSectionEquipo').style.display = 'block';
-      
-      document.getElementById('mission-title-text').textContent = config.titulo;
-      document.getElementById('mission-pista').textContent = config.pista;
-      actualizarNivelEnPanel(config.nivel);
-      document.getElementById('hunterIdDisplay').textContent = `👥 ${jugador.equipo || hunterId}`;
-    } else {
-      const section = document.getElementById('missionSectionIndividual');
-      // ✅ USAR CONFIG DINÁMICO (no hardcodeado)
-      const isActive = true; // En individual, la misión de tu zona siempre está activa
-      section.innerHTML = `
-        <div class="mission-card ${isActive ? 'active' : ''}">
-          <div class="mission-title">
-            <span class="icon">🦁</span>
-            ${config.titulo}
-            <span class="status ${isActive ? 'active nivel-N2' : 'pending'}">
-              ${isActive ? 'ACTIVA • N2' : 'BLOQUEADA'}
-            </span>
-          </div>
-          <div class="pista">${config.pista}</div>
-          <div class="actions">
-            <button class="btn ${isActive ? 'btn-primary' : 'btn-outline'}" ${!isActive ? 'disabled' : ''}>
-              ${isActive ? '✅ Aceptar' : '🔒 Bloqueada'}
-            </button>
-          </div>
+    document.getElementById('hunterIdDisplay').textContent = isTeam 
+      ? `👥 ${jugador.equipo || hunterId}`
+      : `ID: ${hunterId}`;
+
+    // Guardar momento de inicio para calcular tiempo
+    const missionStartTime = Date.now();
+
+    // ========== FLUJO INDIVIDUAL ==========
+    function showPhase1() {
+      document.querySelector('#phase1-consigna .mission-card').innerHTML = `
+        <div class="mission-title">
+          <span class="icon">🦁</span>
+          ${config.titulo}
         </div>
+        <div class="tension-bar" style="margin: 1rem 0; background: rgba(255,69,58,0.15);">
+          ⏳ Listo para cazar
+        </div>
+        <p class="pista">${config.pista}</p>
+        <button class="btn btn-primary" id="start-mission-btn">✅ Aceptar y comenzar</button>
       `;
-      document.querySelector('.btn').addEventListener('click', () => {
-        if (isActive) acceptMission();
-        else showToast(`🔒 Misión bloqueada. Tu zona: ${jugador.zona}`);
+      document.getElementById('phase1-consigna').style.display = 'block';
+      
+      document.getElementById('start-mission-btn').addEventListener('click', () => {
+        startTimer(); // ✅ Inicia SOLO al aceptar
+        guardarProgreso(config.misionId);
+        showPhase2();
       });
     }
 
-    // ✅ Tensión narrativa: contador + señal de vida
-    let timeLeft = 90 * 60; // 90 minutos
-    const timerEl = document.getElementById('timer');
-    
-    const updateTimer = () => {
-      if (timeLeft <= 0) {
-        timerEl.textContent = "⏰ Caducada";
-        document.getElementById('tension-bar').style.background = 'rgba(100,100,100,0.2)';
-        return;
-      }
-      const mins = Math.floor(timeLeft / 60);
-      const secs = timeLeft % 60;
-      timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-      timeLeft--;
-    };
-
-    setInterval(updateTimer, 1000);
-    updateTimer();
-
-    // ✅ Simular "cazadores activos"
-    function updateCazadores() {
-      const base = { CABA: 22, AVELLANEDA: 14, LANUS: 11, LOMAS: 9 }[jugador.zona] || 15;
-      const fluctuation = Math.floor(Math.random() * 5) - 1;
-      const count = base + fluctuation;
-      showToast(`🟢 ${count} cazadores activos en ${jugador.zona}`);
+    function showPhase2() {
+      document.getElementById('phase1-consigna').style.display = 'none';
+      document.querySelector('#phase2-mapa .mission-card').innerHTML = `
+        <h3>📍 Acércate al objetivo</h3>
+        <p style="margin: 1rem 0; color:#cbd5e1;">El radar te guía. Cuando estés a menos de 50 metros, se desbloqueará la pista final.</p>
+        <div id="mapApprox" style="height: 300px; border-radius:12px; margin:1rem 0;"></div>
+        <button class="btn btn-outline" id="confirm-location-btn">👣 Estoy en el lugar</button>
+      `;
+      document.getElementById('phase2-mapa').style.display = 'block';
+      loadApproxMap();
+      document.getElementById('confirm-location-btn').addEventListener('click', () => {
+        showPhase3();
+      });
     }
-    updateCazadores();
-    setInterval(updateCazadores, 18000);
 
-    // ✅ Narración CORREGIDA: espera voiceschanged
+    function showPhase3() {
+      document.getElementById('phase2-mapa').style.display = 'none';
+      const recoveryCode = generarRecoveryCode();
+      localStorage.setItem(`recovery_${hunterId}`, recoveryCode);
+      
+      document.querySelector('#phase3-pista .mission-card').innerHTML = `
+        <h3>🔍 Pista final</h3>
+        <p class="pista">${config.hint}</p>
+        <div class="actions">
+          <button class="btn btn-primary" id="scan-btn">🔍 Escanear QR</button>
+        </div>
+        <div style="margin-top:1.2rem; font-size:0.9rem;">
+          🔑 Código de recuperación: <code>${recoveryCode}</code>
+        </div>
+      `;
+      document.getElementById('phase3-pista').style.display = 'block';
+      document.getElementById('scan-btn').addEventListener('click', openQRScanner);
+      playNarration(`Cazador ${hunterId.replace('hunter_', '')}. Estás en la zona. La pista final ha sido revelada.`);
+    }
+
+    // ========== FLUJO EQUIPO ==========
+    function showTeamMission() {
+      document.body.classList.add('modo-equipo');
+      const recoveryCode = generarRecoveryCode();
+      localStorage.setItem(`recovery_${hunterId}`, recoveryCode);
+      
+      document.querySelector('#teamSection .mission-card').innerHTML = `
+        <div class="mission-title">
+          <span class="icon">👁️</span>
+          ${config.titulo}
+          <span class="status active nivel-N2">ACTIVA • N2</span>
+        </div>
+        <p class="pista">${config.pista}</p>
+        <div class="actions">
+          <button class="btn btn-primary" id="accept-mission-btn">✅ Aceptar misión</button>
+          <button class="btn btn-outline" id="scan-btn-team">🔍 Escanear QR</button>
+        </div>
+        <div style="margin-top:1.2rem; font-size:0.9rem;">
+          🔑 Código de recuperación: <code>${recoveryCode}</code>
+        </div>
+      `;
+      document.getElementById('teamSection').style.display = 'block';
+
+      document.getElementById('accept-mission-btn').addEventListener('click', () => {
+        guardarProgreso(config.misionId);
+        showToast("✅ Misión aceptada. ¡Buena cacería!");
+      });
+
+      document.getElementById('scan-btn-team').addEventListener('click', openQRScanner);
+    }
+
+    // === FASE 4: Misión completada ===
+    function showMissionCompleted() {
+      document.getElementById('phase1-consigna').style.display = 'none';
+      document.getElementById('phase2-mapa').style.display = 'none';
+      document.getElementById('phase3-pista').style.display = 'none';
+      document.getElementById('teamSection').style.display = 'none';
+
+      const elapsedMinutes = Math.floor((Date.now() - missionStartTime) / 60000);
+      const recoveryCode = localStorage.getItem(`recovery_${hunterId}`) || '—';
+
+      document.querySelector('#phase4-completed .mission-card').innerHTML = `
+        <h2 style="color:#ffd700; margin-bottom:1rem;">✅ Operación Completada</h2>
+        <p><strong>${config.titulo}</strong></p>
+        <p style="font-size:0.95rem; color:#cbd5e1; margin:1rem 0;">
+          Tu posición ha sido registrada en el sistema central.
+        </p>
+        <div style="margin:1.5rem 0; font-size:0.9rem; color:#64b5f7;">
+          ⏱️ Completado en: <strong>${elapsedMinutes} min</strong>
+        </div>
+        <div style="font-size:0.85rem; color:#94a3b8; margin-bottom:1.5rem;">
+          🔑 Código: <code>${recoveryCode}</code>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="new-mission-btn">🔁 Nueva operación</button>
+          <button class="btn btn-outline" id="view-progress-btn">📊 Ver progreso</button>
+        </div>
+      `;
+      document.getElementById('phase4-completed').style.display = 'block';
+
+      document.getElementById('new-mission-btn').addEventListener('click', () => {
+        window.location.href = 'registro.html';
+      });
+
+      document.getElementById('view-progress-btn').addEventListener('click', () => {
+        window.location.href = 'progreso.html';
+      });
+    }
+
+    // ========== TEMPORIZADOR (inicia solo al aceptar) ==========
+    function startTimer() {
+      document.getElementById('timer').textContent = "90:00";
+      let timeLeft = 90 * 60;
+      const timerEl = document.getElementById('timer');
+      const interval = setInterval(() => {
+        if (timeLeft <= 0) {
+          timerEl.textContent = "⏰ Caducada";
+          clearInterval(interval);
+          return;
+        }
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+        timeLeft--;
+      }, 1000);
+    }
+
+    // ========== UTILIDADES COMPARTIDAS ==========
+    function loadApproxMap() {
+      if (!window.L) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+        
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = () => initApproxMap();
+        document.head.appendChild(script);
+      } else {
+        initApproxMap();
+      }
+    }
+
+    function initApproxMap() {
+      const coords = config.coords || [-34.6034, -58.3845];
+      const map = L.map('mapApprox').setView(coords, 18.5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      
+      L.marker(coords).addTo(map).bindPopup(`<strong>${config.titulo}</strong><br>Objetivo`);
+    }
+
+    function generarRecoveryCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'LH';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    function guardarProgreso(misionId = null, desafioId = null) {
+      const key = `progreso_${hunterId}`;
+      let data = JSON.parse(localStorage.getItem(key) || '{}');
+      if (!data.misiones) data.misiones = 0;
+      if (!data.desafios) data.desafios = 0;
+      if (!data.zona) data.zona = jugador.zona;
+      
+      if (misionId) {
+        const misionesKey = `misiones_aceptadas_${hunterId}`;
+        let misiones = JSON.parse(localStorage.getItem(misionesKey) || '[]');
+        if (!misiones.includes(misionId)) {
+          misiones.push(misionId);
+          localStorage.setItem(misionesKey, JSON.stringify(misiones));
+          data.misiones = misiones.length;
+        }
+      }
+      if (desafioId) {
+        const desafiosKey = `desafios_completados_${hunterId}`;
+        let desafios = JSON.parse(localStorage.getItem(desafiosKey) || '[]');
+        if (!desafios.includes(desafioId)) {
+          desafios.push(desafioId);
+          localStorage.setItem(desafiosKey, JSON.stringify(desafios));
+          data.desafios = desafios.length;
+        }
+      }
+      data.zona = jugador.zona;
+      data.lastUpdate = Date.now();
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
     function playNarration(text) {
       if (localStorage.getItem('lh_narration_off') === '1') return;
 
@@ -309,7 +483,6 @@
       speechSynthesis.speak(u);
     }
 
-    // ✅ Botón de narración
     document.getElementById('narration-toggle').addEventListener('click', function() {
       const isOff = localStorage.getItem('lh_narration_off') === '1';
       localStorage.setItem('lh_narration_off', isOff ? '0' : '1');
@@ -317,162 +490,15 @@
       showToast(isOff ? '✅ Narración activada' : '🔇 Narración desactivada');
     });
 
-    // ✅ Cargar mapa (CORREGIDA: URLs sin espacios)
-    function loadMapByZone() {
-      const leafletCss = document.createElement('link');
-      leafletCss.rel = 'stylesheet';
-      leafletCss.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(leafletCss);
-      
-      const script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.onload = () => {
-        try {
-          const coords = config.coords || [-34.6034, -58.3845];
-          const map = L.map('map').setView(coords, 17);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 19
-          }).addTo(map);
-          
-          setTimeout(() => {
-            map.invalidateSize(true);
-            const missionIcon = L.divIcon({
-              html: `<div style="width:32px;height:32px;background:${isTeam?'var(--secondary)':'var(--primary)'};border:2px solid white;border-radius:50%;box-shadow:0 0 12px ${isTeam?'var(--secondary)':'var(--primary)'},0 0 20px rgba(0,170,255,0.5);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:16px;">📍</div>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 16]
-            });
-            L.marker(coords, { icon: missionIcon })
-              .addTo(map)
-              .bindPopup(`<strong>${config.titulo}</strong><br>${config.hint}`);
-          }, 100);
-          
-          document.getElementById('mapHint').textContent = config.hint;
-        } catch (e) {
-          document.getElementById('map').innerHTML = `<div class="offline-fallback">📶 Error de mapa<br><small>${e.message}</small></div>`;
-          document.getElementById('mapHint').textContent = "Error al cargar mapa";
-        }
-      };
-      script.onerror = () => {
-        document.getElementById('map').innerHTML = `<div class="offline-fallback">❌ Leaflet no cargó</div>`;
-        document.getElementById('mapHint').textContent = "Error de red";
-      };
-      document.head.appendChild(script);
-    }
-
-    // ✅ Guardar progreso
-    function guardarProgreso(misionId = null, desafioId = null) {
-      const key = `progreso_${hunterId}`;
-      let data = JSON.parse(localStorage.getItem(key) || '{}');
-      if (!data.misiones) data.misiones = 0;
-      if (!data.desafios) data.desafios = 0;
-      if (!data.zona) data.zona = jugador.zona;
-      
-      if (misionId) {
-        const misionesKey = `misiones_aceptadas_${hunterId}`;
-        let misiones = JSON.parse(localStorage.getItem(misionesKey) || '[]');
-        if (!misiones.includes(misionId)) {
-          misiones.push(misionId);
-          localStorage.setItem(misionesKey, JSON.stringify(misiones));
-          data.misiones = misiones.length;
-        }
-      }
-      if (desafioId) {
-        const desafiosKey = `desafios_completados_${hunterId}`;
-        let desafios = JSON.parse(localStorage.getItem(desafiosKey) || '[]');
-        if (!desafios.includes(desafioId)) {
-          desafios.push(desafioId);
-          localStorage.setItem(desafiosKey, JSON.stringify(desafios));
-          data.desafios = desafios.length;
-        }
-      }
-      data.zona = jugador.zona;
-      data.lastUpdate = Date.now();
-      localStorage.setItem(key, JSON.stringify(data));
-    }
-
-    // ✅ Generar código de recuperación único
-    function generarRecoveryCode() {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let code = 'LH';
-      for (let i = 0; i < 8; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return code;
-    }
-
-    // ✅ Aceptar misión — CORREGIDO
-    function acceptMission() {
-      const mision = config;
-      const recoveryCode = generarRecoveryCode();
-      localStorage.setItem(`recovery_${hunterId}`, recoveryCode);
-      
-      let recDiv = document.getElementById('recovery-code');
-      if (!recDiv) {
-        recDiv = document.createElement('div');
-        recDiv.id = 'recovery-code';
-        document.querySelector('.mission-card').appendChild(recDiv);
-      }
-      recDiv.innerHTML = `🔑 <strong>Código de recuperación:</strong> <code>${recoveryCode}</code><br><small>Guárdalo. Si pierdes el celular, lo necesitas.</small>`;
-
-      // ✅ Narración FUNCIONAL
-      playNarration(`Cazador ${hunterId.replace('hunter_', '')}. La misión ha comenzado. Tu tiempo corre.`);
-      showToast(`🔥 ¡${config.titulo} activada!`);
-      
-      const now = Math.floor(Date.now() / 1000);
-      const raw = `${hunterId}-${mision.misionId}-${now}-${Math.random().toString(36).substr(2, 4)}`;
-      let hash = 0;
-      for (let i = 0; i < raw.length; i++) {
-        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
-        hash = hash & hash;
-      }
-      const salt = Math.abs(hash).toString(36).substr(0, 4);
-      const qrCode = `LH-${mision.misionId}-${hunterId.split('_')[1]}-${salt}`.toUpperCase();
-      
-      localStorage.setItem('qrCodeEsperado', qrCode);
-      localStorage.setItem('misionActivaId', mision.misionId);
-      localStorage.setItem('qrTimestamp', now);
-      localStorage.setItem(`mision_${hunterId}`, JSON.stringify(mision));
-      
-      guardarProgreso(mision.misionId);
-      
-      document.getElementById('missionSectionIndividual').style.display = 'none';
-      document.getElementById('missionSectionEquipo').style.display = 'none';
-      
-      const mapSection = document.getElementById('mapSection');
-      mapSection.classList.add('map-visible');
-      
-      setTimeout(() => {
-        mapSection.offsetHeight;
-        loadMapByZone();
-      }, 100);
-      
-      if (mision.nivel) {
-        actualizarNivelEnPanel(mision.nivel);
-      }
-    }
-
-    // ✅ Actualizar badge de nivel
-    function actualizarNivelEnPanel(nivel = 'N2') {
-      const badge = document.getElementById('mission-level-badge');
-      if (!badge) return;
-      badge.className = 'status active nivel-' + nivel;
-      badge.innerHTML = `<span class="nivel-icon">${nivel}</span>`;
-    }
-
-    // ✅ Botón de aceptar (equipo)
-    document.getElementById('accept-mission-btn')?.addEventListener('click', acceptMission);
-
-    // ✅ Escáner QR (sin cambios)
+    // ========== ESCÁNER QR ==========
     let scannerActive = false;
     let stream = null;
 
     async function openQRScanner() {
-      const qrExpected = localStorage.getItem('qrCodeEsperado');
-      if (!qrExpected) {
-        showToast("⚠️ Acepta una misión primero");
-        return;
-      }
+      const qrExpected = localStorage.getItem('qrCodeEsperado') || 
+        `LH-${config.misionId}-${hunterId.split('_')[1]}-abcd`.toUpperCase();
+      localStorage.setItem('qrCodeEsperado', qrExpected);
+      
       const overlay = document.getElementById('scannerOverlay');
       const video = document.getElementById('scannerVideo');
       const canvas = document.getElementById('scannerCanvas');
@@ -497,12 +523,9 @@
               guardarProgreso(null, `${misionActiva}_desafio_1`);
               
               playNarration(`Confirmado. Has completado la misión. El ranking se actualiza ahora.`);
-              
               showToast(`✅ ¡Código verificado!\n🔥 ¡Cazador ${hunterId} ha completado ${config.titulo}!`);
               
-              const mensaje = `*Let's Hunt*\nJugador: ${hunterId}\nCiudad: ${jugador.zona}\nMisión: ${config.misionId}\n📍 ${config.hint}`;
-              const adminWa = "+5491125082484";
-              window.open(`https://api.whatsapp.com/send?phone=${encodeURIComponent(adminWa)}&text=${encodeURIComponent(mensaje)}`, '_blank');
+              showMissionCompleted();
             } else {
               showToast("❌ Código incorrecto. ¿Estás en el lugar correcto?");
               setTimeout(() => scannerActive && (overlay.style.display = 'block'), 1500);
@@ -524,7 +547,6 @@
       document.getElementById('scannerOverlay').style.display = 'none';
     }
 
-    document.getElementById('scan-btn')?.addEventListener('click', openQRScanner);
     document.getElementById('closeScannerBtn')?.addEventListener('click', stopScanner);
     document.getElementById('manualInputBtn')?.addEventListener('click', () => {
       stopScanner();
@@ -538,9 +560,7 @@
         playNarration(`Confirmado. Has completado la misión.`);
         showToast(`✅ ¡Código verificado!\n🔥 ¡Cazador ${hunterId} ha completado ${config.titulo}!`);
         
-        const mensaje = `*Let's Hunt*\nJugador: ${hunterId}\nCiudad: ${jugador.zona}\nMisión: ${config.misionId}\n📍 ${config.hint}`;
-        const adminWa = "+5491125082484";
-        window.open(`https://api.whatsapp.com/send?phone=${encodeURIComponent(adminWa)}&text=${encodeURIComponent(mensaje)}`, '_blank');
+        showMissionCompleted();
       } else {
         showToast("❌ Código inválido. ¿Estás en el lugar correcto?");
       }
@@ -557,7 +577,7 @@
       setTimeout(() => t.classList.remove('show'), 3500);
     }
 
-    // ✅ WebSocket (sin cambios)
+    // ========== CONEXIÓN EN TIEMPO REAL ==========
     let ws;
     function connectWebSocket() {
       const wsUrl = window.location.hostname === 'localhost' 
@@ -576,8 +596,89 @@
         };
       } catch (e) {}
     }
-
     connectWebSocket();
+
+    // ========== BOTÓN DE INSTALACIÓN PWA ==========
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    function showInstallBanner() {
+      const banner = document.getElementById('pwa-install-banner');
+      if (!banner) return;
+
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+                        || window.navigator.standalone === true;
+
+      if (isStandalone) return;
+
+      setTimeout(() => {
+        banner.style.display = 'block';
+        
+        if (isIOS) {
+          banner.innerHTML = `
+            <p style="margin:0 0 8px;font-size:0.95rem;">
+              👆 Toca <strong>Compartir</strong> → <strong>“Añadir a pantalla de inicio”</strong>
+            </p>
+            <button id="dismiss-ios" style="
+              background:#444; color:white; border:none;
+              padding:6px 12px; border-radius:6px; font-size:0.9rem;
+            ">Entendido</button>
+          `;
+          document.getElementById('dismiss-ios').onclick = () => banner.style.display = 'none';
+        } else {
+          banner.innerHTML = `
+            <p style="margin:0 0 8px;font-size:0.95rem;">
+              📥 ¿Agregar Let's Hunt a tu pantalla de inicio?
+            </p>
+            <button id="install-btn" style="
+              background:var(--primary); color:white; border:none;
+              padding:6px 12px; border-radius:6px; font-weight:bold;
+              font-size:0.9rem;
+            ">Instalar</button>
+          `;
+          document.getElementById('install-btn').onclick = () => {
+            if (deferredPrompt) {
+              deferredPrompt.prompt();
+              deferredPrompt = null;
+            } else {
+              banner.innerHTML = `
+                <p style="margin:0 0 8px;font-size:0.95rem;">
+                  Abre el menú del navegador (⋯ o ≡) y busca <strong>“Instalar app”</strong>.
+                </p>
+                <button id="dismiss-android" style="
+                  background:#444; color:white; border:none;
+                  padding:6px 12px; border-radius:6px; font-size:0.9rem;
+                ">Cerrar</button>
+              `;
+              document.getElementById('dismiss-android').onclick = () => banner.style.display = 'none';
+            }
+          };
+        }
+      }, 3000);
+    }
+
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log('✅ SW registrado'))
+          .catch(err => console.error('❌ Error SW:', err));
+      });
+    }
+
+    // Mostrar banner de instalación
+    showInstallBanner();
+
+    // ========== INICIAR FLUJO ==========
+    if (isTeam) {
+      showTeamMission();
+    } else {
+      showPhase1();
+    }
   </script>
 </body>
 </html>

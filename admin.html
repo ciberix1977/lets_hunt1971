@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Let’s Hunt · Admin</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      padding: 2rem;
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #4fc3f7;
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.5rem;
+    }
+    .login-form, .admin-panel {
+      background: #1a1a1a;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 0.6rem;
+      margin: 0.5rem 0 1rem;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 4px;
+    }
+    button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    button:hover {
+      background: #1565c0;
+    }
+    .export-btn {
+      background: #388e3c;
+    }
+    .export-btn:hover {
+      background: #2e7d32;
+    }
+    .delete-btn {
+      background: #d32f2f;
+    }
+    .delete-btn:hover {
+      background: #b71c1c;
+    }
+    .logout {
+      background: #888;
+    }
+    .logout:hover {
+      background: #666;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.6rem;
+      border-bottom: 1px solid #333;
+    }
+    th {
+      color: #4fc3f7;
+    }
+    .empty {
+      color: #999;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Let’s Hunt · Panel de Administración</h1>
+
+    <div id="loginSection" class="login-form">
+      <h2>Acceso restringido</h2>
+      <p>Ingresa la contraseña del administrador:</p>
+      <input type="password" id="adminPass" placeholder="Contraseña" />
+      <button onclick="login()">Ingresar</button>
+    </div>
+
+    <div id="adminSection" class="admin-panel" style="display:none;">
+      <h2>Registros recientes</h2>
+      <button class="logout" onclick="logout()">Cerrar sesión</button>
+      <button class="export-btn" onclick="exportarPorEmail()">📤 Exportar a email</button>
+      <button class="delete-btn" onclick="borrarRegistros()">🗑️ Borrar todos los registros</button>
+      
+      <div id="registrosTable"></div>
+    </div>
+  </div>
+
+  <script>
+    // 🔑 Contraseña del administrador
+    const ADMIN_PASSWORD = "emienzobabu1971"; // ← ¡MODIFICA ESTA CONTRASEÑA!
+
+    function login() {
+      const pass = document.getElementById('adminPass').value;
+      if (pass === ADMIN_PASSWORD) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminSection').style.display = 'block';
+        loadRegistros();
+      } else {
+        alert("⚠ Contraseña incorrecta.");
+      }
+    }
+
+    function logout() {
+      document.getElementById('adminSection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('adminPass').value = '';
+    }
+
+    function loadRegistros() {
+      const registros = JSON.parse(localStorage.getItem('registros_nuevos') || '[]');
+      const tableDiv = document.getElementById('registrosTable');
+
+      if (registros.length === 0) {
+        tableDiv.innerHTML = '<p class="empty">No hay registros nuevos.</p>';
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Zona</th>
+              <th>Modo</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      registros.forEach(r => {
+        const fecha = new Date(r.timestamp).toLocaleString('es-AR');
+        const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
+        html += `
+          <tr>
+            <td>${r.id}</td>
+            <td>${r.nombre}</td>
+            <td>${r.telefono}</td>
+            <td>${r.zona}</td>
+            <td>${modo}</td>
+            <td>${fecha}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      tableDiv.innerHTML = html;
+    }
+
+    function exportarPorEmail() {
+      const registros = JSON.parse(localStorage.getItem('registros_nuevos') || '[]');
+      if (registros.length === 0) {
+        alert("No hay registros para exportar.");
+        return;
+      }
+
+      let cuerpo = "🆕 *NUEVOS CAZADORES REGISTRADOS*\n\n";
+      cuerpo += "ID | Nombre | Teléfono | Zona | Modo | Fecha\n";
+      cuerpo += "-".repeat(60) + "\n";
+
+      registros.forEach(r => {
+        const fecha = new Date(r.timestamp).toLocaleString('es-AR');
+        const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
+        cuerpo += `${r.id} | ${r.nombre} | ${r.telefono} | ${r.zona} | ${modo} | ${fecha}\n`;
+      });
+
+      cuerpo += "\n— Fin del reporte —\nLet’s Hunt · Cacería Urbana GBA";
+
+      const destinatario = "j.carloslarrosa@gmail.com";
+      const asunto = "🆕 Let's Hunt - Reporte de nuevos cazadores";
+      const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+
+      window.location.href = mailtoUrl;
+
+      // ✅ Opcional: borrar tras exportar
+      // Descomenta la siguiente línea si quieres borrar automáticamente:
+      // setTimeout(() => { borrarRegistrosSilencioso(); }, 2000);
+    }
+
+    function borrarRegistros() {
+      if (!confirm("¿Estás seguro de que deseas borrar todos los registros? Esta acción no se puede deshacer.")) {
+        return;
+      }
+      localStorage.removeItem('registros_nuevos');
+      loadRegistros();
+      alert("✅ Registros borrados.");
+    }
+
+    function borrarRegistrosSilencioso() {
+      localStorage.removeItem('registros_nuevos');
+      loadRegistros();
+    }
+
+    document.getElementById('adminPass').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') login();
+    });
+  </script>
+</body>
+</html>

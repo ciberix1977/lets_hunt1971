@@ -3125,3 +3125,77 @@ header {
   max-height: none !important;
   filter: none !important; /* evita invertir si usás logo blanco */
 }
+/* ===== PROGRESS: Radar Animado — Versión Única y Coherente ===== */
+#live-map {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 280px;
+  margin: 1rem auto;
+  border-radius: 16px;
+  overflow: hidden; /* ← clave para evitar recortes */
+  background: #0a0f1a;
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.8),
+    0 4px 12px rgba(0, 10, 30, 0.6);
+}
+
+.radar-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px; /* ← igual que el contenedor */
+  background:
+    radial-gradient(circle at 50% 50%, transparent 10%, rgba(0, 170, 255, 0.08) 11%, transparent 12%),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      transparent 0px,
+      transparent 1px,
+      rgba(0, 170, 255, 0.05) 1px,
+      rgba(0, 170, 255, 0.05) 2px
+    );
+  background-size: 200px 200px;
+}
+
+.radar-sweep {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  border-radius: 50%;
+  background: conic-gradient(
+    transparent 0%,
+    rgba(0, 170, 255, 0.25) 5%,
+    rgba(0, 170, 255, 0.1) 12%,
+    transparent 25%
+  );
+  animation: radar-sweep 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes radar-sweep {
+  to { transform: translate(-50%, -50%) rotate(270deg); }
+}
+<!-- Añade este estilo en el <head> o en styles.css -->
+<style>
+#pwa-install-banner {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 41, 59, 0.95);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border: 1px solid var(--surface-border);
+  text-align: center;
+  max-width: 90%;
+  display: none;
+}
+</style>

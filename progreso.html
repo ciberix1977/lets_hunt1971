@@ -63,13 +63,12 @@
       </ul>
     </div>
   </main>
-
-  <nav class="mobile-nav">
-    <a href="app.html"><i>📍</i>Explorar</a>
-    <a href="app.html#misiones"><i>🎯</i>Misiones</a>
-    <a href="app.html#scan"><i>🔍</i>Escanear</a>
-    <a href="progreso.html" class="active"><i>📊</i>Progreso</a>
-  </nav>
+<nav class="mobile-nav">
+  <a href="progreso.html#radar" class="active"><i>📡</i>Señal en vivo</a>
+  <a href="app.html#misiones"><i>🎯</i>Misiones</a>
+  <a href="app.html#scan"><i>🔍</i>Escanear</a>
+  <a href="progreso.html"><i>📊</i>Progreso</a>
+</nav>
 
   <div id="toast" role="status" aria-live="polite"></div>
 
@@ -226,6 +225,22 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3500);
     }
+
+// ✅ Detectar hash al cargar Y al cambiar
+function scrollToRadar() {
+  if (window.location.hash === '#radar') {
+    const radarSection = document.querySelector('.section:nth-of-type(2)');
+    if (radarSection) {
+      radarSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+}
+
+// Al cargar la página
+scrollToRadar();
+
+// Al hacer clic en enlaces internos (como "Señal en vivo")
+window.addEventListener('hashchange', scrollToRadar);
   </script>
 </body>
 </html>

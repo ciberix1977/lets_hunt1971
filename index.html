@@ -9,41 +9,15 @@
   <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="styles.css"></noscript>
 
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0066ff">>
 
   <!-- ✅ CORRECCIÓN: Estilos mínimos para que el logo aparezca tras intro -->
 
 </head>
 <body>
 
-  <script>
-  // ✅ INTRO: carga fiable en todos los navegadores
-  window.addEventListener('load', () => {
-    const introScreen = document.getElementById('intro-screen');
-    const introVideo = document.getElementById('intro-video');
 
-    const hideIntro = () => {
-      if (!introScreen) return;
-      introScreen.style.opacity = '0';
-      setTimeout(() => {
-        introScreen.remove();
-        // ✅ Asegura que el logo sea visible tras intro
-        document.querySelector('.hero-content')?.classList.add('ready');
-      }, 400);
-    };
-
-    // ✅ Reproducir apenas el video esté listo
-    introVideo?.addEventListener('loadeddata', () => {
-      introVideo.play().catch(() => hideIntro());
-    }, { once: true });
-
-    // ✅ Fallback seguro (7.5s máximo)
-    setTimeout(hideIntro, 7500);
-
-    // ✅ Permitir skip
-    introScreen?.addEventListener('click', hideIntro, { once: true });
-  });
-  </script>
 
   <main>
     <section class="hero" role="banner">
@@ -188,28 +162,25 @@
       <article class="sponsor-card" data-tier="platinum">
         <div class="sponsor-badge">Conectividad Global</div>
         <img src="./sponsor-nexus.webp" alt="Nexus Comm" loading="lazy">
-        <h3 class="sponsor-name">Nexus Comm</h3>
+
         <p class="sponsor-role">Red segura para transmisión en tiempo real</p>
       </article>
 
       <article class="sponsor-card" data-tier="platinum">
         <div class="sponsor-badge">Tecnología Inmersiva</div>
         <img src="./sponsor-aqua.webp" alt="Aqua Labs" loading="lazy">
-        <h3 class="sponsor-name">Aqua Labs</h3>
         <p class="sponsor-role">AR y sensores para pistas en el mundo real</p>
       </article>
 
       <article class="sponsor-card" data-tier="gold">
         <div class="sponsor-badge">Exploración Urbana Segura</div>
         <img src="./sponsor-enterprecios.webp" alt="Enterprecios" loading="lazy">
-        <h3 class="sponsor-name">Enterprecios</h3>
         <p class="sponsor-role">Mapeo ético y acceso a espacios históricos</p>
       </article>
 
       <article class="sponsor-card" data-tier="gold">
         <div class="sponsor-badge">Narrativa Inmersiva</div>
         <img src="./sponsor-zenith.webp" alt="Zenith Games" loading="lazy">
-        <h3 class="sponsor-name">Zenith Games</h3>
         <p class="sponsor-role">Diseño de misiones con tensión narrativa real</p>
       </article>
     </div>
@@ -396,7 +367,29 @@
             🎯 Vos podés estar acá. Solo falta empezar.
           </p>
         </div>
-
+        <!-- ✅ FEATURES: Rediseñado con coherencia -->
+<section class="features-section" aria-labelledby="features-title">
+  <div class="container">
+    <h2 id="features-title" class="section-title">¿Qué obtenés al registrarte?</h2>
+    <div class="features-grid">
+      <div class="feature-card" data-type="whatsapp">
+        <div class="feature-icon">📱</div>
+        <h3 class="feature-title">Notificaciones por WhatsApp</h3>
+        <p class="feature-desc">Desafíos en vivo aleatorios. Acepta, cumple, gana ventaja.</p>
+      </div>
+      <div class="feature-card" data-type="geo">
+        <div class="feature-icon">📍</div>
+        <h3 class="feature-title">Geolocalización precisa</h3>
+        <p class="feature-desc">Las pistas se activan cuando estás en el lugar correcto.</p>
+      </div>
+      <div class="feature-card" data-type="ranking">
+        <div class="feature-icon">📊</div>
+        <h3 class="feature-title">Ranking público</h3>
+        <p class="feature-desc">Ve tu posición en tiempo real. ¿Top 10? Los premios te esperan.</p>
+      </div>
+    </div>
+  </div>
+</section>
         <p class="urgency-note">⏳ Las misiones se cierran cuando los primeros 10 llegan. ¿Vas a ser uno de ellos?</p>
         <a href="registro.html" class="btn-hero">✅ REGISTRARME Y ENTRAR AL RANKING</a>
 
@@ -429,29 +422,7 @@
   </div>
 </div>
 
-<!-- ✅ FEATURES: Rediseñado con coherencia -->
-<section class="features-section" aria-labelledby="features-title">
-  <div class="container">
-    <h2 id="features-title" class="section-title">¿Qué obtenés al registrarte?</h2>
-    <div class="features-grid">
-      <div class="feature-card" data-type="whatsapp">
-        <div class="feature-icon">📱</div>
-        <h3 class="feature-title">Notificaciones por WhatsApp</h3>
-        <p class="feature-desc">Desafíos en vivo aleatorios. Acepta, cumple, gana ventaja.</p>
-      </div>
-      <div class="feature-card" data-type="geo">
-        <div class="feature-icon">📍</div>
-        <h3 class="feature-title">Geolocalización precisa</h3>
-        <p class="feature-desc">Las pistas se activan cuando estás en el lugar correcto.</p>
-      </div>
-      <div class="feature-card" data-type="ranking">
-        <div class="feature-icon">📊</div>
-        <h3 class="feature-title">Ranking público</h3>
-        <p class="feature-desc">Ve tu posición en tiempo real. ¿Top 10? Los premios te esperan.</p>
-      </div>
-    </div>
-  </div>
-</section>
+
   </main>
 
 
@@ -621,6 +592,33 @@
     if (document.querySelector('.live-counter')) {
       updatePlayerCounter();
     }
+
+  // ✅ INTRO: carga fiable en todos los navegadores
+  window.addEventListener('load', () => {
+    const introScreen = document.getElementById('intro-screen');
+    const introVideo = document.getElementById('intro-video');
+
+    const hideIntro = () => {
+      if (!introScreen) return;
+      introScreen.style.opacity = '0';
+      setTimeout(() => {
+        introScreen.remove();
+        // ✅ Asegura que el logo sea visible tras intro
+        document.querySelector('.hero-content')?.classList.add('ready');
+      }, 400);
+    };
+
+    // ✅ Reproducir apenas el video esté listo
+    introVideo?.addEventListener('loadeddata', () => {
+      introVideo.play().catch(() => hideIntro());
+    }, { once: true });
+
+    // ✅ Fallback seguro (7.5s máximo)
+    setTimeout(hideIntro, 7500);
+
+    // ✅ Permitir skip
+    introScreen?.addEventListener('click', hideIntro, { once: true });
+  });
   </script>
   
 </body>
