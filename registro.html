@@ -97,9 +97,9 @@
         <select id="zona" name="zona" required>
           <option value="">Selecciona tu zona...</option>
           <option value="CABA">📍 Ciudad de Buenos Aires (CABA)</option>
-          <option value="AVELLANEDA">🚂 Avellaneda (incluye Dock Sud, Wilde, Sarandí)</option>
-          <option value="LANUS">🌳 Lanús (incluye Remedios de Escalada, Valentín Alsina)</option>
-          <option value="LOMAS">🏘️ Lomas de Zamora (incluye Banfield, Temperley, Llavallol)</option>
+          <option value="Avellaneda">🚂 Avellaneda (incluye Dock Sud, Wilde, Sarandí)</option>
+          <option value="Lanús">🌳 Lanús (incluye Remedios de Escalada, Valentín Alsina)</option>
+          <option value="Lomas de Zamora">🏘️ Lomas de Zamora (incluye Banfield, Temperley, Llavallol)</option>
         </select>
       </div>
 
@@ -131,7 +131,7 @@
   // Mostrar/ocultar campo de equipo
   document.querySelectorAll('input[name="modo"]').forEach(radio => {
     radio.addEventListener('change', () => {
-      const equipoInfo = document.querySelector('.equipo-info'); // ✅ typo corregido
+      const equipoInfo = document.querySelector('.equipo-info');
       if (radio.value === 'equipo') {
         equipoInfo.classList.add('show');
       } else {
@@ -167,6 +167,12 @@
 
     if (telefonoRaw.length !== 10) {
       alert('⚠️ El número debe tener 10 dígitos (sin código de país). Ej: 1112345678');
+      return;
+    }
+
+    // Validar que se haya seleccionado una zona
+    if (!zona) {
+      alert('⚠️ Por favor, selecciona una zona de juego.');
       return;
     }
 
@@ -236,7 +242,7 @@
     updateRitualCounter();
     setInterval(updateRitualCounter, 3000);
 
-    // Redirigir a app.html (sin abrir nada)
+    // Redirigir a app.html (con zona exacta)
     setTimeout(() => {
       window.location.href = `app.html?id=${encodeURIComponent(hunterId)}&zona=${encodeURIComponent(zona)}`;
     }, 1200);

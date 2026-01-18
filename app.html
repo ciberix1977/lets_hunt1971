@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   
-  <!-- Librerías externas (sin espacios) -->
+  <!-- Librerías externas -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   
   <link rel="stylesheet" href="styles.css">
@@ -32,6 +32,22 @@
       text-align: center;
       max-width: 90%;
       display: none;
+      font-size: 0.95rem;
+    }
+    #pwa-install-banner .close-btn {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      font-size: 1.2rem;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -58,6 +74,7 @@
       <!-- FASE 2: Mapa de aproximación -->
       <div id="phase2-mapa" class="mission-phase" style="display: none;">
         <div class="mission-card"></div>
+        <div id="proximity-status" style="text-align:center; margin-top:1rem; color:#64b5f7; font-size:0.9rem;"></div>
       </div>
 
       <!-- FASE 3: Pista final + QR -->
@@ -73,6 +90,7 @@
       <!-- SECCIÓN PARA EQUIPOS -->
       <div id="teamSection" class="mission-phase" style="display: none;">
         <div class="mission-card"></div>
+        <div id="team-proximity-status" style="text-align:center; margin-top:1rem; color:#64b5f7; font-size:0.9rem;"></div>
       </div>
     </div>
   </main>
@@ -129,129 +147,168 @@
 
   <!-- LÓGICA PRINCIPAL -->
   <script>
-    // ========== CONFIGURACIÓN POR ZONA ==========
-    const ZONA_CONFIG = {
-      'CABA': {
-        misionId: 'M1',
-        titulo: 'Misión 1: El León de Bronce',
-        pista: 'Busca al guardián de bronce frente al Congreso.',
-        hint: '🔍 Frente al Congreso, busca la estatua ecuestre del General Belgrano.',
-        coords: [-34.6034, -58.3845],
-        nivel: 'N2'
-      },
-      'AVELLANEDA': {
-        misionId: 'M2',
-        titulo: 'Misión 2: El Eco de Sarandí',
-        pista: 'En la estación que lleva el nombre de un pueblo olvidado, busca el mural que cuenta la historia del lugar.',
-        hint: '🔍 Estación Sarandí, hall mural histórico en andén norte.',
-        coords: [-34.6620, -58.3660],
-        nivel: 'N2'
-      },
-      'LANUS': {
-        misionId: 'M3',
-        titulo: 'Misión 3: El Secreto del Parque',
-        pista: 'Bajo la sombra del árbol centenario, una placa recuerda al fundador. ¿Qué año dice?',
-        hint: '🔍 Parque Juan de Garay, junto a la fuente central.',
-        coords: [-34.7100, -58.3900],
-        nivel: 'N2'
-      },
-      'LOMAS': {
-        misionId: 'M4',
-        titulo: 'Misión 4: La Clave de la Plaza',
-        pista: 'En la plaza donde los niños juegan y los ancianos recuerdan, busca el reloj de sol. ¿Qué hora marca siempre?',
-        hint: '🔍 Plaza Manuel Belgrano, junto al monumento al fundador.',
-        coords: [-34.7520, -58.4100],
-        nivel: 'N2'
-      }
-    };
+    // ========== DATOS DINÁMICOS ==========
+    let misionesSolitario = [];
+    let misionesEquipo = [];
+    let currentMission = null;
+    let missionStartTime = null;
+    let deferredPrompt;
 
     // ========== INICIALIZACIÓN ==========
-    if (!localStorage.getItem('lastHunterId')) {
-      localStorage.setItem('lastHunterId', '0');
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId') || 'hunter0000';
-    let ciudadFromURL = (urlParams.get('zona') || '').trim().toUpperCase();
-
-    // Redirigir a registro si no hay sesión válida
-    if (!hunterId || hunterId === 'hunter0000') {
-      if (!urlParams.has('id')) {
-        window.location.href = 'registro.html';
+    async function initApp() {
+      try {
+        const [solitarioRes, equipoRes] = await Promise.all([
+          fetch('misiones-solitario.json'),
+          fetch('misiones-equipo.json')
+        ]);
+        misionesSolitario = await solitarioRes.json();
+        misionesEquipo = await equipoRes.json();
+      } catch (err) {
+        console.error("⚠️ Error cargando misiones:", err);
+        showToast("⚠️ No se pudieron cargar las misiones. Reintentando...");
+        misionesSolitario = [
+          { id: 1, zona: "CABA", titulo: "Misión de prueba", ubicacion_mapa: "Plaza de Mayo", pista_al_llegar: "Busca la pista final.", coordenadas: { lat: -34.6037, lng: -58.3816 } }
+        ];
       }
+
+      setupJugador();
+
+      if (jugador.modo === 'equipo') {
+        showTeamMission();
+      } else {
+        showPhase1();
+      }
+
+      // Registrar Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(() => console.log('✅ SW registrado'))
+            .catch(err => console.error('❌ Error SW:', err));
+        });
+      }
+
+      // Mostrar banner de instalación
+      showInstallBanner();
     }
 
+    // ========== CONFIGURACIÓN DEL JUGADOR ==========
     let jugador;
-    if (hunterId === 'hunter0000') {
-      const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
-      hunterId = `hunter_${String(nextId).padStart(4, '0')}`;
-      localStorage.setItem('lastHunterId', nextId);
-      
-      const ciudad = ciudadFromURL || 'CABA';
-      jugador = {
-        id: hunterId,
-        nombre: 'Jugador de Prueba',
-        telefono: '+5491112345678',
-        zona: ciudad,
-        modo: 'individual'
-      };
-      localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
-    } else {
-      jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`)) || {
-        id: hunterId,
-        zona: 'CABA',
-        modo: 'individual'
-      };
-      
-      let zonaFinal = 'CABA';
-      if (ciudadFromURL && ZONA_CONFIG[ciudadFromURL]) {
-        zonaFinal = ciudadFromURL;
-      } else if (jugador.zona && ZONA_CONFIG[jugador.zona.trim().toUpperCase()]) {
-        zonaFinal = jugador.zona.trim().toUpperCase();
+    function setupJugador() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId') || 'hunter0000';
+
+      if (!hunterId || hunterId === 'hunter0000') {
+        if (!urlParams.has('id')) {
+          window.location.href = 'registro.html';
+          return;
+        }
       }
-      jugador.zona = zonaFinal;
-      localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+
+      if (hunterId === 'hunter0000') {
+        const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
+        hunterId = `hunter_${String(nextId).padStart(4, '0')}`;
+        localStorage.setItem('lastHunterId', nextId);
+        
+        // ✅ CORRECCIÓN: usar ciudadFromURL, no "ciudad"
+        const ciudadFromURL = decodeURIComponent((urlParams.get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
+        jugador = {
+          id: hunterId,
+          nombre: 'Jugador de Prueba',
+          telefono: '+5491112345678',
+          zona: ciudadFromURL, // ← ¡CORREGIDO!
+          modo: 'individual'
+        };
+        localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+      } else {
+        // ✅ CORRECCIÓN: SIEMPRE priorizar la zona de la URL
+        jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`)) || {
+          id: hunterId,
+          zona: 'CABA',
+          modo: 'individual'
+        };
+
+        const ciudadFromURL = decodeURIComponent((urlParams.get('zona') || '').replace(/\+/g, ' ')).trim();
+        if (ciudadFromURL) {
+          const zonaNormalizada = ciudadFromURL.normalize('NFC');
+          if (getMisionesByZona(zonaNormalizada, 'solitario').length > 0) {
+            jugador.zona = zonaNormalizada;
+          }
+        }
+
+        localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+      }
+
+      localStorage.setItem('currentHunterId', hunterId);
+      document.getElementById('hunterIdDisplay').textContent = 
+        jugador.modo === 'equipo' ? `👥 ${jugador.equipo || hunterId}` : `ID: ${hunterId}`;
     }
 
-    if (!ZONA_CONFIG[jugador.zona]) {
-      jugador.zona = 'CABA';
-      localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+    // ========== UTILIDADES DE MISIÓN ==========
+    function getMisionesByZona(zona, tipo = 'solitario') {
+      const lista = tipo === 'equipo' ? misionesEquipo : misionesSolitario;
+      
+      // Normalizar la zona de entrada
+      const zonaNormalizada = (zona || '').trim().toLowerCase();
+      
+      // Lista de barrios de CABA (para compatibilidad)
+      const barriosCABA = [
+        'san telmo', 'la boca', 'recoleta', 'microcentro', 'palermo',
+        'congreso', 'almagro', 'retiro', 'balvanera', 'villa crespo',
+        'belgrano', 'barracas', 'flores', 'villa urquiza', 'puerto madero',
+        'san cristóbal'
+      ];
+      
+      return lista.filter(m => {
+        const misionZona = (m.zona || '').trim().toLowerCase();
+        
+        // Coincidencia directa
+        if (misionZona === zonaNormalizada) {
+          return true;
+        }
+        
+        // Si la zona solicitada es "caba", aceptar cualquier barrio de CABA
+        if (zonaNormalizada === 'caba' && barriosCABA.includes(misionZona)) {
+          return true;
+        }
+        
+        // Si la misión es de CABA y la zona solicitada es un barrio, también coincide
+        if (barriosCABA.includes(zonaNormalizada) && barriosCABA.includes(misionZona)) {
+          return true;
+        }
+        
+        return false;
+      });
     }
 
-    localStorage.setItem('currentHunterId', hunterId);
-    const isTeam = jugador.modo === 'equipo';
-    const progreso = JSON.parse(localStorage.getItem(`progreso_${hunterId}`)) || {
-      misiones: 0,
-      desafios: 0,
-      zona: jugador.zona
-    };
-    const config = ZONA_CONFIG[jugador.zona] || ZONA_CONFIG['CABA'];
-
-    document.getElementById('hunterIdDisplay').textContent = isTeam 
-      ? `👥 ${jugador.equipo || hunterId}`
-      : `ID: ${hunterId}`;
-
-    // Guardar momento de inicio para calcular tiempo
-    const missionStartTime = Date.now();
+    function selectRandomMission(zona, tipo = 'solitario') {
+      const misiones = getMisionesByZona(zona, tipo);
+      if (misiones.length === 0) {
+        return getMisionesByZona('CABA', tipo)[0] || misionesSolitario[0];
+      }
+      return misiones[Math.floor(Math.random() * misiones.length)];
+    }
 
     // ========== FLUJO INDIVIDUAL ==========
     function showPhase1() {
+      currentMission = selectRandomMission(jugador.zona, 'solitario');
       document.querySelector('#phase1-consigna .mission-card').innerHTML = `
         <div class="mission-title">
           <span class="icon">🦁</span>
-          ${config.titulo}
+          ${currentMission.titulo}
         </div>
         <div class="tension-bar" style="margin: 1rem 0; background: rgba(255,69,58,0.15);">
           ⏳ Listo para cazar
         </div>
-        <p class="pista">${config.pista}</p>
+        <p class="pista">${currentMission.descripcion_narrativa || currentMission.pista_al_llegar}</p>
         <button class="btn btn-primary" id="start-mission-btn">✅ Aceptar y comenzar</button>
       `;
       document.getElementById('phase1-consigna').style.display = 'block';
       
       document.getElementById('start-mission-btn').addEventListener('click', () => {
-        startTimer(); // ✅ Inicia SOLO al aceptar
-        guardarProgreso(config.misionId);
+        missionStartTime = Date.now();
+        startTimer();
+        guardarProgreso(currentMission.id);
         showPhase2();
       });
     }
@@ -260,25 +317,23 @@
       document.getElementById('phase1-consigna').style.display = 'none';
       document.querySelector('#phase2-mapa .mission-card').innerHTML = `
         <h3>📍 Acércate al objetivo</h3>
-        <p style="margin: 1rem 0; color:#cbd5e1;">El radar te guía. Cuando estés a menos de 50 metros, se desbloqueará la pista final.</p>
+        <p style="margin: 1rem 0; color:#cbd5e1;">${currentMission.ubicacion_mapa}</p>
         <div id="mapApprox" style="height: 300px; border-radius:12px; margin:1rem 0;"></div>
-        <button class="btn btn-outline" id="confirm-location-btn">👣 Estoy en el lugar</button>
+        <p id="proximity-instructions" style="font-size:0.9rem; color:#94a3b8;">Esperando tu ubicación...</p>
       `;
       document.getElementById('phase2-mapa').style.display = 'block';
-      loadApproxMap();
-      document.getElementById('confirm-location-btn').addEventListener('click', () => {
-        showPhase3();
-      });
+      loadApproxMap(currentMission.coordenadas.lat, currentMission.coordenadas.lng);
+      startProximityCheck(currentMission.coordenadas.lat, currentMission.coordenadas.lng);
     }
 
     function showPhase3() {
       document.getElementById('phase2-mapa').style.display = 'none';
       const recoveryCode = generarRecoveryCode();
-      localStorage.setItem(`recovery_${hunterId}`, recoveryCode);
+      localStorage.setItem(`recovery_${jugador.id}`, recoveryCode);
       
       document.querySelector('#phase3-pista .mission-card').innerHTML = `
         <h3>🔍 Pista final</h3>
-        <p class="pista">${config.hint}</p>
+        <p class="pista">${currentMission.pista_al_llegar}</p>
         <div class="actions">
           <button class="btn btn-primary" id="scan-btn">🔍 Escanear QR</button>
         </div>
@@ -288,22 +343,24 @@
       `;
       document.getElementById('phase3-pista').style.display = 'block';
       document.getElementById('scan-btn').addEventListener('click', openQRScanner);
-      playNarration(`Cazador ${hunterId.replace('hunter_', '')}. Estás en la zona. La pista final ha sido revelada.`);
+      playNarration(`Cazador ${jugador.id.replace('hunter_', '')}. Estás en la zona. La pista final ha sido revelada.`);
     }
 
     // ========== FLUJO EQUIPO ==========
+    let currentTeamMission = null;
     function showTeamMission() {
       document.body.classList.add('modo-equipo');
+      currentTeamMission = selectRandomMission(jugador.zona, 'equipo');
       const recoveryCode = generarRecoveryCode();
-      localStorage.setItem(`recovery_${hunterId}`, recoveryCode);
+      localStorage.setItem(`recovery_${jugador.id}`, recoveryCode);
       
       document.querySelector('#teamSection .mission-card').innerHTML = `
         <div class="mission-title">
           <span class="icon">👁️</span>
-          ${config.titulo}
+          ${currentTeamMission.titulo}
           <span class="status active nivel-N2">ACTIVA • N2</span>
         </div>
-        <p class="pista">${config.pista}</p>
+        <p class="pista">${currentTeamMission.descripcion_narrativa}</p>
         <div class="actions">
           <button class="btn btn-primary" id="accept-mission-btn">✅ Aceptar misión</button>
           <button class="btn btn-outline" id="scan-btn-team">🔍 Escanear QR</button>
@@ -315,14 +372,328 @@
       document.getElementById('teamSection').style.display = 'block';
 
       document.getElementById('accept-mission-btn').addEventListener('click', () => {
-        guardarProgreso(config.misionId);
+        missionStartTime = Date.now();
+        startTimer();
+        guardarProgreso(currentTeamMission.id);
         showToast("✅ Misión aceptada. ¡Buena cacería!");
+        startTeamProximityCheck();
       });
 
       document.getElementById('scan-btn-team').addEventListener('click', openQRScanner);
     }
 
-    // === FASE 4: Misión completada ===
+    function startTeamProximityCheck() {
+      const coordsA = currentTeamMission.qr_cercanos[0].coordenadas;
+      loadApproxMap(coordsA.lat, coordsA.lng);
+      document.getElementById('team-proximity-status').textContent = "📍 Esperando ubicación...";
+      
+      if (navigator.geolocation) {
+        const watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const userLat = pos.coords.latitude;
+            const userLng = pos.coords.longitude;
+            const distA = calculateDistance(userLat, userLng, coordsA.lat, coordsA.lng);
+            const coordsB = currentTeamMission.qr_cercanos[1]?.coordenadas;
+            let statusText = `Estás a ${distA.toFixed(0)} m del QR A`;
+            if (coordsB) {
+              const distB = calculateDistance(userLat, userLng, coordsB.lat, coordsB.lng);
+              statusText += ` | ${distB.toFixed(0)} m del QR B`;
+            }
+            document.getElementById('team-proximity-status').textContent = statusText;
+          },
+          (err) => {
+            document.getElementById('team-proximity-status').textContent = "⚠️ Ubicación desactivada";
+          },
+          { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
+        );
+      }
+    }
+
+    // ========== VALIDACIÓN DE PROXIMIDAD REAL ==========
+    let proximityWatchId = null;
+    function startProximityCheck(targetLat, targetLng) {
+      if (navigator.geolocation) {
+        document.getElementById('proximity-instructions').textContent = "Verificando tu ubicación...";
+        proximityWatchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const userLat = pos.coords.latitude;
+            const userLng = pos.coords.longitude;
+            const distance = calculateDistance(userLat, userLng, targetLat, targetLng);
+            
+            const statusEl = document.getElementById('proximity-status');
+            if (distance <= 50) {
+              statusEl.innerHTML = "✅ ¡Estás en la zona! Puedes acceder a la pista final.";
+              statusEl.style.color = "#4ade80";
+              if (!document.getElementById('unlock-phase3-btn')) {
+                const btn = document.createElement('button');
+                btn.id = 'unlock-phase3-btn';
+                btn.className = 'btn btn-primary';
+                btn.textContent = '🔓 Acceder a la pista final';
+                btn.onclick = showPhase3;
+                document.querySelector('#phase2-mapa .mission-card').appendChild(btn);
+              }
+            } else {
+              statusEl.innerHTML = `📍 A ${Math.round(distance)} metros del objetivo. Acércate más.`;
+              statusEl.style.color = "#64b5f7";
+              const unlockBtn = document.getElementById('unlock-phase3-btn');
+              if (unlockBtn) unlockBtn.remove();
+            }
+          },
+          (err) => {
+            document.getElementById('proximity-status').textContent = "⚠️ No se pudo obtener tu ubicación. Activa GPS.";
+          },
+          { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
+        );
+      } else {
+        document.getElementById('proximity-status').textContent = "⚠️ Tu navegador no soporta geolocalización.";
+      }
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const φ1 = lat1 * Math.PI/180;
+      const φ2 = lat2 * Math.PI/180;
+      const Δφ = (lat2-lat1) * Math.PI/180;
+      const Δλ = (lon2-lon1) * Math.PI/180;
+
+      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ/2) * Math.sin(Δλ/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+      return R * c;
+    }
+
+    // ========== MAPA ==========
+    function loadApproxMap(lat, lng) {
+      if (!window.L) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        // ✅ CORRECCIÓN: eliminar espacios al final
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+        
+        const script = document.createElement('script');
+        // ✅ CORRECCIÓN: eliminar espacios al final
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = () => initApproxMap(lat, lng);
+        document.head.appendChild(script);
+      } else {
+        initApproxMap(lat, lng);
+      }
+    }
+
+    function initApproxMap(lat, lng) {
+      const map = L.map('mapApprox').setView([lat, lng], 18.5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      
+      L.circle([lat, lng], {
+        color: '#ff6b6b',
+        fillColor: '#ff6b6b',
+        fillOpacity: 0.15,
+        radius: 50
+      }).addTo(map);
+
+      L.marker([lat, lng]).addTo(map).bindPopup(`<strong>Objetivo</strong><br>Zona de 50m`);
+    }
+
+    // ========== TEMPORIZADOR ==========
+    function startTimer() {
+      document.getElementById('timer').textContent = "90:00";
+      let timeLeft = 90 * 60;
+      const timerEl = document.getElementById('timer');
+      const interval = setInterval(() => {
+        if (timeLeft <= 0) {
+          timerEl.textContent = "⏰ Caducada";
+          clearInterval(interval);
+          return;
+        }
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+        timeLeft--;
+      }, 1000);
+    }
+
+    // ========== ESCÁNER QR ==========
+    let scannerActive = false;
+    let stream = null;
+
+    async function openQRScanner() {
+      let qrExpected;
+      if (jugador.modo === 'equipo' && currentTeamMission) {
+        qrExpected = {
+          A: `LH-${currentTeamMission.id}-A-${jugador.id.split('_')[1]}`,
+          B: `LH-${currentTeamMission.id}-B-${jugador.id.split('_')[1]}`
+        };
+        localStorage.setItem('qrCodeEsperado', JSON.stringify(qrExpected));
+      } else {
+        qrExpected = `LH-${currentMission.id}-${jugador.id.split('_')[1]}`;
+        localStorage.setItem('qrCodeEsperado', qrExpected);
+      }
+      
+      const overlay = document.getElementById('scannerOverlay');
+      const video = document.getElementById('scannerVideo');
+      const canvas = document.getElementById('scannerCanvas');
+      
+      try {
+        const constraints = { video: { facingMode: { ideal: "environment" } } };
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        
+        video.onloadedmetadata = () => {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+        };
+        
+        overlay.style.display = 'block';
+        scannerActive = true;
+        
+        const scanInterval = setInterval(() => {
+          if (!scannerActive || !video.videoWidth) return;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: "dontInvert" });
+          
+          if (code && code.data) {
+            clearInterval(scanInterval);
+            stopScanner();
+            
+            if (jugador.modo === 'equipo') {
+              handleTeamQRScan(code.data.trim(), qrExpected);
+            } else {
+              if (code.data.trim() === qrExpected) {
+                completeMission();
+              } else {
+                showToast("❌ Código incorrecto. ¿Estás en el lugar correcto?");
+                setTimeout(() => scannerActive && (overlay.style.display = 'block'), 1500);
+              }
+            }
+          }
+        }, 300);
+      } catch (err) {
+        stopScanner();
+        showToast("⚠️ Error de cámara. Usa ingreso manual.");
+      }
+    }
+
+    function handleTeamQRScan(scannedCode, expectedCodes) {
+      const key = `teamScan_${jugador.id}_${currentTeamMission.id}`;
+      let scans = JSON.parse(localStorage.getItem(key) || '{}');
+      
+      if (scannedCode === expectedCodes.A) {
+        scans.A = Date.now();
+        localStorage.setItem(key, JSON.stringify(scans));
+        showToast("✅ QR A escaneado. ¡Ahora busca el QR B!");
+      } else if (scannedCode === expectedCodes.B) {
+        scans.B = Date.now();
+        localStorage.setItem(key, JSON.stringify(scans));
+        showToast("✅ QR B escaneado. ¡Ahora busca el QR A!");
+      }
+      
+      if (scans.A && scans.B) {
+        const diff = Math.abs(scans.B - scans.A);
+        if (diff <= 15000) {
+          completeMission();
+        } else {
+          showToast("❌ Los escaneos no fueron sincronizados. Inténtalo de nuevo.");
+        }
+      }
+    }
+
+    function completeMission() {
+      const misionId = jugador.modo === 'equipo' ? currentTeamMission.id : currentMission.id;
+      guardarProgreso(null, `${misionId}_desafio_1`);
+      playNarration(`Confirmado. Has completado la misión. El ranking se actualiza ahora.`);
+      showToast(`✅ ¡Código verificado!\n🔥 ¡Cazador ${jugador.id} ha completado la misión!`);
+      showMissionCompleted();
+    }
+
+    function stopScanner() {
+      scannerActive = false;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      document.getElementById('scannerOverlay').style.display = 'none';
+    }
+
+    // ========== UTILIDADES COMPARTIDAS ==========
+    function generarRecoveryCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'LH';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    function guardarProgreso(misionId = null, desafioId = null) {
+      const key = `progreso_${jugador.id}`;
+      let data = JSON.parse(localStorage.getItem(key) || '{}');
+      if (!data.misiones) data.misiones = 0;
+      if (!data.desafios) data.desafios = 0;
+      if (!data.zona) data.zona = jugador.zona;
+      
+      if (misionId) {
+        const misionesKey = `misiones_aceptadas_${jugador.id}`;
+        let misiones = JSON.parse(localStorage.getItem(misionesKey) || '[]');
+        if (!misiones.includes(misionId)) {
+          misiones.push(misionId);
+          localStorage.setItem(misionesKey, JSON.stringify(misiones));
+          data.misiones = misiones.length;
+        }
+      }
+      if (desafioId) {
+        const desafiosKey = `desafios_completados_${jugador.id}`;
+        let desafios = JSON.parse(localStorage.getItem(desafiosKey) || '[]');
+        if (!desafios.includes(desafioId)) {
+          desafios.push(desafioId);
+          localStorage.setItem(desafiosKey, JSON.stringify(desafios));
+          data.desafios = desafios.length;
+        }
+      }
+      data.zona = jugador.zona;
+      data.lastUpdate = Date.now();
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function playNarration(text) {
+      if (localStorage.getItem('lh_narration_off') === '1') return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.62;
+      u.pitch = 0.4;
+      u.volume = 0.95;
+      const loadVoice = () => {
+        const voices = speechSynthesis.getVoices();
+        const voice = voices.find(v => 
+          v.lang.includes('es') && 
+          (v.name.includes('Male') || v.name === 'Diego' || v.name === 'Juan')
+        ) || voices.find(v => v.lang.includes('es')) || null;
+        if (voice) u.voice = voice;
+      };
+      loadVoice();
+      speechSynthesis.addEventListener('voiceschanged', loadVoice, { once: true });
+      u.onstart = () => {
+        if (window.AudioContext) {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const delay = ctx.createDelay(1.5);
+            delay.delayTime.value = 0.7;
+            const feedback = ctx.createGain();
+            feedback.gain.value = 0.25;
+            delay.connect(feedback);
+            feedback.connect(delay);
+            setTimeout(() => ctx.close(), 4000);
+          } catch (e) {}
+        }
+      };
+      speechSynthesis.speak(u);
+    }
+
     function showMissionCompleted() {
       document.getElementById('phase1-consigna').style.display = 'none';
       document.getElementById('phase2-mapa').style.display = 'none';
@@ -330,11 +701,12 @@
       document.getElementById('teamSection').style.display = 'none';
 
       const elapsedMinutes = Math.floor((Date.now() - missionStartTime) / 60000);
-      const recoveryCode = localStorage.getItem(`recovery_${hunterId}`) || '—';
+      const recoveryCode = localStorage.getItem(`recovery_${jugador.id}`) || '—';
+      const missionTitle = jugador.modo === 'equipo' ? currentTeamMission.titulo : currentMission.titulo;
 
       document.querySelector('#phase4-completed .mission-card').innerHTML = `
         <h2 style="color:#ffd700; margin-bottom:1rem;">✅ Operación Completada</h2>
-        <p><strong>${config.titulo}</strong></p>
+        <p><strong>${missionTitle}</strong></p>
         <p style="font-size:0.95rem; color:#cbd5e1; margin:1rem 0;">
           Tu posición ha sido registrada en el sistema central.
         </p>
@@ -360,192 +732,13 @@
       });
     }
 
-    // ========== TEMPORIZADOR (inicia solo al aceptar) ==========
-    function startTimer() {
-      document.getElementById('timer').textContent = "90:00";
-      let timeLeft = 90 * 60;
-      const timerEl = document.getElementById('timer');
-      const interval = setInterval(() => {
-        if (timeLeft <= 0) {
-          timerEl.textContent = "⏰ Caducada";
-          clearInterval(interval);
-          return;
-        }
-        const mins = Math.floor(timeLeft / 60);
-        const secs = timeLeft % 60;
-        timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-        timeLeft--;
-      }, 1000);
-    }
-
-    // ========== UTILIDADES COMPARTIDAS ==========
-    function loadApproxMap() {
-      if (!window.L) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        document.head.appendChild(link);
-        
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.onload = () => initApproxMap();
-        document.head.appendChild(script);
-      } else {
-        initApproxMap();
-      }
-    }
-
-    function initApproxMap() {
-      const coords = config.coords || [-34.6034, -58.3845];
-      const map = L.map('mapApprox').setView(coords, 18.5);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(map);
-      
-      L.marker(coords).addTo(map).bindPopup(`<strong>${config.titulo}</strong><br>Objetivo`);
-    }
-
-    function generarRecoveryCode() {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let code = 'LH';
-      for (let i = 0; i < 8; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return code;
-    }
-
-    function guardarProgreso(misionId = null, desafioId = null) {
-      const key = `progreso_${hunterId}`;
-      let data = JSON.parse(localStorage.getItem(key) || '{}');
-      if (!data.misiones) data.misiones = 0;
-      if (!data.desafios) data.desafios = 0;
-      if (!data.zona) data.zona = jugador.zona;
-      
-      if (misionId) {
-        const misionesKey = `misiones_aceptadas_${hunterId}`;
-        let misiones = JSON.parse(localStorage.getItem(misionesKey) || '[]');
-        if (!misiones.includes(misionId)) {
-          misiones.push(misionId);
-          localStorage.setItem(misionesKey, JSON.stringify(misiones));
-          data.misiones = misiones.length;
-        }
-      }
-      if (desafioId) {
-        const desafiosKey = `desafios_completados_${hunterId}`;
-        let desafios = JSON.parse(localStorage.getItem(desafiosKey) || '[]');
-        if (!desafios.includes(desafioId)) {
-          desafios.push(desafioId);
-          localStorage.setItem(desafiosKey, JSON.stringify(desafios));
-          data.desafios = desafios.length;
-        }
-      }
-      data.zona = jugador.zona;
-      data.lastUpdate = Date.now();
-      localStorage.setItem(key, JSON.stringify(data));
-    }
-
-    function playNarration(text) {
-      if (localStorage.getItem('lh_narration_off') === '1') return;
-
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 0.62;
-      u.pitch = 0.4;
-      u.volume = 0.95;
-
-      const loadVoice = () => {
-        const voices = speechSynthesis.getVoices();
-        const voice = voices.find(v => 
-          v.lang.includes('es') && 
-          (v.name.includes('Male') || v.name === 'Diego' || v.name === 'Juan')
-        ) || voices.find(v => v.lang.includes('es')) || null;
-        
-        if (voice) u.voice = voice;
-      };
-
-      loadVoice();
-      speechSynthesis.addEventListener('voiceschanged', loadVoice, { once: true });
-
-      u.onstart = () => {
-        if (window.AudioContext) {
-          try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const delay = ctx.createDelay(1.5);
-            delay.delayTime.value = 0.7;
-            const feedback = ctx.createGain();
-            feedback.gain.value = 0.25;
-            delay.connect(feedback);
-            feedback.connect(delay);
-            setTimeout(() => ctx.close(), 4000);
-          } catch (e) {}
-        }
-      };
-
-      speechSynthesis.speak(u);
-    }
-
-    document.getElementById('narration-toggle').addEventListener('click', function() {
+    // Event listeners globales
+    document.getElementById('narration-toggle')?.addEventListener('click', function() {
       const isOff = localStorage.getItem('lh_narration_off') === '1';
       localStorage.setItem('lh_narration_off', isOff ? '0' : '1');
       this.textContent = isOff ? '🔊' : '🔇';
       showToast(isOff ? '✅ Narración activada' : '🔇 Narración desactivada');
     });
-
-    // ========== ESCÁNER QR ==========
-    let scannerActive = false;
-    let stream = null;
-
-    async function openQRScanner() {
-      const qrExpected = localStorage.getItem('qrCodeEsperado') || 
-        `LH-${config.misionId}-${hunterId.split('_')[1]}-abcd`.toUpperCase();
-      localStorage.setItem('qrCodeEsperado', qrExpected);
-      
-      const overlay = document.getElementById('scannerOverlay');
-      const video = document.getElementById('scannerVideo');
-      const canvas = document.getElementById('scannerCanvas');
-      const ctx = canvas.getContext('2d');
-      try {
-        const constraints = { video: { facingMode: { ideal: "environment" } } };
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
-        overlay.style.display = 'block';
-        scannerActive = true;
-        
-        const scanInterval = setInterval(() => {
-          if (!scannerActive || !video.videoWidth) return;
-          ctx.drawImage(video, 0, 0, canvas.width || 640, canvas.height || 480);
-          const imageData = ctx.getImageData(0, 0, canvas.width || 640, canvas.height || 480);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-          if (code && code.data) {
-            clearInterval(scanInterval);
-            stopScanner();
-            if (code.data.trim() === qrExpected) {
-              const misionActiva = localStorage.getItem('misionActivaId') || 'M1';
-              guardarProgreso(null, `${misionActiva}_desafio_1`);
-              
-              playNarration(`Confirmado. Has completado la misión. El ranking se actualiza ahora.`);
-              showToast(`✅ ¡Código verificado!\n🔥 ¡Cazador ${hunterId} ha completado ${config.titulo}!`);
-              
-              showMissionCompleted();
-            } else {
-              showToast("❌ Código incorrecto. ¿Estás en el lugar correcto?");
-              setTimeout(() => scannerActive && (overlay.style.display = 'block'), 1500);
-            }
-          }
-        }, 300);
-      } catch (err) {
-        stopScanner();
-        showToast("⚠️ Error de cámara. Usa ingreso manual.");
-      }
-    }
-
-    function stopScanner() {
-      scannerActive = false;
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-      }
-      document.getElementById('scannerOverlay').style.display = 'none';
-    }
 
     document.getElementById('closeScannerBtn')?.addEventListener('click', stopScanner);
     document.getElementById('manualInputBtn')?.addEventListener('click', () => {
@@ -554,15 +747,20 @@
       if (!qrExpected) return showToast("⚠️ Acepta una misión primero");
       const input = prompt("Ingresa el código QR:", "");
       if (!input) return;
-      if (input.trim() === qrExpected) {
-        const misionActiva = localStorage.getItem('misionActivaId') || 'M1';
-        guardarProgreso(null, `${misionActiva}_desafio_1`);
-        playNarration(`Confirmado. Has completado la misión.`);
-        showToast(`✅ ¡Código verificado!\n🔥 ¡Cazador ${hunterId} ha completado ${config.titulo}!`);
-        
-        showMissionCompleted();
+      
+      if (jugador.modo === 'equipo') {
+        const expected = JSON.parse(qrExpected);
+        if (input.trim() === expected.A || input.trim() === expected.B) {
+          handleTeamQRScan(input.trim(), expected);
+        } else {
+          showToast("❌ Código inválido.");
+        }
       } else {
-        showToast("❌ Código inválido. ¿Estás en el lugar correcto?");
+        if (input.trim() === qrExpected) {
+          completeMission();
+        } else {
+          showToast("❌ Código inválido. ¿Estás en el lugar correcto?");
+        }
       }
     });
 
@@ -577,29 +775,7 @@
       setTimeout(() => t.classList.remove('show'), 3500);
     }
 
-    // ========== CONEXIÓN EN TIEMPO REAL ==========
-    let ws;
-    function connectWebSocket() {
-      const wsUrl = window.location.hostname === 'localhost' 
-        ? 'ws://localhost:8080'
-        : `wss://${window.location.hostname}/ws`;
-      try {
-        ws = new WebSocket(wsUrl);
-        ws.onopen = () => {
-          ws.send(JSON.stringify({ 
-            type: 'join', 
-            id: hunterId, 
-            zone: jugador.zona,
-            missions: progreso.misiones,
-            challenges: progreso.desafios
-          }));
-        };
-      } catch (e) {}
-    }
-    connectWebSocket();
-
-    // ========== BOTÓN DE INSTALACIÓN PWA ==========
-    let deferredPrompt;
+    // ========== BANNER DE INSTALACIÓN PWA ==========
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -609,76 +785,92 @@
       const banner = document.getElementById('pwa-install-banner');
       if (!banner) return;
 
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const bannerDismissed = localStorage.getItem('pwaBannerDismissed');
+      const now = Date.now();
+      if (bannerDismissed && (now - parseInt(bannerDismissed)) < 24 * 60 * 60 * 1000) {
+        return;
+      }
+
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
                         || window.navigator.standalone === true;
 
-      if (isStandalone) return;
+      if (isStandalone) {
+        banner.innerHTML = `
+          <button class="close-btn" id="close-install-banner">×</button>
+          <p style="margin:0 0 8px;">
+            🎯 Let's Hunt está instalado.
+          </p>
+          <p style="font-size:0.85rem; margin:0; color:#94a3b8;">
+            ¿Ves esto? Cierra el banner.
+          </p>
+        `;
+        banner.style.display = 'block';
+        document.getElementById('close-install-banner').onclick = () => {
+          banner.style.display = 'none';
+          localStorage.setItem('pwaBannerDismissed', now.toString());
+        };
+        return;
+      }
+
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
       setTimeout(() => {
         banner.style.display = 'block';
         
         if (isIOS) {
           banner.innerHTML = `
-            <p style="margin:0 0 8px;font-size:0.95rem;">
+            <button class="close-btn" id="close-install-banner">×</button>
+            <p style="margin:0 0 8px;">
               👆 Toca <strong>Compartir</strong> → <strong>“Añadir a pantalla de inicio”</strong>
             </p>
-            <button id="dismiss-ios" style="
-              background:#444; color:white; border:none;
-              padding:6px 12px; border-radius:6px; font-size:0.9rem;
-            ">Entendido</button>
           `;
-          document.getElementById('dismiss-ios').onclick = () => banner.style.display = 'none';
+          document.getElementById('close-install-banner').onclick = () => {
+            banner.style.display = 'none';
+            localStorage.setItem('pwaBannerDismissed', now.toString());
+          };
         } else {
           banner.innerHTML = `
-            <p style="margin:0 0 8px;font-size:0.95rem;">
+            <button class="close-btn" id="close-install-banner">×</button>
+            <p style="margin:0 0 8px;">
               📥 ¿Agregar Let's Hunt a tu pantalla de inicio?
             </p>
             <button id="install-btn" style="
               background:var(--primary); color:white; border:none;
               padding:6px 12px; border-radius:6px; font-weight:bold;
-              font-size:0.9rem;
+              font-size:0.9rem; margin-top:4px;
             ">Instalar</button>
           `;
+          document.getElementById('close-install-banner').onclick = () => {
+            banner.style.display = 'none';
+            localStorage.setItem('pwaBannerDismissed', now.toString());
+          };
+          
           document.getElementById('install-btn').onclick = () => {
             if (deferredPrompt) {
               deferredPrompt.prompt();
-              deferredPrompt = null;
+              deferredPrompt.userChoice.then((choiceResult) => {
+                banner.style.display = 'none';
+                deferredPrompt = null;
+              });
             } else {
               banner.innerHTML = `
-                <p style="margin:0 0 8px;font-size:0.95rem;">
+                <button class="close-btn" id="close-install-banner">×</button>
+                <p style="margin:0 0 8px;">
                   Abre el menú del navegador (⋯ o ≡) y busca <strong>“Instalar app”</strong>.
                 </p>
-                <button id="dismiss-android" style="
-                  background:#444; color:white; border:none;
-                  padding:6px 12px; border-radius:6px; font-size:0.9rem;
-                ">Cerrar</button>
               `;
-              document.getElementById('dismiss-android').onclick = () => banner.style.display = 'none';
+              document.getElementById('close-install-banner').onclick = () => {
+                banner.style.display = 'none';
+                localStorage.setItem('pwaBannerDismissed', now.toString());
+              };
             }
           };
         }
       }, 3000);
     }
 
-    // Registrar Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(() => console.log('✅ SW registrado'))
-          .catch(err => console.error('❌ Error SW:', err));
-      });
-    }
-
-    // Mostrar banner de instalación
-    showInstallBanner();
-
-    // ========== INICIAR FLUJO ==========
-    if (isTeam) {
-      showTeamMission();
-    } else {
-      showPhase1();
-    }
+    // Inicializar app
+    window.addEventListener('load', initApp);
   </script>
 </body>
 </html>
