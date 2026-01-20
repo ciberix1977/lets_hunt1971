@@ -11,6 +11,7 @@
   
   <!-- Librerías externas -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="/manifest.json">
@@ -55,24 +56,6 @@
     background: rgba(255, 255, 255, 0.1);
     padding: 4px;
   }
-  /* En la sección de estilos específicos */
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--surface-border);
-  color: var(--text);
-  /* ✅ Mejorar accesibilidad */
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-}
-.btn-outline:focus-visible {
-  outline-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.3);
-}
-.btn-outline:hover {
-  background: rgba(255, 255, 255, 0.08);
-  /* ✅ Asegurar contraste mínimo */
-  color: #f1f5f9;
-}
   </style>
  
 </head>
@@ -230,6 +213,11 @@
 
   <!-- LÓGICA PRINCIPAL -->
   <script>
+    // ========== SUPABASE ==========
+    const supabaseUrl = 'https://seubermhmnyymgdctvxj.supabase.co'; // ← ¡REEMPLAZA CON TU URL!
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNldWJlcm1obW55eW1nZGN0dnhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MTY2NDEsImV4cCI6MjA4NDQ5MjY0MX0.XYYTaYkiUbm6XUVVcc9XLTMNqJqKz2Bd_2K7LBZfK3o'; // ← ¡REEMPLAZA CON TU CLAVE!
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
     // ========== DATOS DINÁMICOS ==========
     let misionesSolitario = [];
     let misionesEquipo = [];
@@ -255,6 +243,44 @@
       }
 
       setupJugador();
+    }
+
+    // ========== VERIFICACIÓN DE MISIÓN EN TIEMPO REAL ==========
+    async function isMisionDisponible(misionId, zona) {
+      const { data, error } = await supabase
+        .from('misiones_activas')
+        .select('estado')
+        .eq('id_mision', `M${misionId}-${zona}`)
+        .single();
+
+      if (error || !data) {
+        // Si no existe, crearla como disponible
+        await supabase
+          .from('misiones_activas')
+          .insert({ 
+            id_mision: `M${misionId}-${zona}`,
+            zona: zona,
+            estado: 'disponible'
+          });
+        return true;
+      }
+      
+      return data.estado === 'disponible';
+    }
+
+    async function completarMision(misionId, zona, hunterId) {
+      const { data, error } = await supabase
+        .from('misiones_activas')
+        .update({ 
+          estado: 'completada',
+          hunter_ganador: hunterId,
+          timestamp: new Date()
+        })
+        .eq('id_mision', `M${misionId}-${zona}`)
+        .eq('estado', 'disponible')
+        .select();
+
+      return !error && data.length > 0;
     }
 
     // Función para ocultar todas las fases
@@ -324,7 +350,7 @@
       document.getElementById('hunterIdDisplay').textContent = 
         jugador.modo === 'equipo' ? `👥 ${jugador.equipo || hunterId}` : `ID: ${hunterId}`;
 
-      // ✅ CORRECCIÓN: Mostrar siempre la misión correspondiente
+      // Mostrar la misión correspondiente
       if (jugador.modo === 'equipo') {
         showTeamMission();
       } else {
@@ -373,8 +399,18 @@
     }
 
     // ========== FLUJO INDIVIDUAL ==========
-    function showPhase1() {
+    async function showPhase1() {
       currentMission = selectRandomMission(jugador.zona, 'solitario');
+      
+      // Verificar disponibilidad en tiempo real
+      const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
+      
+      if (!disponible) {
+        showToast("⚠️ Alguien ya completó esta misión. Buscando otra...");
+        setTimeout(showPhase1, 2000);
+        return;
+      }
+
       document.querySelector('#phase1-consigna .mission-card').innerHTML = `
         <div class="mission-title">
           <span class="icon">🦁</span>
@@ -431,7 +467,7 @@
 
     // ========== FLUJO EQUIPO ==========
     let currentTeamMission = null;
-    function showTeamMission() {
+    async function showTeamMission() {
       document.body.classList.add('modo-equipo');
       currentTeamMission = selectRandomMission(jugador.zona, 'equipo');
       const recoveryCode = generarRecoveryCode();
@@ -632,7 +668,7 @@
         overlay.style.display = 'block';
         scannerActive = true;
         
-        const scanInterval = setInterval(() => {
+        const scanInterval = setInterval(async () => {
           if (!scannerActive || !video.videoWidth) return;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -643,15 +679,31 @@
             clearInterval(scanInterval);
             stopScanner();
             
+            const codigoEscaneado = code.data.trim();
+            let exito = false;
+            
             if (jugador.modo === 'equipo') {
-              handleTeamQRScan(code.data.trim(), qrExpected);
+              // Para equipos, verificar QR individual
+              exito = true; // Simplificado para equipos
+              handleTeamQRScan(codigoEscaneado, qrExpected);
             } else {
-              if (code.data.trim() === qrExpected) {
-                completeMission();
-              } else {
-                showToast("❌ Código incorrecto. ¿Estás en el lugar correcto?");
-                setTimeout(() => scannerActive && (overlay.style.display = 'block'), 1500);
+              // Para individuales, verificar con Supabase
+              if (codigoEscaneado === qrExpected) {
+                exito = await completarMision(currentMission.id, jugador.zona, jugador.id);
               }
+            }
+            
+            if (!exito && jugador.modo !== 'equipo') {
+              showToast("❌ ¡Demasiado tarde! Alguien ya encontró el código.");
+              setTimeout(showPhase1, 3000);
+              return;
+            }
+            
+            if (exito || jugador.modo === 'equipo') {
+              completeMission();
+            } else {
+              showToast("❌ Código incorrecto. ¿Estás en el lugar correcto?");
+              setTimeout(() => scannerActive && (overlay.style.display = 'block'), 1500);
             }
           }
         }, 300);
@@ -837,11 +889,20 @@
           showToast("❌ Código inválido.");
         }
       } else {
-        if (input.trim() === qrExpected) {
-          completeMission();
-        } else {
-          showToast("❌ Código inválido. ¿Estás en el lugar correcto?");
-        }
+        // Verificar con Supabase
+        (async () => {
+          if (input.trim() === qrExpected) {
+            const exito = await completarMision(currentMission.id, jugador.zona, jugador.id);
+            if (exito) {
+              completeMission();
+            } else {
+              showToast("❌ ¡Demasiado tarde! Alguien ya encontró el código.");
+              setTimeout(showPhase1, 3000);
+            }
+          } else {
+            showToast("❌ Código inválido. ¿Estás en el lugar correcto?");
+          }
+        })();
       }
     });
 
