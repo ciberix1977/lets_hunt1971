@@ -14,45 +14,70 @@
   
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="/manifest.json">
-  
-  <!-- Estilo para el banner de instalación -->
+
+  <meta name="theme-color" content="#000000">
+
+  <!-- Estilos específicos para la sección de sponsors -->
   <style>
-    #pwa-install-banner {
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(30, 41, 59, 0.95);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-      z-index: 1000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      border: 1px solid var(--surface-border);
-      text-align: center;
-      max-width: 90%;
-      display: none;
-      font-size: 0.95rem;
-    }
-    #pwa-install-banner .close-btn {
-      position: absolute;
-      top: 4px;
-      right: 8px;
-      background: none;
-      border: none;
-      color: #cbd5e1;
-      font-size: 1.2rem;
-      cursor: pointer;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  /* Estilos específicos para la sección de sponsors en app.html */
+  .sponsor-mission {
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid #ff6b6b;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .sponsor-mission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .sponsor-mission-title {
+    font-weight: bold;
+    color: #f8fafc;
+    margin: 0;
+  }
+  .sponsor-badge {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 8px;
+  }
+  .sponsor-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px;
+  }
+  /* En la sección de estilos específicos */
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--surface-border);
+  color: var(--text);
+  /* ✅ Mejorar accesibilidad */
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.btn-outline:focus-visible {
+  outline-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.3);
+}
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.08);
+  /* ✅ Asegurar contraste mínimo */
+  color: #f1f5f9;
+}
   </style>
+ 
 </head>
 <body>
-  <header>
+ <header>
     <div class="header-left">
       <div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
     </div>
@@ -92,6 +117,63 @@
         <div class="mission-card"></div>
         <div id="team-proximity-status" style="text-align:center; margin-top:1rem; color:#64b5f7; font-size:0.9rem;"></div>
       </div>
+
+      <!-- SECCIÓN DE MISIONES SPONSOR (NUEVO CON IMÁGENES) -->
+      <div id="sponsorSection" class="mission-phase" style="display: none;">
+        <div class="mission-card">
+          <h2 style="color:#ff6b6b; margin-bottom:1.2rem;">🎯 Misiones Sponsor</h2>
+          <p style="margin-bottom:1.5rem; color:#cbd5e1;">
+            Descubrí cómo marcas líderes se integran en la cacería urbana.
+            <br><em>Estas son misiones de demostración para sponsors.</em>
+          </p>
+          
+          <div class="sponsor-mission" style="background:rgba(255,107,107,0.1); border:1px solid #ff6b6b; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div class="sponsor-mission-header">
+              <div>
+                <div class="sponsor-mission-title">🏪 Carrefour · Lanús</div>
+                <span class="sponsor-badge">DEMO</span>
+              </div>
+              <img src="sponsors-carrefour.webp" alt="Carrefour" class="sponsor-logo">
+            </div>
+            <p style="font-size:0.95rem; margin:0 0 12px;">Busca el producto que guarda el sabor del pasado. Su código de barras es tu llave.</p>
+            <button class="btn btn-outline" style="font-size:0.9rem; padding:6px 12px;">📍 Ver ubicación</button>
+          </div>
+
+          <div class="sponsor-mission" style="background:rgba(29,161,242,0.1); border:1px solid #1da1f2; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div class="sponsor-mission-header">
+              <div>
+                <div class="sponsor-mission-title">👟 Nike · CABA</div>
+                <span class="sponsor-badge">DEMO</span>
+              </div>
+               <img src="sponsors-nike.webp" alt="Nike" class="sponsor-logo">
+            </div>
+            <p style="font-size:0.95rem; margin:0 0 12px;">La huella del cazador está en la suela del maniquí. Escanéala antes de que desaparezca.</p>
+            <button class="btn btn-outline" style="font-size:0.9rem; padding:6px 12px;">📍 Ver ubicación</button>
+          </div>
+
+          <div class="sponsor-mission" style="background:rgba(255,200,0,0.1); border:1px solid #ffc800; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div class="sponsor-mission-header">
+              <div>
+                <div class="sponsor-mission-title">⛽ YPF · Avellaneda</div>
+                <span class="sponsor-badge">DEMO</span>
+              </div>
+              <img src="sponsors-ypf.webp" alt="YPF" class="sponsor-logo">
+            </div>
+            <p style="font-size:0.95rem; margin:0 0 12px;">El surtidor 3 tiene memoria. Busca el número que nadie ve.</p>
+            <button class="btn btn-outline" style="font-size:0.9rem; padding:6px 12px;">📍 Ver ubicación</button>
+          </div>
+
+          <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--surface-border);">
+            <h3 style="margin-bottom:12px;">¿Querés que tu marca esté aquí?</h3>
+            <p style="font-size:0.9rem; color:#94a3b8; margin-bottom:16px;">
+              Ofrecemos integraciones orgánicas, no intrusivas, con recompensas reales para hunters.
+            </p>
+            <a href="mailto:contacto@letshunt.ar?subject=Sponsor%20Let%E2%80%99s%20Hunt" class="btn btn-primary" style="display:inline-block;">
+              📩 Contactar para patrocinar
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -130,12 +212,13 @@
     </div>
   </div>
 
-  <!-- NAVEGACIÓN MÓVIL -->
+  <!-- NAVEGACIÓN MÓVIL (con nueva opción) -->
   <nav class="mobile-nav">
-    <a href="progreso.html#radar"><i>📡</i>Señal en vivo</a>
+    <a href="progreso.html#radar"><i>📡</i>Señal</a>
     <a href="#misiones"><i>🎯</i>Misiones</a>
     <a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
     <a href="progreso.html"><i>📊</i>Progreso</a>
+    <a href="#sponsors" id="nav-sponsors"><i>🏢</i>Sponsors</a>
   </nav>
 
   <!-- CONTROLES GLOBALES -->
@@ -159,7 +242,7 @@
       try {
         const [solitarioRes, equipoRes] = await Promise.all([
           fetch('misiones-solitario.json'),
-          fetch('misiones-equipo.json')
+          fetch('misiones-equipo-local.json')
         ]);
         misionesSolitario = await solitarioRes.json();
         misionesEquipo = await equipoRes.json();
@@ -172,25 +255,25 @@
       }
 
       setupJugador();
-
-      if (jugador.modo === 'equipo') {
-        showTeamMission();
-      } else {
-        showPhase1();
-      }
-
-      // Registrar Service Worker
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(() => console.log('✅ SW registrado'))
-            .catch(err => console.error('❌ Error SW:', err));
-        });
-      }
-
-      // Mostrar banner de instalación
-      showInstallBanner();
     }
+
+    // Función para ocultar todas las fases
+    function hideAllPhases() {
+      document.getElementById('phase1-consigna').style.display = 'none';
+      document.getElementById('phase2-mapa').style.display = 'none';
+      document.getElementById('phase3-pista').style.display = 'none';
+      document.getElementById('phase4-completed').style.display = 'none';
+      document.getElementById('teamSection').style.display = 'none';
+      document.getElementById('sponsorSection').style.display = 'none';
+    }
+
+    // Manejar navegación a sponsors
+    document.getElementById('nav-sponsors')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      hideAllPhases();
+      document.getElementById('sponsorSection').style.display = 'block';
+      window.scrollTo(0, 0);
+    });
 
     // ========== CONFIGURACIÓN DEL JUGADOR ==========
     let jugador;
@@ -210,18 +293,16 @@
         hunterId = `hunter_${String(nextId).padStart(4, '0')}`;
         localStorage.setItem('lastHunterId', nextId);
         
-        // ✅ CORRECCIÓN: usar ciudadFromURL, no "ciudad"
         const ciudadFromURL = decodeURIComponent((urlParams.get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
         jugador = {
           id: hunterId,
           nombre: 'Jugador de Prueba',
           telefono: '+5491112345678',
-          zona: ciudadFromURL, // ← ¡CORREGIDO!
+          zona: ciudadFromURL,
           modo: 'individual'
         };
         localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
       } else {
-        // ✅ CORRECCIÓN: SIEMPRE priorizar la zona de la URL
         jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`)) || {
           id: hunterId,
           zona: 'CABA',
@@ -242,16 +323,21 @@
       localStorage.setItem('currentHunterId', hunterId);
       document.getElementById('hunterIdDisplay').textContent = 
         jugador.modo === 'equipo' ? `👥 ${jugador.equipo || hunterId}` : `ID: ${hunterId}`;
+
+      // ✅ CORRECCIÓN: Mostrar siempre la misión correspondiente
+      if (jugador.modo === 'equipo') {
+        showTeamMission();
+      } else {
+        showPhase1();
+      }
     }
 
     // ========== UTILIDADES DE MISIÓN ==========
     function getMisionesByZona(zona, tipo = 'solitario') {
       const lista = tipo === 'equipo' ? misionesEquipo : misionesSolitario;
       
-      // Normalizar la zona de entrada
       const zonaNormalizada = (zona || '').trim().toLowerCase();
       
-      // Lista de barrios de CABA (para compatibilidad)
       const barriosCABA = [
         'san telmo', 'la boca', 'recoleta', 'microcentro', 'palermo',
         'congreso', 'almagro', 'retiro', 'balvanera', 'villa crespo',
@@ -262,17 +348,14 @@
       return lista.filter(m => {
         const misionZona = (m.zona || '').trim().toLowerCase();
         
-        // Coincidencia directa
         if (misionZona === zonaNormalizada) {
           return true;
         }
         
-        // Si la zona solicitada es "caba", aceptar cualquier barrio de CABA
         if (zonaNormalizada === 'caba' && barriosCABA.includes(misionZona)) {
           return true;
         }
         
-        // Si la misión es de CABA y la zona solicitada es un barrio, también coincide
         if (barriosCABA.includes(zonaNormalizada) && barriosCABA.includes(misionZona)) {
           return true;
         }
@@ -469,12 +552,10 @@
       if (!window.L) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        // ✅ CORRECCIÓN: eliminar espacios al final
         link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
         document.head.appendChild(link);
         
         const script = document.createElement('script');
-        // ✅ CORRECCIÓN: eliminar espacios al final
         script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
         script.onload = () => initApproxMap(lat, lng);
         document.head.appendChild(script);
@@ -868,6 +949,18 @@
         }
       }, 3000);
     }
+
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log('✅ SW registrado'))
+          .catch(err => console.error('❌ Error SW:', err));
+      });
+    }
+
+    // Mostrar banner de instalación
+    showInstallBanner();
 
     // Inicializar app
     window.addEventListener('load', initApp);

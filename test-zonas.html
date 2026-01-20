@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test de Zonas · Let’s Hunt</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #0f172a; color: #e2e8f0; }
+    .test-result { margin: 10px 0; padding: 10px; border-radius: 6px; }
+    .pass { background: #0d9488; }
+    .fail { background: #dc2626; }
+    .info { background: #334155; }
+    h1 { color: #60a5fa; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test de Zonas - Let's Hunt</h1>
+  <div id="results"></div>
+
+  <script>
+    // Zonas exactas del registro.html corregido
+    const ZONAS_REGISTRO = [
+      "CABA",
+      "Avellaneda",
+      "Lanús",
+      "Lomas de Zamora",
+      "Valentín Alsina"
+    ];
+
+    // Barrios de CABA (para validación cruzada)
+    const BARRIOS_CABA = [
+      'San Telmo', 'La Boca', 'Recoleta', 'Microcentro', 'Palermo',
+      'Congreso', 'Almagro', 'Retiro', 'Balvanera', 'Villa Crespo',
+      'Belgrano', 'Barracas', 'Flores', 'Villa Urquiza', 'Puerto Madero',
+      'San Cristóbal'
+    ];
+
+    async function runTests() {
+      const resultsDiv = document.getElementById('results');
+      
+      try {
+        // Cargar misiones
+        const response = await fetch('misiones-solitario.json');
+        if (!response.ok) throw new Error('No se pudo cargar misiones-solitario.json');
+        
+        const misiones = await response.json();
+        if (!Array.isArray(misiones)) throw new Error('El archivo no es un array válido');
+
+        resultsDiv.innerHTML += `<div class="info">✅ Cargadas ${misiones.length} misiones</div>`;
+
+        // Contar misiones por zona
+        const conteo = {};
+        misiones.forEach(m => {
+          const z = m.zona || 'SIN_ZONA';
+          conteo[z] = (conteo[z] || 0) + 1;
+        });
+
+        // Mostrar resumen
+        resultsDiv.innerHTML += `<div class="info">📊 Resumen de zonas:<br>${Object.entries(conteo).map(([z, c]) => `${z}: ${c}`).join('<br>')}</div>`;
+
+        // Probar cada zona del registro
+        let allPass = true;
+        for (const zona of ZONAS_REGISTRO) {
+          let tieneMisiones = false;
+          
+          if (zona === 'CABA') {
+            // Para CABA, aceptamos cualquier barrio
+            tieneMisiones = misiones.some(m => 
+              BARRIOS_CABA.includes(m.zona)
+            );
+          } else {
+            // Para otras zonas, coincidencia exacta
+            tieneMisiones = misiones.some(m => m.zona === zona);
+          }
+
+          const status = tieneMisiones ? '✅ PASSED' : '❌ FAILED';
+          const className = tieneMisiones ? 'pass' : 'fail';
+          resultsDiv.innerHTML += `<div class="${className}">${zona}: ${status}</div>`;
+          
+          if (!tieneMisiones) allPass = false;
+        }
+
+        // Resultado final
+        if (allPass) {
+          resultsDiv.innerHTML += `<div class="pass" style="margin-top:20px; font-size:1.2rem;">🎉 ¡TODAS LAS ZONAS FUNCIONAN!</div>`;
+        } else {
+          resultsDiv.innerHTML += `<div class="fail" style="margin-top:20px; font-size:1.2rem;">⚠️ Algunas zonas NO tienen misiones asignadas.</div>`;
+        }
+
+      } catch (err) {
+        resultsDiv.innerHTML += `<div class="fail">💥 Error: ${err.message}</div>`;
+        console.error(err);
+      }
+    }
+
+    // Ejecutar al cargar
+    window.addEventListener('load', runTests);
+  </script>
+</body>
+</html>

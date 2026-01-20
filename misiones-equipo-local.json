@@ -1,0 +1,802 @@
+[
+  {
+    "id": 301,
+    "titulo": "El Eco Sincronizado",
+    "zona": "Lomas de Zamora",
+    "ubicacion_mapa": "Plaza Eva Perón, sector norte",
+    "descripcion_narrativa": "El Vigilante no cree en voces solitarias. Solo en ecos compartidos.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7628, "lng": -58.3985 },
+        "instruccion_al_escanear": "Di en voz alta: 'El juramento es colectivo'. Tu compañero debe escanear el QR B inmediatamente."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7629, "lng": -58.3987 },
+        "instruccion_al_escanear": "Escucha la frase. Si es correcta, la misión se completa."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse con menos de 10 segundos de diferencia."
+  },
+  {
+    "id": 302,
+    "titulo": "La Sombra Compartida",
+    "zona": "Avellaneda",
+    "ubicacion_mapa": "Palacio Municipal, patio interior",
+    "descripcion_narrativa": "Una sombra no basta. Necesitan dos cuerpos para formar el símbolo.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6632, "lng": -58.3668 },
+        "instruccion_al_escanear": "Párate aquí. Pide a tu compañero que se pare 3 metros al este. Su sombra debe tocar la tuya."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6632, "lng": -58.3665 },
+        "instruccion_al_escanear": "Cuando sus sombras se unan, escanea este código."
+      }
+    ],
+    "validacion": "QR B solo se valida si QR A fue escaneado en los últimos 30 segundos."
+  },
+  {
+    "id": 303,
+    "titulo": "El Reloj Roto del Equipo",
+    "zona": "Lanús",
+    "ubicacion_mapa": "Puente peatonal, Av. Hipólito Yrigoyen",
+    "descripcion_narrativa": "El tiempo no avanza solo. Necesita dos manecillas.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7014, "lng": -58.3856 },
+        "instruccion_al_escanear": "Cuenta 7 pasos hacia el este. Espera allí."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7014, "lng": -58.3852 },
+        "instruccion_al_escanear": "Cuenta 7 pasos hacia el oeste. Cuando veas a tu compañero, escanea."
+      }
+    ],
+    "validacion": "Ambos deben escanear dentro de 15 segundos."
+  },
+  {
+    "id": 304,
+    "titulo": "El Muro de los Dos Nombres",
+    "zona": "Fiorito",
+    "ubicacion_mapa": "Pared lateral del potrero, Sánchez de Loria",
+    "descripcion_narrativa": "Un nombre no abre la puerta. Dos sí.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7761, "lng": -58.4017 },
+        "instruccion_al_escanear": "Envía tu alias de hunter."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7762, "lng": -58.4018 },
+        "instruccion_al_escanear": "Envía el alias de tu compañero."
+      }
+    ],
+    "validacion": "Los dos aliases deben pertenecer a un equipo registrado."
+  },
+  {
+    "id": 305,
+    "titulo": "El Susurro Cruzado",
+    "zona": "San Telmo",
+    "ubicacion_mapa": "Pasaje San Lorenzo",
+    "descripcion_narrativa": "Lo que uno oye, el otro debe ver.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6190, "lng": -58.3690 },
+        "instruccion_al_escanear": "Graba 5 segundos de audio del eco del pasaje."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6191, "lng": -58.3691 },
+        "instruccion_al_escanear": "Al recibir el audio de tu compañero, mira al techo. ¿Qué número ves?"
+      }
+    ],
+    "validacion": "El jugador B envía el número. Se valida contra patrón interno."
+  },
+  {
+    "id": 306,
+    "titulo": "La Piedra del Pacto",
+    "zona": "Recoleta",
+    "ubicacion_mapa": "Plaza Francia, sector oeste",
+    "descripcion_narrativa": "Tocarla uno no basta. Deben hacerlo al unísono.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.5872, "lng": -58.3922 },
+        "instruccion_al_escanear": "Toca la piedra con la mano izquierda. Di: 'Juramento'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.5873, "lng": -58.3923 },
+        "instruccion_al_escanear": "Toca la piedra con la mano derecha. Di: 'Lealtad'."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 5 segundos."
+  },
+  {
+    "id": 307,
+    "titulo": "El Espejo Roto del Equipo",
+    "zona": "Microcentro",
+    "ubicacion_mapa": "Galería Güemes, patio central",
+    "descripcion_narrativa": "Uno ve el reflejo. El otro, la verdad.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6031, "lng": -58.3761 },
+        "instruccion_al_escanear": "Mírate en el espejo roto. ¿Qué número aparece detrás de ti?"
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6032, "lng": -58.3762 },
+        "instruccion_al_escanear": "Sin mirar el espejo, cuenta los vidrios rotos frente a ti."
+      }
+    ],
+    "validacion": "Suma ambos números. Debe ser 13."
+  },
+  {
+    "id": 308,
+    "titulo": "El Banco Partido",
+    "zona": "Valentín Alsina",
+    "ubicacion_mapa": "Plaza Güemes, banca de hierro",
+    "descripcion_narrativa": "Sentarse juntos no basta. Deben completar el mensaje.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6847, "lng": -58.3831 },
+        "instruccion_al_escanear": "Lee en voz alta: 'Hunter...'"
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6848, "lng": -58.3832 },
+        "instruccion_al_escanear": "Completa la frase: '...nunca caza solo.'"
+      }
+    ],
+    "validacion": "QR B solo funciona si QR A fue escaneado en los últimos 20 segundos."
+  },
+  {
+    "id": 309,
+    "titulo": "La Huella Doble",
+    "zona": "La Boca",
+    "ubicacion_mapa": "Camino de barro junto a Caminito",
+    "descripcion_narrativa": "Una huella se borra. Dos, se graban para siempre.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6345, "lng": -58.3635 },
+        "instruccion_al_escanear": "Después de la lluvia, sigue la primera huella hasta el círculo."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6346, "lng": -58.3636 },
+        "instruccion_al_escanear": "Sigue la segunda huella. Cuando se crucen, escanea."
+      }
+    ],
+    "validacion": "Ambos deben escanear en menos de 1 minuto."
+  },
+  {
+    "id": 310,
+    "titulo": "El Faro del Equipo",
+    "zona": "Puerto Madero",
+    "ubicacion_mapa": "Dique 3, extremo sur",
+    "descripcion_narrativa": "Una luz no guía. Dos, forman el faro.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6150, "lng": -58.3630 },
+        "instruccion_al_escanear": "Enciende la linterna de tu celular y apunta al sur."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6151, "lng": -58.3631 },
+        "instruccion_al_escanear": "Cuando veas la luz de tu compañero, escanea este código."
+      }
+    ],
+    "validacion": "QR B solo se activa si QR A fue escaneado en los últimos 30 segundos."
+  },
+  {
+    "id": 311,
+    "titulo": "El Eco de los Dos Pasos",
+    "zona": "Congreso",
+    "ubicacion_mapa": "Plaza del Congreso, sector este",
+    "descripcion_narrativa": "Un paso no resuena. Dos, despiertan al Vigilante.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6072, "lng": -58.4028 },
+        "instruccion_al_escanear": "Da un paso hacia el norte. Di: 'Presente'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6073, "lng": -58.4029 },
+        "instruccion_al_escanear": "Da un paso hacia el sur. Di: 'Listo'."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 8 segundos."
+  },
+  {
+    "id": 312,
+    "titulo": "La Llave Partida",
+    "zona": "Almagro",
+    "ubicacion_mapa": "Parque Centenario, cerca del árbol torcido",
+    "descripcion_narrativa": "Ninguno tiene la llave completa. Pero juntos, abren la puerta.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6120, "lng": -58.4220 },
+        "instruccion_al_escanear": "Tu código es la primera mitad: 'HUNT'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6121, "lng": -58.4221 },
+        "instruccion_al_escanear": "Tu código es la segunda mitad: 'ER23'. Combina ambos y envía 'HUNTER23'."
+      }
+    ],
+    "validacion": "El jugador B debe enviar el código completo. Se valida contra patrón interno."
+  },
+  {
+    "id": 313,
+    "titulo": "El Silencio Compartido",
+    "zona": "Palermo",
+    "ubicacion_mapa": "Jardín Botánico, sendero central",
+    "descripcion_narrativa": "Hablar arruina todo. Solo el silencio coordinado abre el camino.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.5960, "lng": -58.4280 },
+        "instruccion_al_escanear": "No hables. Espera a que tu compañero escanee el QR B."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.5961, "lng": -58.4281 },
+        "instruccion_al_escanear": "No hables. Espera a que tu compañero escanee el QR A."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 12 segundos, sin enviar mensaje de texto."
+  },
+  {
+    "id": 314,
+    "titulo": "El Reflejo del Equipo",
+    "zona": "Retiro",
+    "ubicacion_mapa": "Plaza Fuerza Aérea Argentina, frente al Obelisco",
+    "descripcion_narrativa": "Uno mira al cielo. El otro, al reflejo. Solo juntos ven la señal.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6000, "lng": -58.3770 },
+        "instruccion_al_escanear": "Mira el Obelisco. ¿Cuántas ventanas ves en su punta?"
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6001, "lng": -58.3771 },
+        "instruccion_al_escanear": "Mira el reflejo del Obelisco en el charco/pozo. ¿Cuántas ventanas ves?"
+      }
+    ],
+    "validacion": "Ambos números deben ser iguales. Si no, fallan."
+  },
+  {
+    "id": 315,
+    "titulo": "La Cinta del Pacto",
+    "zona": "Lanús",
+    "ubicacion_mapa": "Plaza Manuel Belgrano, árbol de las cintas",
+    "descripcion_narrativa": "Una cinta se rompe. Dos, forman el juramento.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7010, "lng": -58.3850 },
+        "instruccion_al_escanear": "Ata una cinta roja en la rama baja."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7011, "lng": -58.3851 },
+        "instruccion_al_escanear": "Ata una cinta negra junto a la roja. Luego escanea."
+      }
+    ],
+    "validacion": "QR B solo se valida si QR A fue escaneado en los últimos 60 segundos."
+  },
+  {
+    "id": 316,
+    "titulo": "El Latido Sincronizado",
+    "zona": "Avellaneda",
+    "ubicacion_mapa": "Galería Güemes, pasillo central",
+    "descripcion_narrativa": "Sus corazones deben latir al mismo ritmo. ¿Podrán?",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6638, "lng": -58.3675 },
+        "instruccion_al_escanear": "Toca tu pecho tres veces. Escanea inmediatamente después."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6639, "lng": -58.3676 },
+        "instruccion_al_escanear": "Haz lo mismo. Tu escaneo debe coincidir con el de tu compañero."
+      }
+    ],
+    "validacion": "Diferencia máxima de 3 segundos entre escaneos."
+  },
+  {
+    "id": 317,
+    "titulo": "El Muro del Código Doble",
+    "zona": "Villa Crespo",
+    "ubicacion_mapa": "Pasaje entre Córdoba y Thames",
+    "descripcion_narrativa": "El código está partido en dos. Solo los leales lo reconstruyen.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6055, "lng": -58.4360 },
+        "instruccion_al_escanear": "Tu fragmento: '73'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6056, "lng": -58.4361 },
+        "instruccion_al_escanear": "Tu fragmento: '41'. Envía '7341' como código final."
+      }
+    ],
+    "validacion": "El jugador B envía el código completo. Se valida contra base de datos."
+  },
+  {
+    "id": 318,
+    "titulo": "La Sombra del Juramento",
+    "zona": "Flores",
+    "ubicacion_mapa": "Plaza Flores, reloj de sol deteriorado",
+    "descripcion_narrativa": "Una sombra miente. Dos, revelan la hora verdadera.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6350, "lng": -58.4450 },
+        "instruccion_al_escanear": "Párate al este del reloj. Mide tu sombra en pasos."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6351, "lng": -58.4451 },
+        "instruccion_al_escanear": "Párate al oeste. Mide tu sombra. Sumen ambos valores."
+      }
+    ],
+    "validacion": "El total debe ser 9 pasos (ajustable según hora del día)."
+  },
+  {
+    "id": 319,
+    "titulo": "El Susurro del Andén",
+    "zona": "Once",
+    "ubicacion_mapa": "Estación Once, andén principal",
+    "descripcion_narrativa": "El tren no espera. Pero ustedes sí pueden sincronizarse.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6110, "lng": -58.4180 },
+        "instruccion_al_escanear": "Mírate en el espejo de seguridad. Envía el número que ves detrás de ti."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6111, "lng": -58.4181 },
+        "instruccion_al_escanear": "Cuenta los carteles de advertencia en la pared frente a ti."
+      }
+    ],
+    "validacion": "Suma ambos números. Debe ser 22."
+  },
+  {
+    "id": 320,
+    "titulo": "El Último Pacto",
+    "zona": "Puerto Madero",
+    "ubicacion_mapa": "Dique 4, extremo sur",
+    "descripcion_narrativa": "Aquí termina el juego... o comienza la verdadera cacería.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6140, "lng": -58.3640 },
+        "instruccion_al_escanear": "Di en voz baja: 'Somos los elegidos'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6141, "lng": -58.3641 },
+        "instruccion_al_escanear": "Escucha. Si tu compañero dijo la frase, escanea para sellar el pacto."
+      }
+    ],
+    "validacion": "QR B solo funciona si QR A fue escaneado en los últimos 20 segundos."
+  },
+  {
+    "id": 321,
+    "titulo": "El Eco del Silencio",
+    "zona": "Lomas de Zamora",
+    "ubicacion_mapa": "Plaza Eva Perón, sector oeste",
+    "descripcion_narrativa": "Hablar es traición. Solo el silencio compartido abre la puerta.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7628, "lng": -58.3988 },
+        "instruccion_al_escanear": "No hables. Mira a tu compañero y asiente tres veces."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7629, "lng": -58.3989 },
+        "instruccion_al_escanear": "Si tu compañero asintió, escanea ahora."
+      }
+    ],
+    "validacion": "QR B solo se valida si QR A fue escaneado en los últimos 30 segundos."
+  },
+  {
+    "id": 322,
+    "titulo": "La Sombra Gemela",
+    "zona": "Avellaneda",
+    "ubicacion_mapa": "Palacio Municipal, patio trasero",
+    "descripcion_narrativa": "Dos cuerpos. Una sombra. El Vigilante observa.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6633, "lng": -58.3669 },
+        "instruccion_al_escanear": "Párate junto a tu compañero. Sus sombras deben tocarse."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6634, "lng": -58.3670 },
+        "instruccion_al_escanear": "Cuando sus sombras se unan, escanea este código."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 20 segundos."
+  },
+  {
+    "id": 323,
+    "titulo": "El Latido del Puente",
+    "zona": "Lanús",
+    "ubicacion_mapa": "Puente peatonal, Av. Hipólito Yrigoyen",
+    "descripcion_narrativa": "El puente late. Solo si ambos corazones laten al mismo ritmo, responde.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7015, "lng": -58.3857 },
+        "instruccion_al_escanear": "Toca tu pecho con la palma. Cuenta 3 latidos. Escanea."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7016, "lng": -58.3858 },
+        "instruccion_al_escanear": "Haz lo mismo. Tu escaneo debe coincidir con el de tu compañero."
+      }
+    ],
+    "validacion": "Diferencia máxima de 4 segundos entre escaneos."
+  },
+  {
+    "id": 324,
+    "titulo": "El Código del Muro",
+    "zona": "Fiorito",
+    "ubicacion_mapa": "Pared lateral del taller mecánico, Fiorito al 3100",
+    "descripcion_narrativa": "El muro guarda dos mitades. Solo los leales las unen.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7756, "lng": -58.4025 },
+        "instruccion_al_escanear": "Tu fragmento: 'VIG'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7757, "lng": -58.4026 },
+        "instruccion_al_escanear": "Tu fragmento: 'ILANTE'. Envía 'VIGILANTE' como código final."
+      }
+    ],
+    "validacion": "El jugador B envía el código completo. Se valida contra patrón interno."
+  },
+  {
+    "id": 325,
+    "titulo": "El Reflejo Roto",
+    "zona": "San Telmo",
+    "ubicacion_mapa": "Pasaje San Lorenzo, pared de azulejos",
+    "descripcion_narrativa": "Uno ve el reflejo. El otro, la grieta. Juntos, ven la verdad.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6190, "lng": -58.3690 },
+        "instruccion_al_escanear": "Mira el reflejo en los azulejos rotos. ¿Qué número ves?"
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6191, "lng": -58.3691 },
+        "instruccion_al_escanear": "Cuenta las grietas en la pared frente a ti."
+      }
+    ],
+    "validacion": "Multiplica ambos números. Debe ser 42."
+  },
+  {
+    "id": 326,
+    "titulo": "La Piedra del Juramento Doble",
+    "zona": "Recoleta",
+    "ubicacion_mapa": "Plaza Francia, piedra norte",
+    "descripcion_narrativa": "Una mano no basta. Dos sellan el pacto.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.5871, "lng": -58.3921 },
+        "instruccion_al_escanear": "Toca la piedra con la mano izquierda. Di: 'Lealtad'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.5872, "lng": -58.3922 },
+        "instruccion_al_escanear": "Toca la piedra con la mano derecha. Di: 'Silencio'."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 6 segundos."
+  },
+  {
+    "id": 327,
+    "titulo": "El Eco del Mercado",
+    "zona": "Balvanera",
+    "ubicacion_mapa": "Mercado de Sánchez de Bustamante",
+    "descripcion_narrativa": "El mercado escucha. Pero solo si ambos hablan al unísono.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6090, "lng": -58.4150 },
+        "instruccion_al_escanear": "Di en voz alta: 'Hunter'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6091, "lng": -58.4151 },
+        "instruccion_al_escanear": "Di al mismo tiempo: 'Hunter'."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 3 segundos."
+  },
+  {
+    "id": 328,
+    "titulo": "La Huella del Pacto",
+    "zona": "La Boca",
+    "ubicacion_mapa": "Camino de tierra junto a Caminito",
+    "descripcion_narrativa": "Una huella se borra con la lluvia. Dos, se graban para siempre.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6345, "lng": -58.3635 },
+        "instruccion_al_escanear": "Después de la lluvia, sigue la primera huella hasta la marca circular."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6346, "lng": -58.3636 },
+        "instruccion_al_escanear": "Sigue la segunda huella. Cuando se crucen, escanea."
+      }
+    ],
+    "validacion": "Ambos deben escanear en menos de 60 segundos."
+  },
+  {
+    "id": 329,
+    "titulo": "El Faro del Equipo",
+    "zona": "Puerto Madero",
+    "ubicacion_mapa": "Dique 2, poste final",
+    "descripcion_narrativa": "Una luz no guía. Dos, forman el faro del Vigilante.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6160, "lng": -58.3620 },
+        "instruccion_al_escanear": "Enciende la linterna de tu celular y apunta al sur."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6161, "lng": -58.3621 },
+        "instruccion_al_escanear": "Cuando veas la luz de tu compañero, escanea este código."
+      }
+    ],
+    "validacion": "QR B solo se activa si QR A fue escaneado en los últimos 30 segundos."
+  },
+  {
+    "id": 330,
+    "titulo": "El Último Susurro",
+    "zona": "Microcentro",
+    "ubicacion_mapa": "Galería Pacífico, pasillo central",
+    "descripcion_narrativa": "Aquí termina el juego... o comienza la verdadera cacería.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6010, "lng": -58.3750 },
+        "instruccion_al_escanear": "Di en voz baja: 'Somos los elegidos'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6011, "lng": -58.3751 },
+        "instruccion_al_escanear": "Escucha. Si tu compañero dijo la frase, escanea para sellar el pacto."
+      }
+    ],
+    "validacion": "QR B solo funciona si QR A fue escaneado en los últimos 20 segundos."
+  },
+  {
+    "id": 331,
+    "titulo": "El Eco del Juramento",
+    "zona": "Lomas de Zamora",
+    "ubicacion_mapa": "Plaza Eva Perón, árbol centenario",
+    "descripcion_narrativa": "Un juramento dicho solo se pierde. Dicho en pareja, se graba en la ciudad.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7625, "lng": -58.3982 },
+        "instruccion_al_escanear": "Di en voz alta: 'Juramos lealtad'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7626, "lng": -58.3983 },
+        "instruccion_al_escanear": "Repite: 'Nunca cazamos solos'. Escanea inmediatamente después."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 10 segundos."
+  },
+  {
+    "id": 332,
+    "titulo": "La Sombra del Reloj",
+    "zona": "Avellaneda",
+    "ubicacion_mapa": "Palacio Municipal, torre del reloj",
+    "descripcion_narrativa": "El tiempo no avanza solo. Necesita dos manecillas para marcar la verdad.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6631, "lng": -58.3667 },
+        "instruccion_al_escanear": "Párate al este de la torre. Mide tu sombra en pasos."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6632, "lng": -58.3668 },
+        "instruccion_al_escanear": "Párate al oeste. Mide tu sombra. Sumen ambos valores."
+      }
+    ],
+    "validacion": "El total debe ser 8 pasos (ajustable según hora del día)."
+  },
+  {
+    "id": 333,
+    "titulo": "El Latido del Andén",
+    "zona": "Lanús",
+    "ubicacion_mapa": "Estación Lanús, andén principal",
+    "descripcion_narrativa": "El tren no espera. Pero sus corazones sí pueden latir al unísono.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7022, "lng": -58.3861 },
+        "instruccion_al_escanear": "Toca tu pecho tres veces. Escanea inmediatamente."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7023, "lng": -58.3862 },
+        "instruccion_al_escanear": "Haz lo mismo. Tu escaneo debe coincidir con el de tu compañero."
+      }
+    ],
+    "validacion": "Diferencia máxima de 3 segundos entre escaneos."
+  },
+  {
+    "id": 334,
+    "titulo": "El Código del Potrero",
+    "zona": "Fiorito",
+    "ubicacion_mapa": "Potrero abandonado, Sánchez de Loria",
+    "descripcion_narrativa": "El barro guarda secretos. Solo los que juegan juntos los descifran.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.7761, "lng": -58.4017 },
+        "instruccion_al_escanear": "Tu fragmento: '87'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.7762, "lng": -58.4018 },
+        "instruccion_al_escanear": "Tu fragmento: 'HUNT'. Envía '87HUNT' como código final."
+      }
+    ],
+    "validacion": "El jugador B envía el código completo. Se valida contra patrón interno."
+  },
+  {
+    "id": 335,
+    "titulo": "El Reflejo del Pasaje",
+    "zona": "San Telmo",
+    "ubicacion_mapa": "Pasaje San Lorenzo",
+    "descripcion_narrativa": "Uno ve el reflejo. El otro, la grieta. Juntos, ven la señal del Vigilante.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6190, "lng": -58.3690 },
+        "instruccion_al_escanear": "Mira el reflejo en la pared húmeda. ¿Qué número ves?"
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6191, "lng": -58.3691 },
+        "instruccion_al_escanear": "Cuenta las grietas en el piso frente a ti."
+      }
+    ],
+    "validacion": "Multiplica ambos números. Debe ser 36."
+  },
+  {
+    "id": 336,
+    "titulo": "La Piedra del Silencio",
+    "zona": "Recoleta",
+    "ubicacion_mapa": "Plaza Francia, piedra sur",
+    "descripcion_narrativa": "Hablar rompe el hechizo. Solo el silencio compartido sella el pacto.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.5873, "lng": -58.3923 },
+        "instruccion_al_escanear": "No hables. Toca la piedra con la palma izquierda."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.5874, "lng": -58.3924 },
+        "instruccion_al_escanear": "No hables. Toca la piedra con la palma derecha."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 15 segundos."
+  },
+  {
+    "id": 337,
+    "titulo": "El Eco del Mercado",
+    "zona": "Balvanera",
+    "ubicacion_mapa": "Mercado de Sánchez de Bustamante",
+    "descripcion_narrativa": "El mercado escucha. Pero solo si ambos hablan al unísono.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6090, "lng": -58.4150 },
+        "instruccion_al_escanear": "Di en voz alta: 'Hunter'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6091, "lng": -58.4151 },
+        "instruccion_al_escanear": "Di al mismo tiempo: 'Hunter'."
+      }
+    ],
+    "validacion": "Ambos QR deben escanearse en menos de 3 segundos."
+  },
+  {
+    "id": 338,
+    "titulo": "La Huella del Pacto",
+    "zona": "La Boca",
+    "ubicacion_mapa": "Camino de tierra junto a Caminito",
+    "descripcion_narrativa": "Una huella se borra con la lluvia. Dos, se graban para siempre.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6345, "lng": -58.3635 },
+        "instruccion_al_escanear": "Después de la lluvia, sigue la primera huella hasta la marca circular."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6346, "lng": -58.3636 },
+        "instruccion_al_escanear": "Sigue la segunda huella. Cuando se crucen, escanea."
+      }
+    ],
+    "validacion": "Ambos deben escanear en menos de 60 segundos."
+  },
+  {
+    "id": 339,
+    "titulo": "El Faro del Equipo",
+    "zona": "Puerto Madero",
+    "ubicacion_mapa": "Dique 2, poste final",
+    "descripcion_narrativa": "Una luz no guía. Dos, forman el faro del Vigilante.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6160, "lng": -58.3620 },
+        "instruccion_al_escanear": "Enciende la linterna de tu celular y apunta al sur."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6161, "lng": -58.3621 },
+        "instruccion_al_escanear": "Cuando veas la luz de tu compañero, escanea este código."
+      }
+    ],
+    "validacion": "QR B solo se activa si QR A fue escaneado en los últimos 30 segundos."
+  },
+  {
+    "id": 340,
+    "titulo": "El Último Susurro",
+    "zona": "Microcentro",
+    "ubicacion_mapa": "Galería Pacífico, pasillo central",
+    "descripcion_narrativa": "Aquí termina el juego... o comienza la verdadera cacería.",
+    "qr_cercanos": [
+      {
+        "id_qr": "A",
+        "coordenadas": { "lat": -34.6010, "lng": -58.3750 },
+        "instruccion_al_escanear": "Di en voz baja: 'Somos los elegidos'."
+      },
+      {
+        "id_qr": "B",
+        "coordenadas": { "lat": -34.6011, "lng": -58.3751 },
+        "instruccion_al_escanear": "Escucha. Si tu compañero dijo la frase, escanea para sellar el pacto."
+      }
+    ],
+    "validacion": "QR B solo funciona si QR A fue escaneado en los últimos 20 segundos."
+  }
+]
