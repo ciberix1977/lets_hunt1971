@@ -213,10 +213,7 @@
 
   <!-- LÓGICA PRINCIPAL -->
   <script>
-    // ========== SUPABASE ==========
-    const supabaseUrl = 'https://seubermhmnyymgdctvxj.supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNldWJlcm1obW55eW1nZGN0dnhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MTY2NDEsImV4cCI6MjA4NDQ5MjY0MX0.XYYTaYkiUbm6XUVVcc9XLTMNqJqKz2Bd_2K7LBZfK3o';
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+   
 
     // ========== DATOS DINÁMICOS ==========
     let misionesSolitario = [];
@@ -1023,7 +1020,10 @@
     // Mostrar banner de instalación
     showInstallBanner();
 
-    // Inicializar app
+    // ========== SUPABASE ==========
+    const supabaseUrl = 'https://seubermhmnyymgdctvxj.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNldWJlcm1obW55eW1nZGN0dnhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MTY2NDEsImV4cCI6MjA4NDQ5MjY0MX0.XYYTaYkiUbm6XUVVcc9XLTMNqJqKz2Bd_2K7LBZfK3o';
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
     window.addEventListener('load', initApp);
   </script>
 </body>
