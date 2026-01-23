@@ -343,7 +343,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId');
 
-      // Iniciar sesión anónima (para jugadores)
+      // Iniciar sesión anónima
       auth.signInAnonymously().catch((error) => {
         console.error("Error al iniciar sesión anónima:", error);
       });
@@ -1106,6 +1106,48 @@
 
     // Inicializar app
     window.addEventListener('load', initApp);
+
+    // ✅ CORRECCIÓN: Botón de narración no tapa enlaces en ninguna sección
+    const narrationToggle = document.getElementById('narration-toggle');
+    if (narrationToggle) {
+      function adjustNarrationButton() {
+        const sections = [
+          'sponsorSection',
+          'phase1-consigna',
+          'phase2-mapa', 
+          'phase3-pista',
+          'phase4-completed',
+          'teamSection'
+        ];
+        
+        let shouldLift = false;
+        for (const sectionId of sections) {
+          const section = document.getElementById(sectionId);
+          if (section && section.style.display !== 'none') {
+            shouldLift = true;
+            break;
+          }
+        }
+        
+        if (shouldLift) {
+          narrationToggle.style.bottom = '80px';
+        } else {
+          narrationToggle.style.bottom = '20px';
+        }
+      }
+
+      const observer = new MutationObserver(adjustNarrationButton);
+      const mainContainer = document.querySelector('main');
+      if (mainContainer) {
+        observer.observe(mainContainer, { 
+          childList: true, 
+          subtree: true, 
+          attributes: true,
+          attributeFilter: ['style']
+        });
+      }
+      adjustNarrationButton();
+    }
   </script>
 </body>
 </html>
