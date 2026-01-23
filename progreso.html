@@ -6,6 +6,15 @@
   <title>Let’s Hunt · Progreso</title>
   <meta name="description" content="Tu progreso y el de otros cazadores" />
   <meta name="theme-color" content="#000000">
+  
+  <!-- Firebase SDK (legacy v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -73,6 +82,21 @@
   <div id="toast" role="status" aria-live="polite"></div>
 
   <script>
+    // ========== FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f",
+      measurementId: "G-07SR9WR8NV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const firestore = firebase.firestore();
+    const analytics = firebase.analytics();
+
     // ✅ DATOS DEL JUGADOR
     const hunterId = localStorage.getItem('currentHunterId') || 'hunter_0000';
     const jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`)) || { zona: 'CABA' };
@@ -82,13 +106,21 @@
       zona: jugador.zona
     };
 
+    // ✅ REGISTRAR EVENTO DE ANALYTICS
+    analytics.logEvent('progreso_visto', {
+      hunter_id: hunterId,
+      misiones: progreso.misiones,
+      desafios: progreso.desafios,
+      zona: progreso.zona
+    });
+
     // ✅ ACTUALIZAR UI DEL JUGADOR
     document.getElementById('hunter-id').textContent = hunterId;
     document.getElementById('misiones').textContent = progreso.misiones;
     document.getElementById('desafios').textContent = progreso.desafios;
     document.getElementById('ciudad').textContent = progreso.zona;
 
-    // ✅ CONEXIÓN WEBSOCKET REAL
+    // ✅ CONEXIÓN WEBSOCKET REAL (mantenido intacto)
     let ws;
     const players = new Map();
     const ranking = [];
@@ -143,7 +175,7 @@
       };
     }
 
-    // ✅ RENDERIZAR MAPA
+    // ✅ RENDERIZAR MAPA (mantenido intacto)
     function renderMap() {
       const radarContainer = document.querySelector('.radar-bg');
       document.querySelectorAll('.player-marker').forEach(m => m.remove());
@@ -161,45 +193,83 @@
       });
     }
 
-    // ✅ RENDERIZAR RANKING
-    function renderRanking() {
+    // ✅ RENDERIZAR RANKING DESDE FIRESTORE
+    async function renderRanking() {
       const list = document.getElementById('ranking-list');
-      list.innerHTML = '';
+      list.innerHTML = '<li class="ranking-item">Cargando...</li>';
       
-      ranking.slice(0, 5).forEach((p, i) => {
-        const li = document.createElement('li');
-        li.className = 'ranking-item';
-        li.dataset.rank = (i + 1).toString(); // ✅ para medallas
-        li.innerHTML = `
-          <span class="hunter-name ${p.id === hunterId ? 'self-rank' : ''}">${p.id}</span>
-          <span class="hunter-stats">${p.missions}M · ${p.challenges}D</span>
-        `;
-        if (p.id === hunterId) {
+      try {
+        // Obtener los últimos 20 registros (para evitar datos antiguos)
+        const snapshot = await firestore
+          .collection('misiones_completadas')
+          .orderBy('timestamp', 'desc')
+          .limit(20)
+          .get();
+
+        // Agrupar por hunterId y contar misiones/desafíos
+        const hunters = new Map();
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const id = data.hunterId || data.uid;
+          
+          if (!hunters.has(id)) {
+            hunters.set(id, { id, missions: 0, challenges: 0 });
+          }
+          
+          const hunter = hunters.get(id);
+          hunter.missions += 1;
+          hunter.challenges += 1; // Cada misión completada = 1 desafío
+        });
+
+        // Convertir a array y ordenar por misiones (descendente)
+        const ranking = Array.from(hunters.values())
+          .sort((a, b) => b.missions - a.missions)
+          .slice(0, 5);
+
+        // Renderizar
+        list.innerHTML = '';
+        ranking.forEach((p, i) => {
+          const li = document.createElement('li');
+          li.className = 'ranking-item';
+          li.dataset.rank = (i + 1).toString();
+          li.innerHTML = `
+            <span class="hunter-name ${p.id === hunterId ? 'self-rank' : ''}">${p.id}</span>
+            <span class="hunter-stats">${p.missions}M · ${p.challenges}D</span>
+          `;
+          if (p.id === hunterId) {
+            li.style.background = 'rgba(255, 215, 0, 0.1)';
+            li.style.borderRadius = '8px';
+          }
+          list.appendChild(li);
+        });
+
+        // Asegurar que tú estés en la lista si no estás en top 5
+        if (!ranking.some(p => p.id === hunterId)) {
+          const myData = players.get(hunterId) || { missions: progreso.misiones, challenges: progreso.desafios };
+          const li = document.createElement('li');
+          li.className = 'ranking-item';
+          li.dataset.rank = (ranking.length + 1).toString();
+          li.innerHTML = `
+            <span class="hunter-name self-rank">${hunterId}</span>
+            <span class="hunter-stats">${myData.missions}M · ${myData.challenges}D</span>
+          `;
           li.style.background = 'rgba(255, 215, 0, 0.1)';
           li.style.borderRadius = '8px';
+          list.appendChild(li);
         }
-        list.appendChild(li);
-      });
-      
-      // Asegurar que tú estés en la lista si no estás en top 5
-      if (!ranking.some(p => p.id === hunterId)) {
-        const myData = players.get(hunterId) || { missions: progreso.misiones, challenges: progreso.desafios };
-        const li = document.createElement('li');
-        li.className = 'ranking-item';
-        li.dataset.rank = (ranking.length + 1).toString();
-        li.innerHTML = `
-          <span class="hunter-name self-rank">${hunterId}</span>
-          <span class="hunter-stats">${myData.missions}M · ${myData.challenges}D</span>
-        `;
-        li.style.background = 'rgba(255, 215, 0, 0.1)';
-        li.style.borderRadius = '8px';
-        list.appendChild(li);
+      } catch (err) {
+        console.error("Error al cargar ranking:", err);
+        list.innerHTML = '<li class="ranking-item">Error al cargar ranking</li>';
       }
     }
 
     // ✅ INICIAR
     document.addEventListener('DOMContentLoaded', () => {
       initWebSocket();
+      // Cargar ranking cada 10 segundos
+      renderRanking();
+      setInterval(renderRanking, 10000);
+      
       setTimeout(() => {
         if (players.size === 0) {
           players.set(hunterId, { id: hunterId, mission: 'M1', missions: progreso.misiones, challenges: progreso.desafios });
@@ -226,21 +296,21 @@
       setTimeout(() => t.classList.remove('show'), 3500);
     }
 
-// ✅ Detectar hash al cargar Y al cambiar
-function scrollToRadar() {
-  if (window.location.hash === '#radar') {
-    const radarSection = document.querySelector('.section:nth-of-type(2)');
-    if (radarSection) {
-      radarSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // ✅ Detectar hash al cargar Y al cambiar
+    function scrollToRadar() {
+      if (window.location.hash === '#radar') {
+        const radarSection = document.querySelector('.section:nth-of-type(2)');
+        if (radarSection) {
+          radarSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
     }
-  }
-}
 
-// Al cargar la página
-scrollToRadar();
+    // Al cargar la página
+    scrollToRadar();
 
-// Al hacer clic en enlaces internos (como "Señal en vivo")
-window.addEventListener('hashchange', scrollToRadar);
+    // Al hacer clic en enlaces internos (como "Señal en vivo")
+    window.addEventListener('hashchange', scrollToRadar);
   </script>
 </body>
 </html>

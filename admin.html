@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Let’s Hunt · Admin</title>
+  
+  <!-- Firebase SDK (legacy v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -27,7 +33,7 @@
       border-radius: 8px;
       margin-top: 1.5rem;
     }
-    input[type="password"] {
+    input[type="email"], input[type="password"] {
       width: 100%;
       padding: 0.6rem;
       margin: 0.5rem 0 1rem;
@@ -91,10 +97,12 @@
     <h1>Let’s Hunt · Panel de Administración</h1>
 
     <div id="loginSection" class="login-form">
-      <h2>Acceso restringido</h2>
-      <p>Ingresa la contraseña del administrador:</p>
+      <h2>🔐 Acceso restringido</h2>
+      <p>Ingresa tus credenciales de administrador:</p>
+      <input type="email" id="adminEmail" placeholder="Email" />
       <input type="password" id="adminPass" placeholder="Contraseña" />
       <button onclick="login()">Ingresar</button>
+      <div id="loginError" style="color:#f44336; margin-top:10px; display:none;"></div>
     </div>
 
     <div id="adminSection" class="admin-panel" style="display:none;">
@@ -108,115 +116,208 @@
   </div>
 
   <script>
-    // 🔑 Contraseña del administrador
-    const ADMIN_PASSWORD = "emienzobabu1971"; // ← ¡MODIFICA ESTA CONTRASEÑA!
+    // ========== FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-    function login() {
-      const pass = document.getElementById('adminPass').value;
-      if (pass === ADMIN_PASSWORD) {
+    // === AUTENTICACIÓN ===
+    async function login() {
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPass').value;
+      const errorDiv = document.getElementById('loginError');
+      
+      if (!email || !password) {
+        errorDiv.textContent = "⚠️ Completa todos los campos";
+        errorDiv.style.display = "block";
+        return;
+      }
+      
+      try {
+        // Iniciar sesión
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        // Verificar rol en Realtime Database
+        const userRef = db.ref(`usuarios/${user.uid}`);
+        const snapshot = await userRef.once('value');
+        
+        if (!snapshot.exists()) {
+          throw new Error("Usuario no autorizado");
+        }
+        
+        const userData = snapshot.val();
+        if (userData.rol !== 'admin' || !userData.activo) {
+          throw new Error("Acceso denegado - Rol no válido");
+        }
+        
+        // Mostrar panel de admin
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminSection').style.display = 'block';
+        document.getElementById('loginError').style.display = 'none';
+        
         loadRegistros();
-      } else {
-        alert("⚠ Contraseña incorrecta.");
+        
+      } catch (error) {
+        console.error("Error de autenticación:", error);
+        errorDiv.textContent = "❌ " + (error.message || "Credenciales incorrectas");
+        errorDiv.style.display = "block";
       }
     }
 
     function logout() {
-      document.getElementById('adminSection').style.display = 'none';
-      document.getElementById('loginSection').style.display = 'block';
-      document.getElementById('adminPass').value = '';
+      auth.signOut().then(() => {
+        document.getElementById('adminSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('adminEmail').value = '';
+        document.getElementById('adminPass').value = '';
+        document.getElementById('loginError').style.display = 'none';
+      });
     }
 
-    function loadRegistros() {
-      const registros = JSON.parse(localStorage.getItem('registros_nuevos') || '[]');
+    // === CARGAR REGISTROS ===
+    async function loadRegistros() {
       const tableDiv = document.getElementById('registrosTable');
+      tableDiv.innerHTML = '<p>Cargando registros...</p>';
 
-      if (registros.length === 0) {
-        tableDiv.innerHTML = '<p class="empty">No hay registros nuevos.</p>';
-        return;
-      }
+      try {
+        // Obtener registros recientes de Realtime Database
+        const snapshot = await db.ref('registros_nuevos').once('value');
+        
+        if (!snapshot.exists() || snapshot.val() === null) {
+          tableDiv.innerHTML = '<p class="empty">No hay registros nuevos.</p>';
+          return;
+        }
 
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Teléfono</th>
-              <th>Zona</th>
-              <th>Modo</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      registros.forEach(r => {
-        const fecha = new Date(r.timestamp).toLocaleString('es-AR');
-        const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
-        html += `
-          <tr>
-            <td>${r.id}</td>
-            <td>${r.nombre}</td>
-            <td>${r.telefono}</td>
-            <td>${r.zona}</td>
-            <td>${modo}</td>
-            <td>${fecha}</td>
-          </tr>
+        const registros = snapshot.val();
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Zona</th>
+                <th>Modo</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
         `;
-      });
 
-      html += `</tbody></table>`;
-      tableDiv.innerHTML = html;
-    }
+        // Convertir objeto a array y ordenar por timestamp
+        const registrosArray = Object.values(registros).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        
+        registrosArray.slice(0, 50).forEach(r => {
+          const fecha = r.timestamp ? new Date(r.timestamp).toLocaleString('es-AR') : 'Sin fecha';
+          const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
+          
+          html += `
+            <tr>
+              <td>${r.hunterId || '—'}</td>
+              <td>${r.nombre || '—'}</td>
+              <td>${r.telefono || '—'}</td>
+              <td>${r.zona || '—'}</td>
+              <td>${modo}</td>
+              <td>${fecha}</td>
+            </tr>
+          `;
+        });
 
-    function exportarPorEmail() {
-      const registros = JSON.parse(localStorage.getItem('registros_nuevos') || '[]');
-      if (registros.length === 0) {
-        alert("No hay registros para exportar.");
-        return;
+        html += `</tbody></table>`;
+        tableDiv.innerHTML = html;
+      } catch (error) {
+        console.error("Error al cargar registros:", error);
+        tableDiv.innerHTML = '<p class="empty">Error al cargar registros. Verifica la conexión.</p>';
       }
-
-      let cuerpo = "🆕 *NUEVOS CAZADORES REGISTRADOS*\n\n";
-      cuerpo += "ID | Nombre | Teléfono | Zona | Modo | Fecha\n";
-      cuerpo += "-".repeat(60) + "\n";
-
-      registros.forEach(r => {
-        const fecha = new Date(r.timestamp).toLocaleString('es-AR');
-        const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
-        cuerpo += `${r.id} | ${r.nombre} | ${r.telefono} | ${r.zona} | ${modo} | ${fecha}\n`;
-      });
-
-      cuerpo += "\n— Fin del reporte —\nLet’s Hunt · Cacería Urbana GBA";
-
-      const destinatario = "j.carloslarrosa@gmail.com";
-      const asunto = "🆕 Let's Hunt - Reporte de nuevos cazadores";
-      const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-
-      window.location.href = mailtoUrl;
-
-      // ✅ Opcional: borrar tras exportar
-      // Descomenta la siguiente línea si quieres borrar automáticamente:
-      // setTimeout(() => { borrarRegistrosSilencioso(); }, 2000);
     }
 
-    function borrarRegistros() {
+    // === EXPORTAR POR EMAIL ===
+    async function exportarPorEmail() {
+      try {
+        const snapshot = await db.ref('registros_nuevos').once('value');
+        
+        if (!snapshot.exists() || snapshot.val() === null) {
+          alert("No hay registros para exportar.");
+          return;
+        }
+
+        const registros = Object.values(snapshot.val()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        let cuerpo = "🆕 *NUEVOS CAZADORES REGISTRADOS*\n\n";
+        cuerpo += "ID | Nombre | Teléfono | Zona | Modo | Fecha\n";
+        cuerpo += "-".repeat(60) + "\n";
+
+        registros.slice(0, 100).forEach(r => {
+          const fecha = r.timestamp ? new Date(r.timestamp).toLocaleString('es-AR') : 'Sin fecha';
+          const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
+          cuerpo += `${r.hunterId || '—'} | ${r.nombre || '—'} | ${r.telefono || '—'} | ${r.zona || '—'} | ${modo} | ${fecha}\n`;
+        });
+
+        cuerpo += "\n— Fin del reporte —\nLet’s Hunt · Cacería Urbana GBA";
+
+        const destinatario = "j.carloslarrosa@gmail.com";
+        const asunto = "🆕 Let's Hunt - Reporte de nuevos cazadores";
+        const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+
+        window.location.href = mailtoUrl;
+      } catch (error) {
+        console.error("Error al exportar:", error);
+        alert("Error al exportar registros. Intenta nuevamente.");
+      }
+    }
+
+    // === BORRAR REGISTROS ===
+    async function borrarRegistros() {
       if (!confirm("¿Estás seguro de que deseas borrar todos los registros? Esta acción no se puede deshacer.")) {
         return;
       }
-      localStorage.removeItem('registros_nuevos');
-      loadRegistros();
-      alert("✅ Registros borrados.");
+
+      try {
+        // Borrar todos los registros en Realtime Database
+        await db.ref('registros_nuevos').set(null);
+        loadRegistros();
+        alert("✅ Registros borrados.");
+      } catch (error) {
+        console.error("Error al borrar registros:", error);
+        alert("Error al borrar registros. Intenta nuevamente.");
+      }
     }
 
-    function borrarRegistrosSilencioso() {
-      localStorage.removeItem('registros_nuevos');
-      loadRegistros();
-    }
-
+    // === EVENTOS ===
     document.getElementById('adminPass').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') login();
+    });
+
+    document.getElementById('adminEmail').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') login();
+    });
+
+    // === SESIÓN PERSISTENTE ===
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Verificar rol
+        const userRef = db.ref(`usuarios/${user.uid}`);
+        userRef.once('value').then((snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            if (userData.rol === 'admin' && userData.activo) {
+              document.getElementById('loginSection').style.display = 'none';
+              document.getElementById('adminSection').style.display = 'block';
+              loadRegistros();
+            }
+          }
+        });
+      }
     });
   </script>
 </body>

@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Let's Hunt — Desafío</title>
   <meta property="og:title" content="🌑 Let's Hunt — Desafío">
+  
+  <!-- Firebase SDK (legacy v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -95,6 +100,19 @@
   </div>
 
   <script>
+    // ========== FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const firestore = firebase.firestore();
+
     // === DATOS DEL DESAFÍO (recibidos por URL) ===
     const urlParams = new URLSearchParams(window.location.search);
     const m = parseInt(urlParams.get('m')) || 1; // misión
@@ -139,10 +157,25 @@
     document.getElementById('challenge-text').textContent = challengeText;
 
     // Botón de confirmación
-    document.getElementById('btn-confirm').onclick = () => {
+    document.getElementById('btn-confirm').onclick = async () => {
       document.getElementById('btn-confirm').classList.add('hidden');
       document.getElementById('countdown').classList.remove('hidden');
       document.getElementById('status').classList.remove('hidden');
+      
+      // Registrar en Firestore
+      try {
+        await firestore.collection('desafios_aceptados').add({
+          mision: m,
+          desafio: d,
+          token: token,
+          hunterId: localStorage.getItem('currentHunterId') || 'unknown',
+          estado: 'en_progreso',
+          timestamp_inicio: firebase.firestore.FieldValue.serverTimestamp(),
+          tiempo_limite: [900, 720, 600, 480][m-1] || 900
+        });
+      } catch (error) {
+        console.error("Error al registrar desafío:", error);
+      }
       
       // Iniciar cronómetro
       const timeLimit = [900, 720, 600, 480][m-1] || 900; // 15, 12, 10, 8 min
@@ -150,9 +183,6 @@
 
       // Notificar al Vigilante (simulado; en producción: WebSocket o fetch)
       console.log(`[Vigilante] Jugador aceptó desafío M${m}D${d}. Token: ${token}`);
-      
-      // En producción, podrías enviar:
-      // fetch(`/api/notify-vigilante?token=${token}&status=started`);
     };
 
     function startTimer(totalSeconds) {
@@ -172,6 +202,15 @@
     }
 
     function fail() {
+      // Registrar fallo en Firestore
+      firestore.collection('desafios_fallidos').add({
+        mision: m,
+        desafio: d,
+        token: token,
+        hunterId: localStorage.getItem('currentHunterId') || 'unknown',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
       document.body.innerHTML = `<div style="padding:50px;text-align:center;color:#d9c8b0;background:#090c14">
         <h2 style="color:#c14747">misión anulada</h2>
         <p>El Vigilante ha cerrado los ojos.</p>
@@ -183,13 +222,38 @@
     }
 
     // API para que el Vigilante valide (llamado desde su panel)
-    window.validateChallenge = () => {
-      alert("✅ Desafío validado. Coordenadas enviadas por WhatsApp.");
-      document.body.innerHTML = `<div style="padding:50px;text-align:center;color:#d9c8b0;background:#090c14">
-        <h2 style="color:#4caf50">misión completada</h2>
-        <p>Las coordenadas del QR fueron enviadas por WhatsApp.</p>
-        <small>Let's Hunt — CABA</small>
-      </div>`;
+    window.validateChallenge = async () => {
+      try {
+        // Buscar el desafío por token
+        const snapshot = await firestore
+          .collection('desafios_aceptados')
+          .where('token', '==', token)
+          .where('estado', '==', 'en_progreso')
+          .limit(1)
+          .get();
+
+        if (!snapshot.empty) {
+          const doc = snapshot.docs[0];
+          await doc.ref.update({
+            estado: 'completado',
+            timestamp_validacion: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          // Enviar notificación al jugador (simulado)
+          document.body.innerHTML = `<div style="padding:50px;text-align:center;color:#d9c8b0;background:#090c14">
+            <h2 style="color:#4caf50">misión completada</h2>
+            <p>Las coordenadas del QR fueron enviadas por WhatsApp.</p>
+            <small>Let's Hunt — CABA</small>
+          </div>`;
+          
+          // Aquí podrías enviar un mensaje real por WhatsApp usando Twilio o similar
+        } else {
+          alert("❌ Desafío no encontrado o ya expirado.");
+        }
+      } catch (error) {
+        console.error("Error al validar:", error);
+        alert("Error al validar el desafío.");
+      }
     };
   </script>
 </body>

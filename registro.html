@@ -9,6 +9,12 @@
   <!-- ✅ PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0066ff">
+  
+  <!-- Firebase SDK (legacy v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -128,6 +134,20 @@
   </div>
 
   <script>
+  // ========== FIREBASE ==========
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+    authDomain: "let-s-hunt.firebaseapp.com",
+    projectId: "let-s-hunt",
+    storageBucket: "let-s-hunt.firebasestorage.app",
+    messagingSenderId: "787017812046",
+    appId: "1:787017812046:web:da098b2361df4dda995b1f"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const firestore = firebase.firestore();
+
   // Mostrar/ocultar campo de equipo
   document.querySelectorAll('input[name="modo"]').forEach(radio => {
     radio.addEventListener('change', () => {
@@ -152,8 +172,8 @@
     return codigo;
   }
 
-  // Manejar envío SIN API (solo localStorage + redirección local)
-  document.getElementById('registroForm').addEventListener('submit', (e) => {
+  // Manejar envío CON Firebase + localStorage
+  document.getElementById('registroForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const nombre = document.getElementById('nombre').value.trim();
@@ -200,20 +220,40 @@
     localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
 
-    // ✅ OPCION 1: Guardar registro nuevo para administrador (silencioso)
-    const nuevoRegistro = {
-      id: hunterId,
-      nombre,
-      email,
-      telefono: `+549${telefonoRaw}`,
-      zona,
-      modo,
-      equipo,
-      timestamp: Date.now()
-    };
-    let registrosNuevos = JSON.parse(localStorage.getItem('registros_nuevos') || '[]');
-    registrosNuevos.push(nuevoRegistro);
-    localStorage.setItem('registros_nuevos', JSON.stringify(registrosNuevos));
+    // ✅ Guardar en Firestore (base de datos real)
+    try {
+      // Crear usuario anónimo
+      const userCredential = await auth.signInAnonymously();
+      const user = userCredential.user;
+
+      // Guardar en Firestore
+      await firestore.collection('jugadores').doc(user.uid).set({
+        hunterId: hunterId,
+        nombre: nombre,
+        email: email,
+        telefono: `+549${telefonoRaw}`,
+        zona: zona,
+        modo: modo,
+        equipo: equipo,
+        fecha_registro: firebase.firestore.FieldValue.serverTimestamp(),
+        activo: true
+      });
+
+      // ✅ Guardar registro nuevo para administrador (en Firestore)
+      await firestore.collection('registros_nuevos').add({
+        hunterId: hunterId,
+        nombre: nombre,
+        email: email,
+        telefono: `+549${telefonoRaw}`,
+        zona: zona,
+        modo: modo,
+        equipo: equipo,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (error) {
+      console.error("Error al guardar en Firebase:", error);
+      // Continuar igual (no bloquear al usuario)
+    }
 
     // Feedback emocional
     const btn = document.getElementById('submitBtn');

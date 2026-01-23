@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vigilante — Let's Hunt</title>
+  
+  <!-- Firebase SDK (legacy v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -135,32 +141,122 @@
   <div class="container">
     <h1>👁️ PANEL DEL VIGILANTE</h1>
     
-    <div class="connection-banner" id="connection-status">
-      📡 Conectando al servidor...
+    <!-- Formulario de login -->
+    <div id="loginSection" class="instructions" style="text-align:center; padding:30px;">
+      <h2>🔐 Acceso restringido</h2>
+      <p>Ingresa tus credenciales de Vigilante:</p>
+      <input type="email" id="vigilanteEmail" placeholder="Email" style="width:100%; padding:10px; margin:10px 0; border-radius:4px; border:1px solid #4a3a2a; background:#2a3a5a; color:white;">
+      <input type="password" id="vigilantePassword" placeholder="Contraseña" style="width:100%; padding:10px; margin:10px 0; border-radius:4px; border:1px solid #4a3a2a; background:#2a3a5a; color:white;">
+      <button onclick="loginVigilante()" class="btn btn-watch" style="width:100%; margin-top:15px;">Ingresar</button>
+      <div id="loginError" style="color:#f44336; margin-top:10px; display:none;"></div>
     </div>
 
-    <div class="instructions">
-      <strong>Instrucciones:</strong><br>
-      • Los jugadores aparecen automáticamente al aceptar su desafío.<br>
-      • Toca <strong>👁️ OBSERVAR</strong> para conectar la videollamada.<br>
-      • Usa los botones para guiar la misión en vivo.
-    </div>
+    <!-- Panel principal (oculto inicialmente) -->
+    <div id="mainPanel" style="display:none;">
+      <div class="connection-banner" id="connection-status">
+        📡 Conectando al servidor...
+      </div>
 
-    <div id="players-list">
-      <!-- Los jugadores se agregarán aquí dinámicamente -->
-    </div>
+      <div class="instructions">
+        <strong>Instrucciones:</strong><br>
+        • Los jugadores aparecen automáticamente al aceptar su desafío.<br>
+        • Toca <strong>👁️ OBSERVAR</strong> para conectar la videollamada.<br>
+        • Usa los botones para guiar la misión en vivo.
+      </div>
 
-    <div class="instructions" style="margin-top:30px;">
-      <strong>Atajos de teclado (en videollamada):</strong><br>
-      1 = ✅ Validar desafío 1 &nbsp; | &nbsp; 2 = ▶️ Desafío 2 &nbsp; | &nbsp; 3 = ▶️ Desafío 3 &nbsp; | &nbsp; F = ❌ Falló
+      <div id="players-list">
+        <!-- Los jugadores se agregarán aquí dinámicamente -->
+      </div>
+
+      <div class="instructions" style="margin-top:30px;">
+        <strong>Atajos de teclado (en videollamada):</strong><br>
+        1 = ✅ Validar desafío 1 &nbsp; | &nbsp; 2 = ▶️ Desafío 2 &nbsp; | &nbsp; 3 = ▶️ Desafío 3 &nbsp; | &nbsp; F = ❌ Falló
+      </div>
+      
+      <button onclick="logoutVigilante()" class="btn btn-danger" style="margin-top:20px; width:100%;">Cerrar sesión</button>
     </div>
   </div>
 
   <script>
-    // === CONEXIÓN WEBSOCKET REAL ===
+    // ========== FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // === VARIABLES GLOBALES ===
     let ws;
+    let currentUser = null;
     const players = new Map();
 
+    // === AUTENTICACIÓN ===
+    async function loginVigilante() {
+      const email = document.getElementById('vigilanteEmail').value.trim();
+      const password = document.getElementById('vigilantePassword').value;
+      const errorDiv = document.getElementById('loginError');
+      
+      if (!email || !password) {
+        errorDiv.textContent = "⚠️ Completa todos los campos";
+        errorDiv.style.display = "block";
+        return;
+      }
+      
+      try {
+        // Iniciar sesión
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        // Verificar rol en Realtime Database
+        const userRef = db.ref(`usuarios/${user.uid}`);
+        const snapshot = await userRef.once('value');
+        
+        if (!snapshot.exists()) {
+          throw new Error("Usuario no autorizado");
+        }
+        
+        const userData = snapshot.val();
+        if (userData.rol !== 'vigilante' && userData.rol !== 'admin' || !userData.activo) {
+          throw new Error("Acceso denegado - Rol no válido");
+        }
+        
+        // Guardar usuario actual
+        currentUser = { uid: user.uid, email: user.email, rol: userData.rol };
+        
+        // Mostrar panel principal
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('mainPanel').style.display = 'block';
+        document.getElementById('loginError').style.display = 'none';
+        
+        // Conectar WebSocket
+        connectWebSocket();
+        
+      } catch (error) {
+        console.error("Error de autenticación:", error);
+        errorDiv.textContent = "❌ " + (error.message || "Credenciales incorrectas");
+        errorDiv.style.display = "block";
+      }
+    }
+
+    function logoutVigilante() {
+      auth.signOut().then(() => {
+        currentUser = null;
+        document.getElementById('mainPanel').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('vigilanteEmail').value = '';
+        document.getElementById('vigilantePassword').value = '';
+      });
+    }
+
+    // === CONEXIÓN WEBSOCKET REAL ===
     function connectWebSocket() {
       const wsUrl = window.location.hostname === 'localhost' 
         ? 'ws://localhost:8080'
@@ -179,7 +275,6 @@
         
         switch (data.type) {
           case 'players':
-            // Actualizar lista de jugadores
             players.clear();
             data.players.forEach(p => players.set(p.id, p));
             renderPlayers();
@@ -257,8 +352,15 @@
       
       statusEl.textContent = "📞 Llamando por WhatsApp...";
       
-      // En producción: iniciar videollamada real aquí
-      // Por ahora, simular conexión
+      // Registrar en Realtime Database
+      db.ref('sesiones_vigilante').push({
+        vigilanteId: currentUser.uid,
+        jugadorId: playerId,
+        mision: players.get(playerId)?.mission || 1,
+        timestamp_inicio: Date.now(),
+        estado: 'observando'
+      });
+
       setTimeout(() => {
         videoEl.innerHTML = `
           <div style="height:100%;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff">
@@ -271,12 +373,11 @@
         `;
         videoEl.style.display = "block";
         statusEl.textContent = "✅ En vivo — observando";
-        document.body.focus(); // para atajos
+        document.body.focus();
       }, 1500);
     }
 
-    function validateStep(playerId, step) {
-      // ✅ ENVIAR COMANDO AL JUGADOR VIA WEBSOCKET
+    async function validateStep(playerId, step) {
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
           type: 'command',
@@ -286,18 +387,45 @@
         }));
       }
       
+      // Registrar validación en Realtime Database
+      try {
+        await db.ref('validaciones_vigilante').push({
+          vigilanteId: currentUser.uid,
+          jugadorId: playerId,
+          paso: step,
+          mision: players.get(playerId)?.mission || 1,
+          timestamp: Date.now(),
+          resultado: 'exitoso'
+        });
+      } catch (error) {
+        console.error("Error al registrar validación:", error);
+      }
+      
       const statusEl = document.getElementById(`status-${playerId}`);
       statusEl.textContent = `✅ Desafío ${step} validado`;
       console.log(`[Vigilante] Validado paso ${step} para ${playerId}`);
     }
 
-    function failMission(playerId) {
+    async function failMission(playerId) {
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
           type: 'command',
           target: playerId,
           action: 'fail'
         }));
+      }
+      
+      // Registrar fallo en Realtime Database
+      try {
+        await db.ref('fallos_vigilante').push({
+          vigilanteId: currentUser.uid,
+          jugadorId: playerId,
+          mision: players.get(playerId)?.mission || 1,
+          timestamp: Date.now(),
+          razon: 'manual'
+        });
+      } catch (error) {
+        console.error("Error al registrar fallo:", error);
       }
       
       const statusEl = document.getElementById(`status-${playerId}`);
@@ -322,13 +450,29 @@
       }
     });
 
+    // === SESIÓN PERSISTENTE ===
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        const userRef = db.ref(`usuarios/${user.uid}`);
+        userRef.once('value').then((snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            if ((userData.rol === 'vigilante' || userData.rol === 'admin') && userData.activo) {
+              currentUser = { uid: user.uid, email: user.email, rol: userData.rol };
+              document.getElementById('loginSection').style.display = 'none';
+              document.getElementById('mainPanel').style.display = 'block';
+              connectWebSocket();
+            }
+          }
+        });
+      }
+    });
+
     // === INICIAR ===
     document.addEventListener('DOMContentLoaded', () => {
-      connectWebSocket();
-      
       // Simular datos iniciales si no hay conexión
       setTimeout(() => {
-        if (players.size === 0) {
+        if (players.size === 0 && !currentUser) {
           players.set('hunter_0001', { id: 'hunter_0001', mission: 1, step: 1, timeLeft: 842, missions: 0, challenges: 0 });
           players.set('hunter_0109', { id: 'hunter_0109', mission: 2, step: 1, timeLeft: 658, missions: 1, challenges: 3 });
           renderPlayers();

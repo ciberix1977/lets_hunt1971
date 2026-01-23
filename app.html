@@ -9,10 +9,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   
+  <!-- Firebase SDK (legacy v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+  
   <!-- Librerías externas -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="/manifest.json">
 
@@ -213,7 +221,22 @@
 
   <!-- LÓGICA PRINCIPAL -->
   <script>
-   
+    // ========== FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f",
+      measurementId: "G-07SR9WR8NV"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+    const analytics = firebase.analytics();
 
     // ========== DATOS DINÁMICOS ==========
     let misionesSolitario = [];
@@ -227,57 +250,71 @@
       try {
         const [solitarioRes, equipoRes] = await Promise.all([
           fetch('misiones-solitario.json'),
-          fetch('misiones-equipo-local.json') // ✅ Corregido: .json
+          fetch('misiones-equipo-local.json')
         ]);
+        if (!solitarioRes.ok) throw new Error(`Error ${solitarioRes.status}: misiones-solitario.json`);
+        if (!equipoRes.ok) throw new Error(`Error ${equipoRes.status}: misiones-equipo-local.json`);
         misionesSolitario = await solitarioRes.json();
         misionesEquipo = await equipoRes.json();
       } catch (err) {
-        console.error("⚠️ Error cargando misiones:", err);
-        showToast("⚠️ No se pudieron cargar las misiones. Reintentando...");
+        console.error("⚠️ Error crítico:", err);
+        showToast("⚠️ Error al cargar misiones. Verifica los archivos JSON.");
         misionesSolitario = [
           { id: 1, zona: "CABA", titulo: "Misión de prueba", ubicacion_mapa: "Plaza de Mayo", pista_al_llegar: "Busca la pista final.", coordenadas: { lat: -34.6037, lng: -58.3816 } }
         ];
       }
-
       setupJugador();
     }
 
     // ========== VERIFICACIÓN DE MISIÓN EN TIEMPO REAL ==========
     async function isMisionDisponible(misionId, zona) {
-      const { data, error } = await supabase
-        .from('misiones_activas')
-        .select('estado')
-        .eq('id_mision', `M${misionId}-${zona}`)
-        .single();
-
-      if (error || !data) {
-        // Si no existe, crearla como disponible
-        await supabase
-          .from('misiones_activas')
-          .insert({ 
-            id_mision: `M${misionId}-${zona}`,
-            zona: zona,
-            estado: 'disponible'
-          });
-        return true;
+      try {
+        const misionRef = db.ref(`misiones/${misionId}-${zona}`);
+        const snapshot = await misionRef.once('value');
+        
+        if (!snapshot.exists()) {
+          return true; // Disponible si no existe
+        }
+        
+        const data = snapshot.val();
+        return data.estado !== 'completada';
+      } catch (err) {
+        console.error("Error en Firebase:", err);
+        return true; // Fallback seguro
       }
-      
-      return data.estado === 'disponible';
     }
 
     async function completarMision(misionId, zona, hunterId) {
-      const { data, error } = await supabase
-        .from('misiones_activas')
-        .update({ 
+      try {
+        const misionRef = db.ref(`misiones/${misionId}-${zona}`);
+        const snapshot = await misionRef.once('value');
+        
+        if (!snapshot.exists()) {
+          // Primero en completar
+          await misionRef.set({
+            estado: 'completada',
+            hunter_ganador: hunterId,
+            timestamp: Date.now()
+          });
+          return true;
+        }
+        
+        const data = snapshot.val();
+        if (data.estado === 'completada') {
+          return false; // Ya fue completada
+        }
+        
+        // Marcar como completada
+        await misionRef.set({
           estado: 'completada',
           hunter_ganador: hunterId,
-          timestamp: new Date()
-        })
-        .eq('id_mision', `M${misionId}-${zona}`)
-        .eq('estado', 'disponible')
-        .select();
-
-      return !error && data.length > 0;
+          timestamp: Date.now()
+        });
+        return true;
+      } catch (err) {
+        console.error("Error al completar misión:", err);
+        return true; // No bloquear al jugador
+      }
     }
 
     // Función para ocultar todas las fases
@@ -300,23 +337,40 @@
 
     // ========== CONFIGURACIÓN DEL JUGADOR ==========
     let jugador;
+    let firebaseUser = null;
+
     function setupJugador() {
       const urlParams = new URLSearchParams(window.location.search);
-      let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId') || 'hunter0000';
+      let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId');
 
-      if (!hunterId || hunterId === 'hunter0000') {
-        if (!urlParams.has('id')) {
-          window.location.href = 'registro.html';
-          return;
+      // Iniciar sesión anónima (para jugadores)
+      auth.signInAnonymously().catch((error) => {
+        console.error("Error al iniciar sesión anónima:", error);
+      });
+
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          firebaseUser = user;
+          localStorage.setItem('firebaseUid', user.uid);
+          
+          // Generar hunterId basado en UID
+          hunterId = `hunter_${user.uid.substring(0, 8)}`;
+          localStorage.setItem('currentHunterId', hunterId);
+          
+          _continueSetupJugador(hunterId);
+        } else {
+          _continueSetupJugador(hunterId);
         }
-      }
+      });
+    }
 
-      if (hunterId === 'hunter0000') {
+    function _continueSetupJugador(hunterId) {
+      if (!hunterId) {
         const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
         hunterId = `hunter_${String(nextId).padStart(4, '0')}`;
         localStorage.setItem('lastHunterId', nextId);
         
-        const ciudadFromURL = decodeURIComponent((urlParams.get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
+        const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
         jugador = {
           id: hunterId,
           nombre: 'Jugador de Prueba',
@@ -325,14 +379,24 @@
           modo: 'individual'
         };
         localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+        localStorage.setItem('currentHunterId', hunterId);
       } else {
-        jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`)) || {
+        // Manejo seguro de localStorage
+        let storedJugador;
+        try {
+          storedJugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`));
+        } catch (e) {
+          console.warn("Datos corruptos en localStorage. Reiniciando jugador.");
+          storedJugador = null;
+        }
+
+        jugador = storedJugador || {
           id: hunterId,
           zona: 'CABA',
           modo: 'individual'
         };
 
-        const ciudadFromURL = decodeURIComponent((urlParams.get('zona') || '').replace(/\+/g, ' ')).trim();
+        const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || '').replace(/\+/g, ' ')).trim();
         if (ciudadFromURL) {
           const zonaNormalizada = ciudadFromURL.normalize('NFC');
           if (getMisionesByZona(zonaNormalizada, 'solitario').length > 0) {
@@ -341,9 +405,9 @@
         }
 
         localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+        localStorage.setItem('currentHunterId', hunterId);
       }
 
-      localStorage.setItem('currentHunterId', hunterId);
       document.getElementById('hunterIdDisplay').textContent = 
         jugador.modo === 'equipo' ? `👥 ${jugador.equipo || hunterId}` : `ID: ${hunterId}`;
 
@@ -398,6 +462,13 @@
     // ========== FLUJO INDIVIDUAL ==========
     async function showPhase1() {
       currentMission = selectRandomMission(jugador.zona, 'solitario');
+      
+      // Registrar evento de Analytics
+      analytics.logEvent('mision_aceptada', {
+        zona: jugador.zona,
+        tipo: 'solitario',
+        hunter_id: jugador.id
+      });
       
       // Verificar disponibilidad en tiempo real
       const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
@@ -684,13 +755,17 @@
               exito = true; // Simplificado para equipos
               handleTeamQRScan(codigoEscaneado, qrExpected);
             } else {
-              // Para individuales, verificar con Supabase
+              // Para individuales, verificar con Firebase
               if (codigoEscaneado === qrExpected) {
                 exito = await completarMision(currentMission.id, jugador.zona, jugador.id);
               }
             }
             
             if (!exito && jugador.modo !== 'equipo') {
+              analytics.logEvent('qr_escaneo_fallido', {
+                zona: jugador.zona,
+                hunter_id: jugador.id
+              });
               showToast("❌ ¡Demasiado tarde! Alguien ya encontró el código.");
               setTimeout(showPhase1, 3000);
               return;
@@ -737,6 +812,15 @@
     function completeMission() {
       const misionId = jugador.modo === 'equipo' ? currentTeamMission.id : currentMission.id;
       guardarProgreso(null, `${misionId}_desafio_1`);
+      
+      // Registrar evento de Analytics
+      analytics.logEvent('mision_completada', {
+        zona: jugador.zona,
+        tipo: jugador.modo,
+        hunter_id: jugador.id,
+        tiempo_min: Math.floor((Date.now() - missionStartTime) / 60000)
+      });
+      
       playNarration(`Confirmado. Has completado la misión. El ranking se actualiza ahora.`);
       showToast(`✅ ¡Código verificado!\n🔥 ¡Cazador ${jugador.id} ha completado la misión!`);
       showMissionCompleted();
@@ -886,7 +970,7 @@
           showToast("❌ Código inválido.");
         }
       } else {
-        // Verificar con Supabase
+        // Verificar con Firebase
         (async () => {
           if (input.trim() === qrExpected) {
             const exito = await completarMision(currentMission.id, jugador.zona, jugador.id);
@@ -1020,10 +1104,7 @@
     // Mostrar banner de instalación
     showInstallBanner();
 
-    // ========== SUPABASE ==========
-    const supabaseUrl = 'https://seubermhmnyymgdctvxj.supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNldWJlcm1obW55eW1nZGN0dnhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MTY2NDEsImV4cCI6MjA4NDQ5MjY0MX0.XYYTaYkiUbm6XUVVcc9XLTMNqJqKz2Bd_2K7LBZfK3o';
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Inicializar app
     window.addEventListener('load', initApp);
   </script>
 </body>
