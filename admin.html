@@ -132,49 +132,53 @@
     const db = firebase.database();
 
     // === AUTENTICACIÓN ===
-    async function login() {
-      const email = document.getElementById('adminEmail').value.trim();
-      const password = document.getElementById('adminPass').value;
-      const errorDiv = document.getElementById('loginError');
-      
-      if (!email || !password) {
-        errorDiv.textContent = "⚠️ Completa todos los campos";
-        errorDiv.style.display = "block";
-        return;
-      }
-      
-      try {
-        // Iniciar sesión
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-        
-        // Verificar rol en Realtime Database
-        const userRef = db.ref(`usuarios/${user.uid}`);
-        const snapshot = await userRef.once('value');
-        
-        if (!snapshot.exists()) {
-          throw new Error("Usuario no autorizado");
-        }
-        
-        const userData = snapshot.val();
-        if (userData.rol !== 'admin' || !userData.activo) {
-          throw new Error("Acceso denegado - Rol no válido");
-        }
-        
-        // Mostrar panel de admin
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminSection').style.display = 'block';
-        document.getElementById('loginError').style.display = 'none';
-        
-        loadRegistros();
-        
-      } catch (error) {
-        console.error("Error de autenticación:", error);
-        errorDiv.textContent = "❌ " + (error.message || "Credenciales incorrectas");
-        errorDiv.style.display = "block";
-      }
+  async function login() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPass').value;
+  const errorDiv = document.getElementById('loginError');
+  
+  if (!email || !password) {
+    errorDiv.textContent = "⚠️ Completa todos los campos";
+    errorDiv.style.display = "block";
+    return;
+  }
+  
+  try {
+    // Iniciar sesión
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    console.log("✅ Usuario autenticado:", user.uid);
+    
+    // Verificar rol en Realtime Database
+    const userRef = db.ref(`usuarios/${user.uid}`);
+    const snapshot = await userRef.once('value');
+    console.log("🔍 Snapshot existe:", snapshot.exists());
+    console.log("📊 Datos:", snapshot.val());
+    
+    if (!snapshot.exists()) {
+      throw new Error("Usuario no autorizado - No existe en base de datos");
     }
-
+    
+    const userData = snapshot.val();
+    console.log("🔑 Rol:", userData.rol, "Activo:", userData.activo);
+    
+    if (userData.rol !== 'admin' || !userData.activo) {
+      throw new Error("Acceso denegado - Rol no válido");
+    }
+    
+    // Mostrar panel de admin
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('adminSection').style.display = 'block';
+    document.getElementById('loginError').style.display = 'none';
+    
+    loadRegistros();
+    
+  } catch (error) {
+    console.error("❌ Error de autenticación:", error);
+    errorDiv.textContent = "❌ " + (error.message || "Credenciales incorrectas");
+    errorDiv.style.display = "block";
+  }
+}
     function logout() {
       auth.signOut().then(() => {
         document.getElementById('adminSection').style.display = 'none';
