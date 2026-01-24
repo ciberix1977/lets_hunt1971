@@ -13,7 +13,7 @@
   <!-- Firebase SDK (legacy v8.10.1) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -138,6 +138,7 @@
   const firebaseConfig = {
     apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
     authDomain: "let-s-hunt.firebaseapp.com",
+    databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
     projectId: "let-s-hunt",
     storageBucket: "let-s-hunt.firebasestorage.app",
     messagingSenderId: "787017812046",
@@ -146,7 +147,7 @@
   
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
-  const firestore = firebase.firestore();
+  const db = firebase.database();
 
   // Mostrar/ocultar campo de equipo
   document.querySelectorAll('input[name="modo"]').forEach(radio => {
@@ -220,14 +221,14 @@
     localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
 
-    // ✅ Guardar en Firestore (base de datos real)
+    // ✅ Guardar en Realtime Database (base de datos real)
     try {
       // Crear usuario anónimo
       const userCredential = await auth.signInAnonymously();
       const user = userCredential.user;
 
-      // Guardar en Firestore
-      await firestore.collection('jugadores').doc(user.uid).set({
+      // Guardar en Realtime Database - jugadores
+      await db.ref(`jugadores/${user.uid}`).set({
         hunterId: hunterId,
         nombre: nombre,
         email: email,
@@ -235,12 +236,12 @@
         zona: zona,
         modo: modo,
         equipo: equipo,
-        fecha_registro: firebase.firestore.FieldValue.serverTimestamp(),
+        fecha_registro: Date.now(),
         activo: true
       });
 
-      // ✅ Guardar registro nuevo para administrador (en Firestore)
-      await firestore.collection('registros_nuevos').add({
+      // ✅ Guardar registro nuevo para administrador (en Realtime Database)
+      await db.ref('registros_nuevos').push({
         hunterId: hunterId,
         nombre: nombre,
         email: email,
@@ -248,7 +249,7 @@
         zona: zona,
         modo: modo,
         equipo: equipo,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        timestamp: Date.now()
       });
     } catch (error) {
       console.error("Error al guardar en Firebase:", error);
