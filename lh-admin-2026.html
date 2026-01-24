@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Let’s Hunt · Admin</title>
+  
+  <!-- Firebase SDK (legacy v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      padding: 2rem;
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #4fc3f7;
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.5rem;
+    }
+    .login-form, .admin-panel {
+      background: #1a1a1a;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+    }
+    input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 0.6rem;
+      margin: 0.5rem 0 1rem;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 4px;
+    }
+    button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    button:hover {
+      background: #1565c0;
+    }
+    .export-btn {
+      background: #388e3c;
+    }
+    .export-btn:hover {
+      background: #2e7d32;
+    }
+    .delete-btn {
+      background: #d32f2f;
+    }
+    .delete-btn:hover {
+      background: #b71c1c;
+    }
+    .logout {
+      background: #888;
+    }
+    .logout:hover {
+      background: #666;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.6rem;
+      border-bottom: 1px solid #333;
+    }
+    th {
+      color: #4fc3f7;
+    }
+    .empty {
+      color: #999;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Let’s Hunt · Panel de Administración</h1>
+
+    <div id="loginSection" class="login-form">
+      <h2>🔐 Acceso restringido</h2>
+      <p>Ingresa tus credenciales de administrador:</p>
+      <input type="email" id="adminEmail" placeholder="Email" />
+      <input type="password" id="adminPass" placeholder="Contraseña" />
+      <button onclick="login()">Ingresar</button>
+      <div id="loginError" style="color:#f44336; margin-top:10px; display:none;"></div>
+    </div>
+
+    <div id="adminSection" class="admin-panel" style="display:none;">
+      <h2>Registros recientes</h2>
+      <button class="logout" onclick="logout()">Cerrar sesión</button>
+      <button class="export-btn" onclick="exportarPorEmail()">📤 Exportar a email</button>
+      <button class="delete-btn" onclick="borrarRegistros()">🗑️ Borrar todos los registros</button>
+      
+      <div id="registrosTable"></div>
+    </div>
+  </div>
+
+  <script>
+    // ========== FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // === AUTENTICACIÓN ===
+    async function login() {
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPass').value;
+      const errorDiv = document.getElementById('loginError');
+      
+      if (!email || !password) {
+        errorDiv.textContent = "⚠️ Completa todos los campos";
+        errorDiv.style.display = "block";
+        return;
+      }
+      
+      try {
+        // Iniciar sesión
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        // Verificar rol en Realtime Database
+        const userRef = db.ref(`usuarios/${user.uid}`);
+        const snapshot = await userRef.once('value');
+        
+        if (!snapshot.exists()) {
+          throw new Error("Usuario no autorizado");
+        }
+        
+        const userData = snapshot.val();
+        if (userData.rol !== 'admin' || !userData.activo) {
+          throw new Error("Acceso denegado - Rol no válido");
+        }
+        
+        // Mostrar panel de admin
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminSection').style.display = 'block';
+        document.getElementById('loginError').style.display = 'none';
+        
+        loadRegistros();
+        
+      } catch (error) {
+        console.error("Error de autenticación:", error);
+        errorDiv.textContent = "❌ " + (error.message || "Credenciales incorrectas");
+        errorDiv.style.display = "block";
+      }
+    }
+
+    function logout() {
+      auth.signOut().then(() => {
+        document.getElementById('adminSection').style.display = 'none';
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('adminEmail').value = '';
+        document.getElementById('adminPass').value = '';
+        document.getElementById('loginError').style.display = 'none';
+      });
+    }
+
+    // === CARGAR REGISTROS ===
+    async function loadRegistros() {
+      const tableDiv = document.getElementById('registrosTable');
+      tableDiv.innerHTML = '<p>Cargando registros...</p>';
+
+      try {
+        // Obtener registros recientes de Realtime Database
+        const snapshot = await db.ref('registros_nuevos').once('value');
+        
+        if (!snapshot.exists() || snapshot.val() === null) {
+          tableDiv.innerHTML = '<p class="empty">No hay registros nuevos.</p>';
+          return;
+        }
+
+        const registros = snapshot.val();
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Zona</th>
+                <th>Modo</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        // Convertir objeto a array y ordenar por timestamp
+        const registrosArray = Object.values(registros).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        
+        registrosArray.slice(0, 50).forEach(r => {
+          const fecha = r.timestamp ? new Date(r.timestamp).toLocaleString('es-AR') : 'Sin fecha';
+          const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
+          
+          html += `
+            <tr>
+              <td>${r.hunterId || '—'}</td>
+              <td>${r.nombre || '—'}</td>
+              <td>${r.telefono || '—'}</td>
+              <td>${r.zona || '—'}</td>
+              <td>${modo}</td>
+              <td>${fecha}</td>
+            </tr>
+          `;
+        });
+
+        html += `</tbody></table>`;
+        tableDiv.innerHTML = html;
+      } catch (error) {
+        console.error("Error al cargar registros:", error);
+        tableDiv.innerHTML = '<p class="empty">Error al cargar registros. Verifica la conexión.</p>';
+      }
+    }
+
+    // === EXPORTAR POR EMAIL ===
+    async function exportarPorEmail() {
+      try {
+        const snapshot = await db.ref('registros_nuevos').once('value');
+        
+        if (!snapshot.exists() || snapshot.val() === null) {
+          alert("No hay registros para exportar.");
+          return;
+        }
+
+        const registros = Object.values(snapshot.val()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        let cuerpo = "🆕 *NUEVOS CAZADORES REGISTRADOS*\n\n";
+        cuerpo += "ID | Nombre | Teléfono | Zona | Modo | Fecha\n";
+        cuerpo += "-".repeat(60) + "\n";
+
+        registros.slice(0, 100).forEach(r => {
+          const fecha = r.timestamp ? new Date(r.timestamp).toLocaleString('es-AR') : 'Sin fecha';
+          const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
+          cuerpo += `${r.hunterId || '—'} | ${r.nombre || '—'} | ${r.telefono || '—'} | ${r.zona || '—'} | ${modo} | ${fecha}\n`;
+        });
+
+        cuerpo += "\n— Fin del reporte —\nLet’s Hunt · Cacería Urbana GBA";
+
+        const destinatario ="lets.hunt2026@gmail.com";
+        const asunto = "🆕 Let's Hunt - Reporte de nuevos cazadores";
+        const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+
+        window.location.href = mailtoUrl;
+      } catch (error) {
+        console.error("Error al exportar:", error);
+        alert("Error al exportar registros. Intenta nuevamente.");
+      }
+    }
+
+    // === BORRAR REGISTROS ===
+    async function borrarRegistros() {
+      if (!confirm("¿Estás seguro de que deseas borrar todos los registros? Esta acción no se puede deshacer.")) {
+        return;
+      }
+
+      try {
+        // Borrar todos los registros en Realtime Database
+        await db.ref('registros_nuevos').set(null);
+        loadRegistros();
+        alert("✅ Registros borrados.");
+      } catch (error) {
+        console.error("Error al borrar registros:", error);
+        alert("Error al borrar registros. Intenta nuevamente.");
+      }
+    }
+
+    // === EVENTOS ===
+    document.getElementById('adminPass').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') login();
+    });
+
+    document.getElementById('adminEmail').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') login();
+    });
+
+    // === SESIÓN PERSISTENTE ===
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Verificar rol
+        const userRef = db.ref(`usuarios/${user.uid}`);
+        userRef.once('value').then((snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            if (userData.rol === 'admin' && userData.activo) {
+              document.getElementById('loginSection').style.display = 'none';
+              document.getElementById('adminSection').style.display = 'block';
+              loadRegistros();
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
