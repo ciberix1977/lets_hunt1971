@@ -284,36 +284,43 @@
       }
     }
 
+    // ========== COMPLETAR MISIÓN CON SINCRONIZACIÓN EN TIEMPO REAL ==========
     async function completarMision(misionId, zona, hunterId) {
       try {
         const misionRef = db.ref(`misiones/${misionId}-${zona}`);
-        const snapshot = await misionRef.once('value');
         
-        if (!snapshot.exists()) {
-          // Primero en completar
-          await misionRef.set({
-            estado: 'completada',
-            hunter_ganador: hunterId,
-            timestamp: Date.now()
-          });
-          return true;
-        }
-        
-        const data = snapshot.val();
-        if (data.estado === 'completada') {
-          return false; // Ya fue completada
-        }
-        
-        // Marcar como completada
-        await misionRef.set({
-          estado: 'completada',
-          hunter_ganador: hunterId,
-          timestamp: Date.now()
+        // Usar transacción atómica
+        const result = await misionRef.transaction((currentData) => {
+          if (currentData === null) {
+            // Primero en completar
+            return {
+              estado: 'completada',
+              hunter_ganador: hunterId,
+              timestamp: Date.now(),
+              version: 1
+            };
+          }
+          
+          if (currentData.estado === 'completada') {
+            // Ya fue completada por otro jugador
+            return; // No modificar los datos
+          }
+          
+          // Caso teórico: estado inválido
+          return currentData;
         });
-        return true;
+        
+        // Verificar si la transacción fue exitosa y este jugador ganó
+        if (result.committed && result.snapshot.val()?.hunter_ganador === hunterId) {
+          return true; // Este jugador ganó
+        }
+        
+        return false; // Otro jugador ganó primero
+        
       } catch (err) {
-        console.error("Error al completar misión:", err);
-        return true; // No bloquear al jugador
+        console.error("Error en transacción de misión:", err);
+        // En caso de error, asumir que falló (no bloquear al jugador)
+        return true;
       }
     }
 
@@ -755,7 +762,7 @@
               exito = true; // Simplificado para equipos
               handleTeamQRScan(codigoEscaneado, qrExpected);
             } else {
-              // Para individuales, verificar con Firebase
+              // Para individuales, verificar con transacción atómica
               if (codigoEscaneado === qrExpected) {
                 exito = await completarMision(currentMission.id, jugador.zona, jugador.id);
               }
@@ -970,7 +977,7 @@
           showToast("❌ Código inválido.");
         }
       } else {
-        // Verificar con Firebase
+        // Verificar con transacción atómica
         (async () => {
           if (input.trim() === qrExpected) {
             const exito = await completarMision(currentMission.id, jugador.zona, jugador.id);
