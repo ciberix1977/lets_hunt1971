@@ -109,7 +109,7 @@
         <div id="team-proximity-status" style="text-align:center; margin-top:1rem; color:#64b5f7; font-size:0.9rem;"></div>
       </div>
 
-      <!-- SECCIÓN DE MISIONES SPONSOR (NUEVO CON IMÁGENES) -->
+      <!-- SECCIÓN DE MISIONES SPONSOR (NUEVO CON IMÁGENES Y BOTÓN DE RETORNO) -->
       <div id="sponsorSection" class="mission-phase" style="display: none;">
         <div class="mission-card">
           <h2 style="color:#ff6b6b; margin-bottom:1.2rem;">🎯 Misiones Sponsor</h2>
@@ -162,6 +162,13 @@
             <a href="mailto:contacto@letshunt.ar?subject=Sponsor%20Let%E2%80%99s%20Hunt" class="btn btn-primary" style="display:inline-block;">
               📩 Contactar para patrocinar
             </a>
+          </div>
+
+          <!-- BOTÓN DE RETORNO A LA MISIÓN ACTIVA -->
+          <div style="margin-top:24px; text-align:center;">
+            <button class="btn btn-outline" id="back-to-mission-btn" style="padding:8px 20px;">
+              🔙 Volver a mi misión
+            </button>
           </div>
         </div>
       </div>
@@ -1361,6 +1368,30 @@
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && scannerActive) stopScanner();
+    });
+
+    // Evento para botón de retorno a la misión
+    document.getElementById('back-to-mission-btn')?.addEventListener('click', () => {
+      // Determinar qué fase mostrar según el estado actual
+      if (document.getElementById('phase4-completed').style.display === 'block') {
+        // Ya completó la misión
+        document.getElementById('sponsorSection').style.display = 'none';
+        document.getElementById('phase4-completed').style.display = 'block';
+      } else if (document.getElementById('phase3-pista').style.display === 'block') {
+        // Está en la pista final
+        document.getElementById('sponsorSection').style.display = 'none';
+        document.getElementById('phase3-pista').style.display = 'block';
+      } else if (document.getElementById('phase2-mapa').style.display === 'block') {
+        // Está en el mapa
+        document.getElementById('sponsorSection').style.display = 'none';
+        document.getElementById('phase2-mapa').style.display = 'block';
+      } else {
+        // Está en la consigna inicial
+        document.getElementById('sponsorSection').style.display = 'none';
+        document.getElementById('phase1-consigna').style.display = 'block';
+      }
+      
+      window.scrollTo(0, 0);
     });
 
     // Evento para botón de accesibilidad
