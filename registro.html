@@ -197,10 +197,10 @@
       return;
     }
 
-    // Generar hunterId
+    // Generar hunterId SECUENCIAL con prefijo LH
     let lastId = parseInt(localStorage.getItem('lastHunterId') || '0');
     let newId = lastId + 1;
-    let hunterId = `hunter_${String(newId).padStart(4, '0')}`;
+    let hunterId = `LH-${String(newId).padStart(4, '0')}`;
     localStorage.setItem('lastHunterId', newId);
 
     // Gestionar equipo

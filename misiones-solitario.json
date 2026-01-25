@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": "LH-001",
     "zona": "Lomas de Zamora",
     "titulo": "El Árbol del Juramento",
     "ubicacion_mapa": "Plaza Eva Perón (frente a la Municipalidad)",
@@ -8,7 +8,7 @@
     "coordenadas": { "lat": -34.7625, "lng": -58.3982 }
   },
   {
-    "id": 2,
+    "id": "LH-002",
     "zona": "Avellaneda",
     "titulo": "El Reloj que Nunca Olvida",
     "ubicacion_mapa": "Palacio Municipal de Avellaneda, Av. Mitre 470",
@@ -16,7 +16,7 @@
     "coordenadas": { "lat": -34.6631, "lng": -58.3667 }
   },
   {
-    "id": 3,
+    "id": "LH-003",
     "zona": "Valentín Alsina",
     "titulo": "El Ojo del Sur",
     "ubicacion_mapa": "Esquina de Alsina y Lavalle",
@@ -24,7 +24,7 @@
     "coordenadas": { "lat": -34.6853, "lng": -58.3822 }
   },
   {
-    "id": 4,
+    "id": "LH-004",
     "zona": "Lanús",
     "titulo": "El Eco del Puente",
     "ubicacion_mapa": "Puente peatonal sobre las vías, Av. Hipólito Yrigoyen",
@@ -32,7 +32,7 @@
     "coordenadas": { "lat": -34.7014, "lng": -58.3856 }
   },
   {
-    "id": 5,
+    "id": "LH-005",
     "zona": "Fiorito",
     "titulo": "El Potrero Fantasma",
     "ubicacion_mapa": "Esquina de Sánchez de Loria y José León Suárez",
@@ -40,7 +40,7 @@
     "coordenadas": { "lat": -34.7761, "lng": -58.4017 }
   },
   {
-    "id": 6,
+    "id": "LH-006",
     "zona": "Lomas de Zamora",
     "titulo": "La Placa del Fundador",
     "ubicacion_mapa": "Monumento central, Plaza Eva Perón",
@@ -48,7 +48,7 @@
     "coordenadas": { "lat": -34.7625, "lng": -58.3982 }
   },
   {
-    "id": 7,
+    "id": "LH-007",
     "zona": "Lanús",
     "titulo": "El Kiosco del Tiempo",
     "ubicacion_mapa": "Esquina de Av. Mitre y Sarmiento",
@@ -56,7 +56,7 @@
     "coordenadas": { "lat": -34.7003, "lng": -58.3842 }
   },
   {
-    "id": 8,
+    "id": "LH-008",
     "zona": "Avellaneda",
     "titulo": "El Pasaje del Ferroviario",
     "ubicacion_mapa": "Pasaje entre Sarmiento y Belgrano",
@@ -64,7 +64,7 @@
     "coordenadas": { "lat": -34.6642, "lng": -58.3681 }
   },
   {
-    "id": 9,
+    "id": "LH-009",
     "zona": "Valentín Alsina",
     "titulo": "La Banca del Susurro",
     "ubicacion_mapa": "Plaza Güemes, banca de hierro bajo el árbol grande",
@@ -72,7 +72,7 @@
     "coordenadas": { "lat": -34.6847, "lng": -58.3831 }
   },
   {
-    "id": 10,
+    "id": "LH-010",
     "zona": "Lomas de Zamora",
     "titulo": "El Mosaico del Sur",
     "ubicacion_mapa": "Frente al Correo Argentino, San Martín 1000",
@@ -80,7 +80,7 @@
     "coordenadas": { "lat": -34.7631, "lng": -58.3990 }
   },
   {
-    "id": 11,
+    "id": "LH-011",
     "zona": "Avellaneda",
     "titulo": "La Sombra del Mercado",
     "ubicacion_mapa": "Galería Güemes, entrada principal",
@@ -88,7 +88,7 @@
     "coordenadas": { "lat": -34.6638, "lng": -58.3675 }
   },
   {
-    "id": 12,
+    "id": "LH-012",
     "zona": "Lanús",
     "titulo": "La Hora del Último Tren",
     "ubicacion_mapa": "Estación Lanús, andén principal",
@@ -96,7 +96,7 @@
     "coordenadas": { "lat": -34.7022, "lng": -58.3861 }
   },
   {
-    "id": 13,
+    "id": "LH-013",
     "zona": "Valentín Alsina",
     "titulo": "El Puente de los Trenes Fantasma",
     "ubicacion_mapa": "Puente sobre las vías, Rivadavia al 3000",
@@ -104,7 +104,7 @@
     "coordenadas": { "lat": -34.6861, "lng": -58.3845 }
   },
   {
-    "id": 14,
+    "id": "LH-014",
     "zona": "Fiorito",
     "titulo": "El Muro de los Nombres",
     "ubicacion_mapa": "Pared lateral de taller mecánico, Fiorito al 3100",
@@ -112,7 +112,7 @@
     "coordenadas": { "lat": -34.7756, "lng": -58.4025 }
   },
   {
-    "id": 15,
+    "id": "LH-015",
     "zona": "Lomas de Zamora",
     "titulo": "La Torre que No Suena",
     "ubicacion_mapa": "Iglesia Santa Rosa, Rivadavia y San Martín",
@@ -120,7 +120,7 @@
     "coordenadas": { "lat": -34.7628, "lng": -58.3987 }
   },
   {
-    "id": 16,
+    "id": "LH-016",
     "zona": "Avellaneda",
     "titulo": "El Espejo Roto",
     "ubicacion_mapa": "Bar “El Recreo”, Alsina 1400",
@@ -128,7 +128,7 @@
     "coordenadas": { "lat": -34.6650, "lng": -58.3690 }
   },
   {
-    "id": 17,
+    "id": "LH-017",
     "zona": "Lanús",
     "titulo": "El Árbol de las Cintas",
     "ubicacion_mapa": "Plaza Manuel Belgrano",
@@ -136,7 +136,7 @@
     "coordenadas": { "lat": -34.7010, "lng": -58.3850 }
   },
   {
-    "id": 18,
+    "id": "LH-018",
     "zona": "Valentín Alsina",
     "titulo": "La Estatua sin Nombre",
     "ubicacion_mapa": "Plaza Güemes, estatua de bronce central",
@@ -144,7 +144,7 @@
     "coordenadas": { "lat": -34.6847, "lng": -58.3831 }
   },
   {
-    "id": 19,
+    "id": "LH-019",
     "zona": "Fiorito",
     "titulo": "La Huella en el Barro",
     "ubicacion_mapa": "Camino de tierra cerca del potrero, Sánchez de Loria",
@@ -152,7 +152,7 @@
     "coordenadas": { "lat": -34.7765, "lng": -58.4020 }
   },
   {
-    "id": 20,
+    "id": "LH-020",
     "zona": "Lomas de Zamora",
     "titulo": "El Mapa del Piso",
     "ubicacion_mapa": "Entrada del Correo Argentino",
@@ -160,7 +160,7 @@
     "coordenadas": { "lat": -34.7631, "lng": -58.3990 }
   },
   {
-    "id": 21,
+    "id": "LH-021",
     "zona": "Avellaneda",
     "titulo": "La Pared de los Reflejos",
     "ubicacion_mapa": "Calle Belgrano 500, pared de azulejos rotos",
@@ -168,7 +168,7 @@
     "coordenadas": { "lat": -34.6645, "lng": -58.3685 }
   },
   {
-    "id": 22,
+    "id": "LH-022",
     "zona": "Lanús",
     "titulo": "El Murmullo del Riachuelo",
     "ubicacion_mapa": "Acceso peatonal al Riachuelo, Av. Hipólito Yrigoyen",
@@ -176,7 +176,7 @@
     "coordenadas": { "lat": -34.7030, "lng": -58.3870 }
   },
   {
-    "id": 23,
+    "id": "LH-023",
     "zona": "Valentín Alsina",
     "titulo": "La Pared de los Códigos",
     "ubicacion_mapa": "Pasaje entre Alsina y Lavalle",
@@ -184,7 +184,7 @@
     "coordenadas": { "lat": -34.6853, "lng": -58.3822 }
   },
   {
-    "id": 24,
+    "id": "LH-024",
     "zona": "Fiorito",
     "titulo": "El Silbato del Viento",
     "ubicacion_mapa": "Entre casas en Fiorito al 3100",
@@ -192,7 +192,7 @@
     "coordenadas": { "lat": -34.7756, "lng": -58.4025 }
   },
   {
-    "id": 25,
+    "id": "LH-025",
     "zona": "Lomas de Zamora",
     "titulo": "La Librería del Tiempo Perdido",
     "ubicacion_mapa": "Local cerrado, Rivadavia 1200",
@@ -200,7 +200,7 @@
     "coordenadas": { "lat": -34.7635, "lng": -58.3995 }
   },
   {
-    "id": 26,
+    "id": "LH-026",
     "zona": "Avellaneda",
     "titulo": "El Banco de los Poetas",
     "ubicacion_mapa": "Plaza Güemes, banca de piedra este",
@@ -208,7 +208,7 @@
     "coordenadas": { "lat": -34.6635, "lng": -58.3670 }
   },
   {
-    "id": 27,
+    "id": "LH-027",
     "zona": "Lanús",
     "titulo": "El Poste del Mensaje Perdido",
     "ubicacion_mapa": "Frente a la estación Lanús, poste de luz",
@@ -216,7 +216,7 @@
     "coordenadas": { "lat": -34.7022, "lng": -58.3861 }
   },
   {
-    "id": 28,
+    "id": "LH-028",
     "zona": "Valentín Alsina",
     "titulo": "El Pozo de los Susurros",
     "ubicacion_mapa": "Calle Moreno al 1500, boca de tormenta",
@@ -224,7 +224,7 @@
     "coordenadas": { "lat": -34.6858, "lng": -58.3838 }
   },
   {
-    "id": 29,
+    "id": "LH-029",
     "zona": "Fiorito",
     "titulo": "El Banco Roto",
     "ubicacion_mapa": "Esquina de Fiorito y Sánchez de Loria",
@@ -232,7 +232,7 @@
     "coordenadas": { "lat": -34.7761, "lng": -58.4017 }
   },
   {
-    "id": 30,
+    "id": "LH-030",
     "zona": "Lomas de Zamora",
     "titulo": "El Archivo Oculto",
     "ubicacion_mapa": "Biblioteca Popular, San Martín 900",
@@ -240,7 +240,7 @@
     "coordenadas": { "lat": -34.7629, "lng": -58.3988 }
   },
   {
-    "id": 31,
+    "id": "LH-031",
     "zona": "Avellaneda",
     "titulo": "La Fábrica del Silencio",
     "ubicacion_mapa": "Edificio textil abandonado, Güemes y 9 de Julio",
@@ -248,7 +248,7 @@
     "coordenadas": { "lat": -34.6655, "lng": -58.3700 }
   },
   {
-    "id": 32,
+    "id": "LH-032",
     "zona": "Lanús",
     "titulo": "La Tapadera del Vigilante",
     "ubicacion_mapa": "Tapa de cloaca, esquina Yrigoyen y Sarmiento",
@@ -256,7 +256,7 @@
     "coordenadas": { "lat": -34.7008, "lng": -58.3847 }
   },
   {
-    "id": 33,
+    "id": "LH-033",
     "zona": "Valentín Alsina",
     "titulo": "El Reloj de Arena Urbano",
     "ubicacion_mapa": "Parada de colectivo, Rivadavia y Alsina",
@@ -264,7 +264,7 @@
     "coordenadas": { "lat": -34.6861, "lng": -58.3845 }
   },
   {
-    "id": 34,
+    "id": "LH-034",
     "zona": "Fiorito",
     "titulo": "La Pelota Perdida",
     "ubicacion_mapa": "Potrero abandonado, Soler al 3000",
@@ -272,7 +272,7 @@
     "coordenadas": { "lat": -34.7750, "lng": -58.4030 }
   },
   {
-    "id": 35,
+    "id": "LH-035",
     "zona": "Lomas de Zamora",
     "titulo": "El Faro de Hormigón",
     "ubicacion_mapa": "Torre de agua, calle 14 y San Martín",
@@ -280,7 +280,7 @@
     "coordenadas": { "lat": -34.7640, "lng": -58.4000 }
   },
   {
-    "id": 36,
+    "id": "LH-036",
     "zona": "Avellaneda",
     "titulo": "El Eco del Riachuelo",
     "ubicacion_mapa": "Mirador del Riachuelo, Av. Bartolomé Mitre",
@@ -288,7 +288,7 @@
     "coordenadas": { "lat": -34.6620, "lng": -58.3650 }
   },
   {
-    "id": 37,
+    "id": "LH-037",
     "zona": "Lanús",
     "titulo": "La Puerta que No Abre",
     "ubicacion_mapa": "Casa con rejas verdes, Calle 14 y Soler",
@@ -296,7 +296,7 @@
     "coordenadas": { "lat": -34.7015, "lng": -58.3865 }
   },
   {
-    "id": 38,
+    "id": "LH-038",
     "zona": "Valentín Alsina",
     "titulo": "El Muro del Tiempo",
     "ubicacion_mapa": "Pared lateral de escuela, Moreno al 1600",
@@ -304,7 +304,7 @@
     "coordenadas": { "lat": -34.6860, "lng": -58.3840 }
   },
   {
-    "id": 39,
+    "id": "LH-039",
     "zona": "Fiorito",
     "titulo": "El Camino del Barro",
     "ubicacion_mapa": "Sendero entre casas, Fiorito al 3200",
@@ -312,7 +312,7 @@
     "coordenadas": { "lat": -34.7752, "lng": -58.4035 }
   },
   {
-    "id": 40,
+    "id": "LH-040",
     "zona": "Lomas de Zamora",
     "titulo": "El Reloj de Sol Urbano",
     "ubicacion_mapa": "Parque Saavedra, sector norte",
@@ -320,7 +320,7 @@
     "coordenadas": { "lat": -34.7600, "lng": -58.3950 }
   },
   {
-    "id": 41,
+    "id": "LH-041",
     "zona": "Avellaneda",
     "titulo": "La Ventana Cerrada",
     "ubicacion_mapa": "Edificio histórico, Belgrano 400",
@@ -328,7 +328,7 @@
     "coordenadas": { "lat": -34.6640, "lng": -58.3680 }
   },
   {
-    "id": 42,
+    "id": "LH-042",
     "zona": "Lanús",
     "titulo": "El Cartel del Olvido",
     "ubicacion_mapa": "Parada de tren, cartel deteriorado",
@@ -336,7 +336,7 @@
     "coordenadas": { "lat": -34.7022, "lng": -58.3861 }
   },
   {
-    "id": 43,
+    "id": "LH-043",
     "zona": "Valentín Alsina",
     "titulo": "La Sombra del Monumento",
     "ubicacion_mapa": "Plaza Güemes, monumento central",
@@ -344,7 +344,7 @@
     "coordenadas": { "lat": -34.6847, "lng": -58.3831 }
   },
   {
-    "id": 44,
+    "id": "LH-044",
     "zona": "Fiorito",
     "titulo": "El Alambre que Canta",
     "ubicacion_mapa": "Alambrado del potrero, lado sur",
@@ -352,7 +352,7 @@
     "coordenadas": { "lat": -34.7770, "lng": -58.4020 }
   },
   {
-    "id": 45,
+    "id": "LH-045",
     "zona": "Lomas de Zamora",
     "titulo": "La Piedra del Juramento",
     "ubicacion_mapa": "Plaza Eva Perón, sector oeste",
@@ -360,7 +360,7 @@
     "coordenadas": { "lat": -34.7628, "lng": -58.3988 }
   },
   {
-    "id": 46,
+    "id": "LH-046",
     "zona": "Avellaneda",
     "titulo": "El Piso que Habla",
     "ubicacion_mapa": "Entrada de la estación Avellaneda",
@@ -368,7 +368,7 @@
     "coordenadas": { "lat": -34.6625, "lng": -58.3660 }
   },
   {
-    "id": 47,
+    "id": "LH-047",
     "zona": "Lanús",
     "titulo": "El Espejo del Andén",
     "ubicacion_mapa": "Estación Lanús, espejo de seguridad",
@@ -376,7 +376,7 @@
     "coordenadas": { "lat": -34.7022, "lng": -58.3861 }
   },
   {
-    "id": 48,
+    "id": "LH-048",
     "zona": "Valentín Alsina",
     "titulo": "La Puerta del Tiempo",
     "ubicacion_mapa": "Casa antigua, Alsina 1300",
@@ -384,7 +384,7 @@
     "coordenadas": { "lat": -34.6855, "lng": -58.3825 }
   },
   {
-    "id": 49,
+    "id": "LH-049",
     "zona": "Fiorito",
     "titulo": "El Muro del Sur",
     "ubicacion_mapa": "Pared final del barrio, Fiorito al 3300",
@@ -392,7 +392,7 @@
     "coordenadas": { "lat": -34.7745, "lng": -58.4040 }
   },
   {
-    "id": 50,
+    "id": "LH-050",
     "zona": "Lomas de Zamora",
     "titulo": "El Último Mensaje",
     "ubicacion_mapa": "Banco de plaza, sector sur de Plaza Eva Perón",
@@ -400,7 +400,7 @@
     "coordenadas": { "lat": -34.7627, "lng": -58.3985 }
   },
   {
-    "id": 51,
+    "id": "LH-051",
     "zona": "San Telmo",
     "titulo": "El Pasaje del Tiempo",
     "ubicacion_mapa": "Pasaje San Lorenzo, entre Defensa y Estados Unidos",
@@ -408,7 +408,7 @@
     "coordenadas": { "lat": -34.6190, "lng": -58.3690 }
   },
   {
-    "id": 52,
+    "id": "LH-052",
     "zona": "La Boca",
     "titulo": "El Ojo de Caminito",
     "ubicacion_mapa": "Caminito, altura de la intersección con Magallanes",
@@ -416,7 +416,7 @@
     "coordenadas": { "lat": -34.6340, "lng": -58.3630 }
   },
   {
-    "id": 53,
+    "id": "LH-053",
     "zona": "Recoleta",
     "titulo": "La Estatua que No Descansa",
     "ubicacion_mapa": "Plaza Intendente Alvear (Plaza Francia), frente al cementerio",
@@ -424,7 +424,7 @@
     "coordenadas": { "lat": -34.5870, "lng": -58.3920 }
   },
   {
-    "id": 54,
+    "id": "LH-054",
     "zona": "Microcentro",
     "titulo": "El Reloj de las Sombras",
     "ubicacion_mapa": "Galería Güemes, entrada Rivadavia 1600",
@@ -432,7 +432,7 @@
     "coordenadas": { "lat": -34.6030, "lng": -58.3760 }
   },
   {
-    "id": 55,
+    "id": "LH-055",
     "zona": "Palermo",
     "titulo": "El Árbol del Poeta",
     "ubicacion_mapa": "Parque Las Heras, sector norte, cerca del lago",
@@ -440,7 +440,7 @@
     "coordenadas": { "lat": -34.5930, "lng": -58.4250 }
   },
   {
-    "id": 56,
+    "id": "LH-056",
     "zona": "San Telmo",
     "titulo": "La Placa Borrada",
     "ubicacion_mapa": "Antiguo edificio en Humberto Primo 300",
@@ -448,7 +448,7 @@
     "coordenadas": { "lat": -34.6185, "lng": -58.3695 }
   },
   {
-    "id": 57,
+    "id": "LH-057",
     "zona": "Puerto Madero",
     "titulo": "El Puente que Susurra",
     "ubicacion_mapa": "Puente de la Mujer, lado este",
@@ -456,7 +456,7 @@
     "coordenadas": { "lat": -34.6170, "lng": -58.3610 }
   },
   {
-    "id": 58,
+    "id": "LH-058",
     "zona": "Congreso",
     "titulo": "El Libro de Piedra",
     "ubicacion_mapa": "Plaza del Congreso, monumento a los Dos Congresos",
@@ -464,7 +464,7 @@
     "coordenadas": { "lat": -34.6070, "lng": -58.4030 }
   },
   {
-    "id": 59,
+    "id": "LH-059",
     "zona": "Almagro",
     "titulo": "El Banco del Silencio",
     "ubicacion_mapa": "Parque Centenario, sector oeste, bajo el árbol torcido",
@@ -472,7 +472,7 @@
     "coordenadas": { "lat": -34.6120, "lng": -58.4220 }
   },
   {
-    "id": 60,
+    "id": "LH-060",
     "zona": "Retiro",
     "titulo": "El Espejo del Andén",
     "ubicacion_mapa": "Estación Retiro, andén principal",
@@ -480,7 +480,7 @@
     "coordenadas": { "lat": -34.5950, "lng": -58.3750 }
   },
   {
-    "id": 61,
+    "id": "LH-061",
     "zona": "San Nicolás",
     "titulo": "La Torre que No Suena",
     "ubicacion_mapa": "Torre de los Ingleses, Av. Santa Fe y Libertador",
@@ -488,7 +488,7 @@
     "coordenadas": { "lat": -34.5960, "lng": -58.3820 }
   },
   {
-    "id": 62,
+    "id": "LH-062",
     "zona": "Balvanera",
     "titulo": "El Muro de los Nombres",
     "ubicacion_mapa": "Pared lateral de mercado en Sánchez de Bustamante 1800",
@@ -496,7 +496,7 @@
     "coordenadas": { "lat": -34.6090, "lng": -58.4150 }
   },
   {
-    "id": 63,
+    "id": "LH-063",
     "zona": "Villa Crespo",
     "titulo": "El Graffiti del Vigilante",
     "ubicacion_mapa": "Pasaje entre Córdoba y Anchorena",
@@ -504,7 +504,7 @@
     "coordenadas": { "lat": -34.6050, "lng": -58.4350 }
   },
   {
-    "id": 64,
+    "id": "LH-064",
     "zona": "Belgrano",
     "titulo": "El Faro Urbano",
     "ubicacion_mapa": "Plaza Manuel Belgrano, obelisco local",
@@ -512,7 +512,7 @@
     "coordenadas": { "lat": -34.5830, "lng": -58.4530 }
   },
   {
-    "id": 65,
+    "id": "LH-065",
     "zona": "Barracas",
     "titulo": "El Puente del Olvido",
     "ubicacion_mapa": "Puente peatonal sobre el Riachuelo, Av. Caseros",
@@ -520,7 +520,7 @@
     "coordenadas": { "lat": -34.6380, "lng": -58.3700 }
   },
   {
-    "id": 66,
+    "id": "LH-066",
     "zona": "Microcentro",
     "titulo": "La Puerta que No Abre",
     "ubicacion_mapa": "Edificio histórico, Florida 200",
@@ -528,7 +528,7 @@
     "coordenadas": { "lat": -34.6020, "lng": -58.3740 }
   },
   {
-    "id": 67,
+    "id": "LH-067",
     "zona": "Palermo",
     "titulo": "El Reloj de Sol",
     "ubicacion_mapa": "Jardín Botánico, sector este",
@@ -536,7 +536,7 @@
     "coordenadas": { "lat": -34.5960, "lng": -58.4280 }
   },
   {
-    "id": 68,
+    "id": "LH-068",
     "zona": "San Telmo",
     "titulo": "El Eco del Mercado",
     "ubicacion_mapa": "Mercado de San Telmo, pasillo central",
@@ -544,7 +544,7 @@
     "coordenadas": { "lat": -34.6195, "lng": -58.3685 }
   },
   {
-    "id": 69,
+    "id": "LH-069",
     "zona": "Recoleta",
     "titulo": "La Banca del Juramento",
     "ubicacion_mapa": "Plaza Francia, banca de mármol sur",
@@ -552,7 +552,7 @@
     "coordenadas": { "lat": -34.5870, "lng": -58.3920 }
   },
   {
-    "id": 70,
+    "id": "LH-070",
     "zona": "La Boca",
     "titulo": "La Huella del Barro",
     "ubicacion_mapa": "Calle estrecha junto a Caminito, Magallanes al 500",
@@ -560,7 +560,7 @@
     "coordenadas": { "lat": -34.6345, "lng": -58.3635 }
   },
   {
-    "id": 71,
+    "id": "LH-071",
     "zona": "Puerto Madero",
     "titulo": "El Código del Contenedor",
     "ubicacion_mapa": "Dique 2, contenedor azul con grafiti",
@@ -568,7 +568,7 @@
     "coordenadas": { "lat": -34.6160, "lng": -58.3620 }
   },
   {
-    "id": 72,
+    "id": "LH-072",
     "zona": "Almagro",
     "titulo": "El Mosaico del Sur",
     "ubicacion_mapa": "Entrada de taller mecánico, Av. Rivadavia 4000",
@@ -576,7 +576,7 @@
     "coordenadas": { "lat": -34.6100, "lng": -58.4200 }
   },
   {
-    "id": 73,
+    "id": "LH-073",
     "zona": "Congreso",
     "titulo": "La Columna Rota",
     "ubicacion_mapa": "Plaza del Congreso, columna norte",
@@ -584,7 +584,7 @@
     "coordenadas": { "lat": -34.6070, "lng": -58.4030 }
   },
   {
-    "id": 74,
+    "id": "LH-074",
     "zona": "Villa Urquiza",
     "titulo": "El Árbol del Norte",
     "ubicacion_mapa": "Parque Los Andes, árbol solitario al norte",
@@ -592,7 +592,7 @@
     "coordenadas": { "lat": -34.5650, "lng": -58.4850 }
   },
   {
-    "id": 75,
+    "id": "LH-075",
     "zona": "Flores",
     "titulo": "El Reloj Parado",
     "ubicacion_mapa": "Plaza Flores, reloj de sol deteriorado",
@@ -600,7 +600,7 @@
     "coordenadas": { "lat": -34.6350, "lng": -58.4450 }
   },
   {
-    "id": 76,
+    "id": "LH-076",
     "zona": "Microcentro",
     "titulo": "El Piso que Habla",
     "ubicacion_mapa": "Galería Pacífico, sector central",
@@ -608,7 +608,7 @@
     "coordenadas": { "lat": -34.6010, "lng": -58.3750 }
   },
   {
-    "id": 77,
+    "id": "LH-077",
     "zona": "San Cristóbal",
     "titulo": "La Tapadera del Vigilante",
     "ubicacion_mapa": "Tapa de cloaca, Av. Caseros y Suárez",
@@ -616,7 +616,7 @@
     "coordenadas": { "lat": -34.6370, "lng": -58.3710 }
   },
   {
-    "id": 78,
+    "id": "LH-078",
     "zona": "Palermo",
     "titulo": "El Muro del Tiempo",
     "ubicacion_mapa": "Pared lateral de escuela, Godoy Cruz 2000",
@@ -624,7 +624,7 @@
     "coordenadas": { "lat": -34.5980, "lng": -58.4300 }
   },
   {
-    "id": 79,
+    "id": "LH-079",
     "zona": "Retiro",
     "titulo": "La Sombra del Obelisco",
     "ubicacion_mapa": "Plaza Fuerza Aérea Argentina",
@@ -632,7 +632,7 @@
     "coordenadas": { "lat": -34.6000, "lng": -58.3770 }
   },
   {
-    "id": 80,
+    "id": "LH-080",
     "zona": "Barracas",
     "titulo": "El Alambre que Canta",
     "ubicacion_mapa": "Alambrado cerca del Puente Transbordador",
@@ -640,7 +640,7 @@
     "coordenadas": { "lat": -34.6390, "lng": -58.3720 }
   },
   {
-    "id": 81,
+    "id": "LH-081",
     "zona": "San Telmo",
     "titulo": "La Ventana Cerrada",
     "ubicacion_mapa": "Edificio antiguo, Defensa 800",
@@ -648,7 +648,7 @@
     "coordenadas": { "lat": -34.6175, "lng": -58.3680 }
   },
   {
-    "id": 82,
+    "id": "LH-082",
     "zona": "Recoleta",
     "titulo": "El Libro Perdido",
     "ubicacion_mapa": "Biblioteca Nacional, entrada lateral",
@@ -656,7 +656,7 @@
     "coordenadas": { "lat": -34.5880, "lng": -58.3940 }
   },
   {
-    "id": 83,
+    "id": "LH-083",
     "zona": "La Boca",
     "titulo": "La Pelota Perdida",
     "ubicacion_mapa": "Cancha abandonada, Olavarría al 2000",
@@ -664,7 +664,7 @@
     "coordenadas": { "lat": -34.6360, "lng": -58.3650 }
   },
   {
-    "id": 84,
+    "id": "LH-084",
     "zona": "Almagro",
     "titulo": "El Faro de Hormigón",
     "ubicacion_mapa": "Torre de agua, Sánchez de Bustamante 1700",
@@ -672,7 +672,7 @@
     "coordenadas": { "lat": -34.6095, "lng": -58.4155 }
   },
   {
-    "id": 85,
+    "id": "LH-085",
     "zona": "Puerto Madero",
     "titulo": "El Eco del Dique",
     "ubicacion_mapa": "Dique 3, extremo sur",
@@ -680,7 +680,7 @@
     "coordenadas": { "lat": -34.6150, "lng": -58.3630 }
   },
   {
-    "id": 86,
+    "id": "LH-086",
     "zona": "Microcentro",
     "titulo": "La Puerta del Tiempo",
     "ubicacion_mapa": "Casa antigua, Lavalle 500",
@@ -688,7 +688,7 @@
     "coordenadas": { "lat": -34.6025, "lng": -58.3765 }
   },
   {
-    "id": 87,
+    "id": "LH-087",
     "zona": "Villa Crespo",
     "titulo": "El Camino del Graffiti",
     "ubicacion_mapa": "Pasaje entre Córdoba y Thames",
@@ -696,7 +696,7 @@
     "coordenadas": { "lat": -34.6055, "lng": -58.4360 }
   },
   {
-    "id": 88,
+    "id": "LH-088",
     "zona": "Belgrano",
     "titulo": "La Piedra del Juramento",
     "ubicacion_mapa": "Plaza Manuel Belgrano, sector oeste",
@@ -704,7 +704,7 @@
     "coordenadas": { "lat": -34.5835, "lng": -58.4535 }
   },
   {
-    "id": 89,
+    "id": "LH-089",
     "zona": "Flores",
     "titulo": "El Cartel del Olvido",
     "ubicacion_mapa": "Parada de tren, cartel deteriorado",
@@ -712,7 +712,7 @@
     "coordenadas": { "lat": -34.6355, "lng": -58.4455 }
   },
   {
-    "id": 90,
+    "id": "LH-090",
     "zona": "Congreso",
     "titulo": "El Último Mensaje",
     "ubicacion_mapa": "Banco de plaza, sector sur de Plaza del Congreso",
@@ -720,7 +720,7 @@
     "coordenadas": { "lat": -34.6075, "lng": -58.4035 }
   },
   {
-    "id": 91,
+    "id": "LH-091",
     "zona": "San Telmo",
     "titulo": "El Reloj de Arena Urbano",
     "ubicacion_mapa": "Parada de colectivo, Defensa y Chile",
@@ -728,7 +728,7 @@
     "coordenadas": { "lat": -34.6180, "lng": -58.3685 }
   },
   {
-    "id": 92,
+    "id": "LH-092",
     "zona": "Recoleta",
     "titulo": "La Sombra del Monumento",
     "ubicacion_mapa": "Plaza Francia, monumento central",
@@ -736,7 +736,7 @@
     "coordenadas": { "lat": -34.5870, "lng": -58.3920 }
   },
   {
-    "id": 93,
+    "id": "LH-093",
     "zona": "La Boca",
     "titulo": "El Muro del Sur",
     "ubicacion_mapa": "Pared final del barrio, Pedro de Mendoza al 2200",
@@ -744,7 +744,7 @@
     "coordenadas": { "lat": -34.6370, "lng": -58.3660 }
   },
   {
-    "id": 94,
+    "id": "LH-094",
     "zona": "Palermo",
     "titulo": "El Silbato del Viento",
     "ubicacion_mapa": "Entre casas en Honduras al 5000",
@@ -752,7 +752,7 @@
     "coordenadas": { "lat": -34.5990, "lng": -58.4320 }
   },
   {
-    "id": 95,
+    "id": "LH-095",
     "zona": "Microcentro",
     "titulo": "La Pared de los Reflejos",
     "ubicacion_mapa": "Calle Lavalle 300, pared de azulejos rotos",
@@ -760,7 +760,7 @@
     "coordenadas": { "lat": -34.6035, "lng": -58.3770 }
   },
   {
-    "id": 96,
+    "id": "LH-096",
     "zona": "Almagro",
     "titulo": "La Hora del Último Tren",
     "ubicacion_mapa": "Estación Once, andén principal",
@@ -768,7 +768,7 @@
     "coordenadas": { "lat": -34.6110, "lng": -58.4180 }
   },
   {
-    "id": 97,
+    "id": "LH-097",
     "zona": "Barracas",
     "titulo": "La Banca de los Poetas",
     "ubicacion_mapa": "Plaza Olavarría, banca este",
@@ -776,7 +776,7 @@
     "coordenadas": { "lat": -34.6375, "lng": -58.3705 }
   },
   {
-    "id": 98,
+    "id": "LH-098",
     "zona": "Villa Urquiza",
     "titulo": "El Poste del Mensaje Perdido",
     "ubicacion_mapa": "Frente a la estación Villa Urquiza",
@@ -784,7 +784,7 @@
     "coordenadas": { "lat": -34.5640, "lng": -58.4840 }
   },
   {
-    "id": 99,
+    "id": "LH-099",
     "zona": "Flores",
     "titulo": "El Pozo de los Susurros",
     "ubicacion_mapa": "Calle Rivadavia 7000, boca de tormenta",
@@ -792,7 +792,7 @@
     "coordenadas": { "lat": -34.6365, "lng": -58.4470 }
   },
   {
-    "id": 100,
+    "id": "LH-100",
     "zona": "Puerto Madero",
     "titulo": "El Faro del Sur",
     "ubicacion_mapa": "Extremo sur del Dique 4",

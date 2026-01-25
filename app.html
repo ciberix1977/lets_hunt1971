@@ -76,7 +76,7 @@
       <img src="logo.webp" alt="Let’s Hunt" class="app-logo">
     </div>
     <div class="header-right">
-      <div class="hunter-id" id="hunterIdDisplay">ID: hunter0000</div>
+      <div class="hunter-id" id="hunterIdDisplay">ID: LH-0000</div>
     </div>
   </header>
 
@@ -591,10 +591,7 @@
           firebaseUser = user;
           localStorage.setItem('firebaseUid', user.uid);
           
-          // Generar hunterId basado en UID
-          hunterId = `hunter_${user.uid.substring(0, 8)}`;
-          localStorage.setItem('currentHunterId', hunterId);
-          
+          // Usar el ID del registro (no generar uno nuevo basado en UID)
           _continueSetupJugador(hunterId);
         } else {
           _continueSetupJugador(hunterId);
@@ -604,8 +601,9 @@
 
     function _continueSetupJugador(hunterId) {
       if (!hunterId) {
+        // Generar nuevo ID secuencial con prefijo LH
         const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
-        hunterId = `hunter_${String(nextId).padStart(4, '0')}`;
+        hunterId = `LH-${String(nextId).padStart(4, '0')}`;
         localStorage.setItem('lastHunterId', nextId);
         
         const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
@@ -804,7 +802,7 @@
       `;
       document.getElementById('phase3-pista').style.display = 'block';
       document.getElementById('scan-btn').addEventListener('click', openQRScanner);
-      playNarration(`Cazador ${jugador.id.replace('hunter_', '')}. Estás en la zona. La pista final ha sido revelada.`);
+      playNarration(`Cazador ${jugador.id.replace('LH-', '')}. Estás en la zona. La pista final ha sido revelada.`);
     }
 
     // ========== FLUJO EQUIPO ==========
@@ -1015,12 +1013,12 @@
       let qrExpected;
       if (jugador.modo === 'equipo' && currentTeamMission) {
         qrExpected = {
-          A: `LH-${currentTeamMission.id}-A-${jugador.id.split('_')[1]}`,
-          B: `LH-${currentTeamMission.id}-B-${jugador.id.split('_')[1]}`
+          A: `LH-${currentTeamMission.id}-A-${jugador.id.split('-')[1]}`,
+          B: `LH-${currentTeamMission.id}-B-${jugador.id.split('-')[1]}`
         };
         localStorage.setItem('qrCodeEsperado', JSON.stringify(qrExpected));
       } else {
-        qrExpected = `LH-${currentMission.id}-${jugador.id.split('_')[1]}`;
+        qrExpected = `LH-${currentMission.id}-${jugador.id.split('-')[1]}`;
         localStorage.setItem('qrCodeEsperado', qrExpected);
       }
       
@@ -1097,7 +1095,7 @@
       }
       
       if (!success) {
-        const expectedPattern = new RegExp(`^LH-${currentMission.id}-[0-9]{8}$`);
+        const expectedPattern = new RegExp(`^LH-${currentMission.id}-[0-9]{4}$`);
         if (expectedPattern.test(scannedCode)) {
           // Código válido pero ya usado
           if (isOnline) {
