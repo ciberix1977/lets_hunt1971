@@ -113,25 +113,44 @@
     <a href="progreso.html"><i>📊</i>Progreso</a>
   </nav>
 
-  <!-- CONTROLES GLOBALES -->
-  <button id="narration-toggle" title="Activar/Desactivar narración">🔊</button>
-  <div id="toast" role="status" aria-live="polite"></div>
-
-  <!-- BOTÓN DE ACCESIBILIDAD -->
-  <button id="accessibility-toggle" title="Modo normal" style="
+  <!-- BOTONES COORDINADOS -->
+  <div id="floating-controls" style="
     position: fixed;
-    bottom: 20px;
     right: 20px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    border: none;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 1.2rem;
-    cursor: pointer;
+    bottom: 20px;
     z-index: 999;
-  ">👁️</button>
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  ">
+    <button id="narration-toggle" 
+            title="Activar/Desactivar narración"
+            style="
+              background: rgba(0,0,0,0.7);
+              color: white;
+              border: none;
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              font-size: 1.2rem;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            ">🔊</button>
+            
+    <button id="accessibility-toggle" 
+            title="Modo normal"
+            style="
+              background: rgba(0,0,0,0.7);
+              color: white;
+              border: none;
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              font-size: 1.2rem;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            ">👁️</button>
+  </div>
 
   <!-- Contenedor del banner de instalación -->
   <div id="pwa-install-banner"></div>
@@ -282,6 +301,25 @@
       applyAccessibilityMode();
       
       showToast(`✅ ${getAccessibilityModeName(accessibilityMode)}`);
+    }
+
+    // ========== POSICIONAMIENTO COORDINADO DE BOTONES ==========
+    function updateFloatingControlsPosition() {
+      const controls = document.getElementById('floating-controls');
+      if (!controls) return;
+      
+      // Detectar navegación móvil
+      const mobileNav = document.querySelector('.mobile-nav');
+      const isMobileNavVisible = mobileNav && 
+        (window.getComputedStyle(mobileNav).display !== 'none');
+      
+      // Calcular posición
+      if (isMobileNavVisible) {
+        const navHeight = mobileNav.offsetHeight || 60;
+        controls.style.bottom = `${navHeight + 20}px`;
+      } else {
+        controls.style.bottom = '20px';
+      }
     }
 
     // ========== RECUPERACIÓN POST-ERROR ==========
@@ -1252,6 +1290,9 @@
       if (e.key === 'Escape' && scannerActive) stopScanner();
     });
 
+    // Evento para botón de accesibilidad
+    document.getElementById('accessibility-toggle')?.addEventListener('click', toggleAccessibilityMode);
+
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -1365,49 +1406,12 @@
     // Mostrar banner de instalación
     showInstallBanner();
 
+    // Inicializar posicionamiento de botones
+    updateFloatingControlsPosition();
+    window.addEventListener('resize', updateFloatingControlsPosition);
+
     // Inicializar app
     window.addEventListener('load', initApp);
-
-    // ✅ CORRECCIÓN: Botón de narración no tapa enlaces en ninguna sección
-    const narrationToggle = document.getElementById('narration-toggle');
-    if (narrationToggle) {
-      function adjustNarrationButton() {
-        const sections = [
-          'phase1-consigna',
-          'phase2-mapa', 
-          'phase3-pista',
-          'phase4-completed',
-          'teamSection'
-        ];
-        
-        let shouldLift = false;
-        for (const sectionId of sections) {
-          const section = document.getElementById(sectionId);
-          if (section && section.style.display !== 'none') {
-            shouldLift = true;
-            break;
-          }
-        }
-        
-        if (shouldLift) {
-          narrationToggle.style.bottom = '80px';
-        } else {
-          narrationToggle.style.bottom = '20px';
-        }
-      }
-
-      const observer = new MutationObserver(adjustNarrationButton);
-      const mainContainer = document.querySelector('main');
-      if (mainContainer) {
-        observer.observe(mainContainer, { 
-          childList: true, 
-          subtree: true, 
-          attributes: true,
-          attributeFilter: ['style']
-        });
-      }
-      adjustNarrationButton();
-    }
   </script>
 </body>
 </html>
