@@ -25,6 +25,47 @@
   <link rel="manifest" href="/manifest.json">
 
   <meta name="theme-color" content="#000000">
+
+  <!-- Estilos específicos para la sección de sponsors -->
+  <style>
+  /* Estilos específicos para la sección de sponsors en app.html */
+  .sponsor-mission {
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid #ff6b6b;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .sponsor-mission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .sponsor-mission-title {
+    font-weight: bold;
+    color: #f8fafc;
+    margin: 0;
+  }
+  .sponsor-badge {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 8px;
+  }
+  .sponsor-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px;
+  }
+  </style>
+ 
 </head>
 <body>
  <header>
@@ -67,6 +108,70 @@
         <div class="mission-card"></div>
         <div id="team-proximity-status" style="text-align:center; margin-top:1rem; color:#64b5f7; font-size:0.9rem;"></div>
       </div>
+
+      <!-- SECCIÓN DE MISIONES SPONSOR (NUEVO CON IMÁGENES Y BOTÓN DE RETORNO) -->
+      <div id="sponsorSection" class="mission-phase" style="display: none;">
+        <div class="mission-card">
+          <h2 style="color:#ff6b6b; margin-bottom:1.2rem;">🎯 Misiones Sponsor</h2>
+          <p style="margin-bottom:1.5rem; color:#cbd5e1;">
+            Descubrí cómo marcas líderes se integran en la cacería urbana.
+            <br><em>Estas son misiones de demostración para sponsors.</em>
+          </p>
+          
+          <div class="sponsor-mission" style="background:rgba(255,107,107,0.1); border:1px solid #ff6b6b; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div class="sponsor-mission-header">
+              <div>
+                <div class="sponsor-mission-title">🏪 Carrefour · Lanús</div>
+                <span class="sponsor-badge">DEMO</span>
+              </div>
+              <img src="sponsors-carrefour.webp" alt="Carrefour" class="sponsor-logo">
+            </div>
+            <p style="font-size:0.95rem; margin:0 0 12px;">Busca el producto que guarda el sabor del pasado. Su código de barras es tu llave.</p>
+            <button class="btn btn-outline" style="font-size:0.9rem; padding:6px 12px;">📍 Ver ubicación</button>
+          </div>
+
+          <div class="sponsor-mission" style="background:rgba(29,161,242,0.1); border:1px solid #1da1f2; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div class="sponsor-mission-header">
+              <div>
+                <div class="sponsor-mission-title">👟 Nike · CABA</div>
+                <span class="sponsor-badge">DEMO</span>
+              </div>
+               <img src="sponsors-nike.webp" alt="Nike" class="sponsor-logo">
+            </div>
+            <p style="font-size:0.95rem; margin:0 0 12px;">La huella del cazador está en la suela del maniquí. Escanéala antes de que desaparezca.</p>
+            <button class="btn btn-outline" style="font-size:0.9rem; padding:6px 12px;">📍 Ver ubicación</button>
+          </div>
+
+          <div class="sponsor-mission" style="background:rgba(255,200,0,0.1); border:1px solid #ffc800; border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div class="sponsor-mission-header">
+              <div>
+                <div class="sponsor-mission-title">⛽ YPF · Avellaneda</div>
+                <span class="sponsor-badge">DEMO</span>
+              </div>
+              <img src="sponsors-ypf.webp" alt="YPF" class="sponsor-logo">
+            </div>
+            <p style="font-size:0.95rem; margin:0 0 12px;">El surtidor 3 tiene memoria. Busca el número que nadie ve.</p>
+            <button class="btn btn-outline" style="font-size:0.9rem; padding:6px 12px;">📍 Ver ubicación</button>
+          </div>
+
+          <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--surface-border);">
+            <h3 style="margin-bottom:12px;">¿Querés que tu marca esté aquí?</h3>
+            <p style="font-size:0.9rem; color:#94a3b8; margin-bottom:16px;">
+              Ofrecemos integraciones orgánicas, no intrusivas, con recompensas reales para hunters.
+            </p>
+            <a href="mailto:contacto@letshunt.ar?subject=Sponsor%20Let%E2%80%99s%20Hunt" class="btn btn-primary" style="display:inline-block;">
+              📩 Contactar para patrocinar
+            </a>
+          </div>
+
+          <!-- BOTÓN DE RETORNO A LA MISIÓN ACTIVA -->
+          <div style="margin-top:24px; text-align:center;">
+            <button class="btn btn-outline" id="back-to-mission-btn" style="padding:8px 20px;">
+              🔙 Volver a mi misión
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -105,12 +210,13 @@
     </div>
   </div>
 
-  <!-- NAVEGACIÓN MÓVIL -->
+  <!-- NAVEGACIÓN MÓVIL (con nueva opción) -->
   <nav class="mobile-nav">
     <a href="progreso.html#radar"><i>📡</i>Señal</a>
     <a href="#misiones"><i>🎯</i>Misiones</a>
     <a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
     <a href="progreso.html"><i>📊</i>Progreso</a>
+    <a href="#sponsors" id="nav-sponsors"><i>🏢</i>Sponsors</a>
   </nav>
 
   <!-- CONTROLES GLOBALES -->
@@ -180,7 +286,8 @@
             color: yellow !important;
           }
           .accessibility-high-contrast .mission-card,
-          .accessibility-high-contrast .modal-content {
+          .accessibility-high-contrast .modal-content,
+          .accessibility-high-contrast .sponsor-mission {
             background: #111 !important;
             border: 2px solid yellow !important;
             color: yellow !important;
@@ -455,7 +562,16 @@
       document.getElementById('phase3-pista').style.display = 'none';
       document.getElementById('phase4-completed').style.display = 'none';
       document.getElementById('teamSection').style.display = 'none';
+      document.getElementById('sponsorSection').style.display = 'none';
     }
+
+    // Manejar navegación a sponsors
+    document.getElementById('nav-sponsors')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      hideAllPhases();
+      document.getElementById('sponsorSection').style.display = 'block';
+      window.scrollTo(0, 0);
+    });
 
     // ========== CONFIGURACIÓN DEL JUGADOR ==========
     let jugador;
@@ -1252,6 +1368,33 @@
       if (e.key === 'Escape' && scannerActive) stopScanner();
     });
 
+    // Evento para botón de retorno a la misión
+    document.getElementById('back-to-mission-btn')?.addEventListener('click', () => {
+      // Determinar qué fase mostrar según el estado actual
+      if (document.getElementById('phase4-completed').style.display === 'block') {
+        // Ya completó la misión
+        document.getElementById('sponsorSection').style.display = 'none';
+        document.getElementById('phase4-completed').style.display = 'block';
+      } else if (document.getElementById('phase3-pista').style.display === 'block') {
+        // Está en la pista final
+        document.getElementById('sponsorSection').style.display = 'none';
+        document.getElementById('phase3-pista').style.display = 'block';
+      } else if (document.getElementById('phase2-mapa').style.display === 'block') {
+        // Está en el mapa
+        document.getElementById('sponsorSection').style.display = 'none';
+        document.getElementById('phase2-mapa').style.display = 'block';
+      } else {
+        // Está en la consigna inicial
+        document.getElementById('sponsorSection').style.display = 'none';
+        document.getElementById('phase1-consigna').style.display = 'block';
+      }
+      
+      window.scrollTo(0, 0);
+    });
+
+    // Evento para botón de accesibilidad
+    document.getElementById('accessibility-toggle')?.addEventListener('click', toggleAccessibilityMode);
+
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -1373,6 +1516,7 @@
     if (narrationToggle) {
       function adjustNarrationButton() {
         const sections = [
+          'sponsorSection',
           'phase1-consigna',
           'phase2-mapa', 
           'phase3-pista',
