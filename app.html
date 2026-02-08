@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Let’s Hunt · App</title>
+  <title>Codigo Ebel · App</title>
   <meta name="description" content="Tu cacería urbana en el Gran Buenos Aires" />
   <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,7 +32,7 @@
       <div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
     </div>
     <div class="header-center">
-      <img src="logo.webp" alt="Let’s Hunt" class="app-logo">
+      <img src="code_ebel3.webp" alt="Codigo Ebel" class="app-logo">
     </div>
     <div class="header-right">
       <div class="hunter-id" id="hunterIdDisplay">ID: LH-0000</div>
@@ -756,7 +756,7 @@
         missionStartTime = Date.now();
         startTimer();
         guardarProgreso(currentTeamMission.id);
-        showToast("✅ Misión aceptada. ¡Buena cacería!");
+        showToast("📍 Misión registrada · Tu alias ya está activo");
         startTeamProximityCheck();
       });
 
@@ -1229,6 +1229,20 @@
         <div style="font-size:0.85rem; color:#94a3b8; margin-bottom:1.5rem;">
           🔑 Código: <code>${recoveryCode}</code>
         </div>
+         <div style="
+            margin:1.2rem 0;
+            padding:0.8rem;
+            border-radius:10px;
+            background:rgba(255,215,0,0.08);
+            color:#ffd700;
+            font-size:0.9rem;
+          ">
+  🎖️ <strong>Desafío completado</strong><br>
+  Has ganado el badge <strong>“Primer Cazador”</strong><br>
+  📡 Tu alias permanece visible en el radar
+</div>
+
+
         <div class="actions">
           <button class="btn btn-primary" id="new-mission-btn">🔁 Nueva operación</button>
           <button class="btn btn-outline" id="view-progress-btn">📊 Ver progreso</button>
@@ -1357,7 +1371,7 @@
           banner.innerHTML = `
             <button class="close-btn" id="close-install-banner">×</button>
             <p style="margin:0 0 8px;">
-              📥 ¿Agregar Let's Hunt a tu pantalla de inicio?
+              📥 ¿Agregar Codigo Ebel a tu pantalla de inicio?
             </p>
             <button id="install-btn" style="
               background:var(--primary); color:white; border:none;

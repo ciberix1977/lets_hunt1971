@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registro · Let’s Hunt</title>
+  <title>Registro · Codigo Ebel</title>
   <meta name="description" content="Únete a la cacería urbana en el Gran Buenos Aires. Gratis. Inmersivo. Real." />
   
   <!-- ✅ PWA Manifest -->
@@ -24,50 +24,27 @@
 
   <div class="form-card mission-card" data-type="registro">
     <div class="logo-container centered">
-      <img src="logo.webp" alt="Let’s Hunt">
+      <img src="code_ebel3.webp" alt="Codigo Ebel">
     </div>
 
-    <h1 class="section-title">Regístrate para comenzar</h1>
+    <h1 class="section-title">🔐 Regístrate con WhatsApp</h1>
     <p class="subtitle">
-      Elige tu modo de caza: solo o en equipo.
+      Tu número de WhatsApp será tu identidad única en Codigo Ebel.
     </p>
 
     <form id="registroForm">
       <div class="form-group">
-        <label for="nombre">Nombre completo *</label>
-        <input 
-          type="text" 
-          id="nombre" 
-          name="nombre"
-          required
-          autocomplete="name"
-          placeholder="Ej: Ana López">
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email *</label>
-        <input 
-          type="email" 
-          id="email" 
-          name="email"
-          required
-          autocomplete="email"
-          placeholder="tu@email.com">
-      </div>
-
-      <div class="form-group">
-        <label for="telefono">Teléfono móvil (10 dígitos) *</label>
+        <label for="telefono">📱 Número de WhatsApp (10 dígitos) *</label>
         <input 
           type="tel" 
           id="telefono" 
           name="telefono"
           required
-          autocomplete="tel"
           inputmode="numeric"
           pattern="[0-9]{10}"
           placeholder="1112345678"
           title="Solo 10 dígitos. Ej: 1112345678">
-        <p class="privacy-note">Usamos WhatsApp para enviar pistas. Nunca compartimos tu número.</p>
+        <p class="privacy-note">Usamos WhatsApp para enviar pistas y verificar tu identidad. Solo números móviles argentinos (+549...).</p>
       </div>
 
       <!-- ✅ Modo de juego -->
@@ -120,16 +97,9 @@
         </label>
       </div>
 
-      <!-- Línea divisoria sutil -->
-      <div class="form-divider"></div>
-
       <button type="submit" class="btn-hero" id="submitBtn">
-        🔒 Registrarme y comenzar la cacería
+        🔒 Registrarme con WhatsApp
       </button>
-
-      <p class="terms">
-        Al registrarte, aceptas recibir pistas por WhatsApp. Puedes darte de baja en cualquier momento.
-      </p>
     </form>
   </div>
 
@@ -173,12 +143,16 @@
     return codigo;
   }
 
-  // Manejar envío CON Firebase + localStorage
+  // Validar número argentino
+  function validarNumeroArgentino(phone) {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Manejar envío CON verificación por WhatsApp
   document.getElementById('registroForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const nombre = document.getElementById('nombre').value.trim();
-    const email = document.getElementById('email').value.trim();
     let telefonoRaw = document.getElementById('telefono').value.trim().replace(/\D/g, '');
     const zona = document.getElementById('zona').value;
     const modo = document.querySelector('input[name="modo"]:checked').value;
@@ -186,7 +160,7 @@
       ? document.getElementById('codigo-equipo').value.trim().toUpperCase() 
       : null;
 
-    if (telefonoRaw.length !== 10) {
+    if (!validarNumeroArgentino(telefonoRaw)) {
       alert('⚠️ El número debe tener 10 dígitos (sin código de país). Ej: 1112345678');
       return;
     }
@@ -196,6 +170,17 @@
       alert('⚠️ Por favor, selecciona una zona de juego.');
       return;
     }
+
+    // Validar código de equipo
+    if (modo === 'equipo' && codigoIngresado) {
+      if (!/^[A-Z]{4}[0-9]{3}$/.test(codigoIngresado)) {
+        alert('⚠️ Código inválido. Debe ser 4 letras + 3 números. Ej: HUNT245');
+        return;
+      }
+    }
+
+    // Formatear teléfono para WhatsApp
+    const telefonoWhatsapp = `+549${telefonoRaw}`;
 
     // Generar hunterId SECUENCIAL con prefijo LH
     let lastId = parseInt(localStorage.getItem('lastHunterId') || '0');
@@ -208,86 +193,140 @@
     if (modo === 'equipo') {
       if (!codigoIngresado) {
         equipo = generarCodigoEquipo();
-      } else if (/^[A-Z]{4}[0-9]{3}$/.test(codigoIngresado)) {
-        equipo = codigoIngresado;
       } else {
-        alert('⚠️ Código inválido. Debe ser 4 letras + 3 números. Ej: HUNT245');
-        return;
+        equipo = codigoIngresado;
       }
     }
 
-    // Guardar en localStorage
-    const jugador = { id: hunterId, nombre, email, telefono: `+549${telefonoRaw}`, zona, modo, equipo };
+    // Guardar en localStorage temporalmente
+    const jugador = { 
+      id: hunterId, 
+      telefono: telefonoWhatsapp, 
+      zona, 
+      modo, 
+      equipo,
+      whatsapp_verified: false // Pendiente de verificación
+    };
     localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
 
-    // ✅ Guardar en Realtime Database (base de datos real)
+    // ✅ ENVIAR CÓDIGO DE VERIFICACIÓN POR WHATSAPP (simulado)
+    const verificationCode = Math.random().toString().substr(2, 6);
+    localStorage.setItem('whatsapp_verification_code', verificationCode);
+    
+    // Guardar en Firebase para backend real
     try {
-      // Crear usuario anónimo
-      const userCredential = await auth.signInAnonymously();
-      const user = userCredential.user;
-
-      // Guardar en Realtime Database - jugadores
-      await db.ref(`jugadores/${user.uid}`).set({
+      await db.ref(`jugadores_temporales/${hunterId}`).set({
         hunterId: hunterId,
-        nombre: nombre,
-        email: email,
-        telefono: `+549${telefonoRaw}`,
+        telefono: telefonoWhatsapp,
         zona: zona,
         modo: modo,
         equipo: equipo,
-        fecha_registro: Date.now(),
-        activo: true
-      });
-
-      // ✅ Guardar registro nuevo para administrador (en Realtime Database)
-      await db.ref('registros_nuevos').push({
-        hunterId: hunterId,
-        nombre: nombre,
-        email: email,
-        telefono: `+549${telefonoRaw}`,
-        zona: zona,
-        modo: modo,
-        equipo: equipo,
-        timestamp: Date.now()
+        verification_code: verificationCode,
+        timestamp: Date.now(),
+        verified: false
       });
     } catch (error) {
       console.error("Error al guardar en Firebase:", error);
-      // Continuar igual (no bloquear al usuario)
     }
 
-    // Feedback emocional
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Activando caza…';
-
-    const container = document.querySelector('.form-card');
-    const successMsg = document.createElement('div');
-    successMsg.className = 'registration-ritual';
-    successMsg.innerHTML = `
-      🔊 <span style="color: #64b5f6;">Cazador identificado.</span><br>
-      <span style="font-size: 1.4rem; margin: 0.4rem 0; display: block; color: #fff;">${hunterId.toUpperCase()}</span>
-      <span style="font-size: 0.95rem; opacity: 0.85; display: block; margin-top: 0.5rem;">
-        Tu zona <strong>${zona}</strong> está activa.<br>
-        🟢 <span id="live-count-ritual">24</span> cazadores en el GBA ahora.
-      </span>
-    `;
-    container.insertBefore(successMsg, btn.parentNode);
-
-    // Simular contador
-    function updateRitualCounter() {
-      const base = 20;
-      const fluctuation = Math.floor(Math.random() * 8);
-      document.getElementById('live-count-ritual').textContent = base + fluctuation;
-    }
-    updateRitualCounter();
-    setInterval(updateRitualCounter, 3000);
-
-    // Redirigir a app.html (con zona exacta)
-    setTimeout(() => {
-      window.location.href = `app.html?id=${encodeURIComponent(hunterId)}&zona=${encodeURIComponent(zona)}`;
-    }, 1200);
+    // Mostrar pantalla de verificación
+    mostrarPantallaVerificacion(hunterId, telefonoWhatsapp, verificationCode);
   });
+
+  function mostrarPantallaVerificacion(hunterId, telefono, verificationCode) {
+    const container = document.querySelector('.form-card');
+    container.innerHTML = `
+      <div class="logo-container centered">
+        <img src="logo.webp" alt="Let’s Hunt">
+      </div>
+      <h1 class="section-title">📱 Verificación por WhatsApp</h1>
+      <p style="text-align:center; margin:1rem 0;">
+        Hemos enviado un código de 6 dígitos a:<br>
+        <strong>${telefono}</strong>
+      </p>
+      <div class="form-group" style="margin:2rem 0;">
+        <input type="text" id="verification-code" maxlength="6" placeholder="123456" 
+               style="font-size:1.2rem; padding:12px; text-align:center; width:100%;">
+      </div>
+      <button class="btn-hero" id="verify-btn">✅ Verificar código</button>
+      <p style="font-size:0.9rem; color:#94a3b8; margin-top:1rem;">
+        ¿No recibiste el código? Revisa que el número sea correcto.
+      </p>
+    `;
+
+    document.getElementById('verify-btn').addEventListener('click', async () => {
+      const inputCode = document.getElementById('verification-code').value.trim();
+      
+      if (inputCode === verificationCode) {
+        // ✅ Verificación exitosa
+        const jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`));
+        jugador.whatsapp_verified = true;
+        localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
+        
+        // Actualizar en Firebase
+        try {
+          await db.ref(`jugadores/${hunterId}`).set({
+            hunterId: hunterId,
+            telefono: jugador.telefono,
+            zona: jugador.zona,
+            modo: jugador.modo,
+            equipo: jugador.equipo,
+            fecha_registro: Date.now(),
+            activo: true,
+            whatsapp_verified: true
+          });
+          
+          // Eliminar registro temporal
+          await db.ref(`jugadores_temporales/${hunterId}`).remove();
+        } catch (error) {
+          console.error("Error al actualizar verificación:", error);
+        }
+
+        // Feedback emocional
+        const successMsg = document.createElement('div');
+        successMsg.className = 'registration-ritual';
+        successMsg.innerHTML = `
+          ✅ <span style="color: #4ade80;">¡Verificación exitosa!</span><br>
+          <span style="font-size: 1.4rem; margin: 0.4rem 0; display: block; color: #fff;">${hunterId.toUpperCase()}</span>
+          <span style="font-size: 0.95rem; opacity: 0.85; display: block; margin-top: 0.5rem;">
+            Tu cuenta está activa.<br>
+            <!-- 🎖️ BENEFICIO INMEDIATO AL REGISTRARTE -->
+<div class="instant-reward register-reward">
+  <h3 style="margin-bottom: 0.4rem;">🎖️ Al registrarte ahora</h3>
+  <ul style="list-style: none; padding: 0; margin: 0.6rem 0;">
+    <li>📡 Tu alias aparece en el <strong>radar en vivo</strong>.</li>
+    <li>🎯 Desbloqueás tu <strong>primer desafío</strong>.</li>
+    <li>🏷️ Recibís el badge <strong>“Primer Cazador”</strong>.</li>
+  </ul>
+  <p style="font-size: 0.85rem; opacity: 0.85;">
+    No necesitás ganar el ranking para empezar a jugar.
+  </p>
+</div>
+
+            🟢 <span id="live-count-ritual">24</span> cazadores en el GBA ahora.
+          </span>
+        `;
+        document.querySelector('.form-card').appendChild(successMsg);
+
+        // Simular contador
+        function updateRitualCounter() {
+          const base = 20;
+          const fluctuation = Math.floor(Math.random() * 8);
+          document.getElementById('live-count-ritual').textContent = base + fluctuation;
+        }
+        updateRitualCounter();
+        setInterval(updateRitualCounter, 3000);
+
+        // Redirigir a app.html
+        setTimeout(() => {
+          window.location.href = `app.html?id=${encodeURIComponent(hunterId)}&zona=${encodeURIComponent(jugador.zona)}`;
+        }, 1200);
+      } else {
+        alert('❌ Código incorrecto. Verifica el mensaje de WhatsApp.');
+      }
+    });
+  }
   </script>
 </body>
 </html>

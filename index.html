@@ -3,22 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Let’s Hunt · Aventuras Urbanas con Premios Reales</title>
-  <meta name="description" content="Resuelve pistas, completa desafíos en vivo y compite por premios individuales y por equipo. ¿Llegarás al top del ranking?" />
+  <title>Codigo Ebel · Aventuras Urbanas con Premios Reales</title>
+  <meta name="description" content="Codigo Ebel: Resuelve pistas, completa desafíos en vivo y compite por premios individuales y por equipo. ¿Llegarás al top del ranking?" />
 
   <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="styles.css"></noscript>
 
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0066ff">>
-
-  <!-- ✅ CORRECCIÓN: Estilos mínimos para que el logo aparezca tras intro -->
-
+  <meta name="theme-color" content="#0066ff">
 </head>
 <body>
-
-
-
   <main>
     <section class="hero" role="banner">
      <header class="hero-content centered">
@@ -41,13 +35,28 @@
     </svg>
   </div>
   <!-- ✅ LOGO — encima del radar -->
-  <div class="logo-wrapper">
-    <img src="./logo.webp" alt="Let’s Hunt" loading="eager">
-  </div>
+  <div class="logo-wrapper" style="transform: scale(1.25); transform-origin: center;">
+  <img src="./code_ebel3.webp" alt="Code Ebel" loading="eager">
 </div>
-        <div id="typewriter" class="typewriter-text">Resuelve pistas. Acepta desafíos. Entra al ranking. ¿Ganarás los premios?</div>
+</div>
+        <div id="typewriter" class="typewriter-text">Un juego urbano gratuito donde resolvés pistas reales en la ciudad para ganar premios.</div>
+        
+        <!-- ✅ BOTÓN DE VOZ NO INVASIVA -->
+        <button id="narration-btn" class="narration-btn" style="
+          background: rgba(0, 102, 255, 0.2);
+          border: 1px solid #0066ff;
+          color: #64b5f6;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 0.9rem;
+          cursor: pointer;
+          margin: 1rem 0;
+          transition: all 0.3s ease;
+        " aria-label="Escuchá el mensaje del Vigilante">
+          🎧 Escuchá el mensaje del Vigilante
+        </button>
+        
         <p class="tension-tag">⚠️ Solo el 12% de los jugadores completa las 3 misiones.</p>
-  <!-- ❌ ELIMINADO: hero-cta aquí (queda solo al final) -->
         <div class="counter-banner">
         <div class="pulse-dot"></div>
     🟢 <span id="live-count">27</span> jugadores activos ahora
@@ -60,7 +69,7 @@
         <h2 id="intro-title" class="section-title">Tu Misión, si la Aceptas</h2>
         <div class="about-summary">
           <p>
-            <strong>Let’s Hunt</strong> es una aventura urbana en el Gran Buenos Aires donde combinas inteligencia, coraje y velocidad. 
+            <strong>Code Ebel</strong> es una aventura urbana en el Gran Buenos Aires donde combinas inteligencia, coraje y velocidad. 
             Resuelve pistas históricas en la ciudad, <strong>y activa desafíos en vivo por WhatsApp</strong> para ganar coordenadas antes que los demás.
           </p>
           <p class="tension-line"><strong>🧠 Cada error te cuesta tiempo. Y el tiempo… no se recarga.</strong></p>
@@ -109,7 +118,7 @@
    <!-- ✅ SECCIÓN: Cómo se juega — Rediseñada -->
 <section id="como-jugar" class="how-to-play" aria-labelledby="how-to-play-title">
   <div class="container">
-    <h2 id="how-to-play-title" class="section-title">🧭 Cómo se juega Let’s Hunt</h2>
+    <h2 id="how-to-play-title" class="section-title">🧭 Cómo se juega Codigo Ebel</h2>
     <div class="steps-grid">
       <div class="step-card" data-step="1">
         <div class="step-badge">
@@ -119,7 +128,7 @@
         <h3 class="step-title">🔐 Te registrás</h3>
         <p class="step-desc">
           Gratis. Sin tarjetas. Elegís jugar <strong>solo o en equipo</strong>.
-          Tu identidad: <code>hunter_XXXX</code>.
+          Tu identidad: <code>LH-XXXX</code>.
         </p>
       </div>
       <div class="step-card" data-step="2">
@@ -148,59 +157,6 @@
   </div>
 </section>
 
-       <!-- ✅ SECCIÓN: Patrocinadores — Full width, alianzas estratégicas -->
-<section class="sponsors-section" aria-labelledby="sponsors-title">
-  <div class="sponsors-hero">
-    <h2 id="sponsors-title" class="sponsors-title">🤝 Alianzas Estratégicas</h2>
-    <p class="sponsors-lead">
-      Let’s Hunt es posible gracias a socios que aportan capacidades críticas al ecosistema.
-    </p>
-  </div>
-
-  <div class="sponsors-grid-container">
-    <div class="sponsors-grid">
-      <article class="sponsor-card" data-tier="platinum">
-        <div class="sponsor-badge">Conectividad Global</div>
-        <img src="./sponsor-nexus.webp" alt="Nexus Comm" loading="lazy">
-
-        <p class="sponsor-role">Red segura para transmisión en tiempo real</p>
-      </article>
-
-      <article class="sponsor-card" data-tier="platinum">
-        <div class="sponsor-badge">Tecnologia network</div>
-        <img src="./sponsor-aqua.webp" alt="Aqua Labs" loading="lazy">
-        <p class="sponsor-role">El mundo a sus pies</p>
-      </article>
-
-      <article class="sponsor-card" data-tier="gold">
-        <div class="sponsor-badge">Comparacion Segura</div>
-        <img src="./sponsor-enterprecios.webp" alt="Enterprecios" loading="lazy">
-        <p class="sponsor-role">Los mejores precios </p>
-      </article>
-
-      <article class="sponsor-card" data-tier="gold">
-        <div class="sponsor-badge">Aseguradora</div>
-        <img src="./sponsor-zenith.webp" alt="Zenith Games" loading="lazy">
-        <p class="sponsor-role">Aseguramos tus tesoros</p>
-      </article>
-    </div>
-  </div>
-
-  <div class="sponsors-cta">
-    <p class="sponsors-cta-text">
-      ✦ ¿Querés formar parte de la próxima temporada como aliado estratégico?
-    </p>
-    <a href="mailto:contacto@letshunt.ar" class="btn-outline">
-      📩 Contacto para patrocinios
-    </a>
-  </div>
-</section>
-
-
-
-
-
-    <!-- ✅ NUEVA SECCIÓN #3: ¿Quién juega? -->
     <!-- ✅ SECCIÓN: ¿Quién juega? — Rediseñada -->
 <section id="quien-juega" class="who-plays" aria-labelledby="who-plays-title">
   <div class="container">
@@ -299,7 +255,7 @@
       <div class="container">
         <h2 id="register-title" class="section-title">¿Listo para la cacería urbana?</h2>
 
-        <!-- ✅ NUEVO BLOQUE #5: Ranking visible -->
+        <!-- ✅ BLOQUE: Ranking visible -->
         <div class="ranking-preview">
           <h3 style="
             color: #4fc3f7;
@@ -390,6 +346,69 @@
     </div>
   </div>
 </section>
+<!-- ✅ SECCIÓN: Tus primeras recompensas -->
+<section class="rewards-preview" aria-labelledby="rewards-title" style="
+  padding: 2.5rem 0;
+  background: rgba(0, 102, 255, 0.04);
+  border-bottom: 1px solid rgba(0, 102, 255, 0.1);
+">
+  <div class="container">
+    <h2 id="rewards-title" class="section-title" style="text-align: center; margin-bottom: 2rem;">
+      🎁 Tus primeras recompensas — ¡desde el minuto 1!
+    </h2>
+    <div style="
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    ">
+      <div style="
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #334155;
+      ">
+        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎖️</div>
+        <h3 style="margin: 0 0 0.75rem; color: #64b5f6;">Primer desafío</h3>
+        <p style="color: #cbd5e1; font-size: 0.95rem;">
+          Badge <strong>“Cazador Novato”</strong> desbloqueado al instante.
+        </p>
+      </div>
+      
+      <div style="
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #334155;
+      ">
+        <div style="font-size: 2.5rem; margin-bottom: 1rem;">📍</div>
+        <h3 style="margin: 0 0 0.75rem; color: #64b5f6;">Primera misión</h3>
+        <p style="color: #cbd5e1; font-size: 0.95rem;">
+          Tu nombre aparece en el <strong>radar en vivo</strong> para todos los cazadores.
+        </p>
+      </div>
+      
+      <div style="
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #334155;
+      ">
+        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🏆</div>
+        <h3 style="margin: 0 0 0.75rem; color: #64b5f6;">Top 100</h3>
+        <p style="color: #cbd5e1; font-size: 0.95rem;">
+          Badge exclusivo <strong>“Pionero del GBA”</strong> para los primeros 100.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
         <p class="urgency-note">⏳ Las misiones se cierran cuando los primeros 10 llegan. ¿Vas a ser uno de ellos?</p>
         <a href="registro.html" class="btn-hero">✅ REGISTRARME Y ENTRAR AL RANKING</a>
 
@@ -397,15 +416,6 @@
         <a href="registro.html" class="cta-emocional" style="margin-top: 1.2rem; display: inline-block;">
           🗺️ Comenzar mi primera misión
         </a>
-
-        <div class="consent-section" style="margin: 1.8rem auto 0; max-width: 600px; text-align: center;">
-          <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
-            Al continuar, aceptas nuestra 
-            <a href="politicas.html#privacidad" target="_blank" rel="noopener">Política de Privacidad</a>
-            y los 
-            <a href="politicas.html#terminos" target="_blank" rel="noopener">Términos y Condiciones</a>.
-          </p>
-        </div>
 
        <!-- ✅ CONSENTIMIENTO: Separado y con peso ritual -->
 <div class="consent-section">
@@ -425,23 +435,40 @@
 
   </main>
 
-
-
    <footer class="footer" role="contentinfo">
   <div class="footer-main">
-    <div class="footer-brand">
-      <img src="./logo.webp" alt="Let’s Hunt" width="160" height="48" loading="lazy">
-      <p>Aventuras Urbanas en el Gran Buenos Aires</p>
-    </div>
+   <div class="footer-brand" style="
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+">
+  <img src="./code_ebel3.webp" alt="Let’s Hunt" width="160" height="48" loading="lazy" style="
+    display: block;
+  ">
+  <p style="
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  ">Aventuras Urbanas en el Gran Buenos Aires</p>
+</div>
 
     <div class="footer-legal">
       <p class="disclaimer">
-        ℹ️ <strong>Let’s Hunt</strong> es un proyecto independiente. 
+        ℹ️ <strong>Codigo Ebel</strong> es un proyecto independiente. 
         No está afiliado a marcas o series con nombre similar.
       </p>
       
+      <!-- ✅ BOTÓN DE CONTACTO MOVIDO AL FOOTER -->
+      <div class="footer-contact" style="margin: 1.2rem 0;">
+<a href="mailto:contacto@codigoebel.com?subject=Contacto%20Code%20Ebel" class="btn-outline">
+  📩 Contacto
+</a>
+      </div>
+      
       <div class="footer-bottom">
-        <p>&copy; <span id="year">2025</span> Let’s Hunt. Todos los derechos reservados.</p>
+        <p>&copy; <span id="year">2025</span> Codigo Ebel. Todos los derechos reservados.</p>
       </div>
     </div>
   </div>
@@ -452,7 +479,7 @@
       <h3 class="sr-only">Síguenos en redes sociales</h3>
       <ul class="social-list" role="list">
         <li>
-          <a href="https://facebook.com/letshunst pistas" target="_blank" rel="noopener" 
+          <a href="https://facebook.com/codigoebel" target="_blank" rel="noopener" 
              aria-label="Let’s Hunt en Facebook" class="social-link">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -460,7 +487,7 @@
           </a>
         </li>
         <li>
-          <a href="https://instagram.com/lets.hunt.ok" target="_blank" rel="noopener" 
+          <a href="https://instagram.com/codigo_ebel.ok" target="_blank" rel="noopener" 
              aria-label="Let’s Hunt en Instagram" class="social-link">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2.163a9.847 9.847 0 0 0-6.934 2.844A9.847 9.847 0 0 0 2.163 12c0 2.722 1.07 5.18 2.843 6.934A9.847 9.847 0 0 0 12 21.837a9.847 9.847 0 0 0 6.934-2.844A9.847 9.847 0 0 0 21.837 12a9.847 9.847 0 0 0-2.843-6.934A9.847 9.847 0 0 0 12 2.163zm0 17.674a7.847 7.847 0 1 1 0-15.694 7.847 7.847 0 0 1 0 15.694zm6.495-9.03a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 0 0 2.5 0zm-6.495 4.28a4.95 4.95 0 1 0 0-9.9 4.95 4.95 0 0 0 0 9.9zm0-8.2a3.25 3.25 0 1 1 0 6.5 3.25 3.25 0 0 1 0-6.5z"/>
@@ -471,12 +498,12 @@
           <a href="https://x.com/@letshunt_BsAs" target="_blank" rel="noopener" 
              aria-label="Let’s Hunt en X" class="social-link">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.205 2.25h3.308l-7.227 8.26 8.502 11.24H16.13l-5.214-6.817L4.94 21.75H1.63l7.724-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              <path d="M18.205 8.09a1.49 1.49 0 0 0-1.43-.99c-.84 0-1.69.33-2.29 1.01v8.42a4.5 4.5 0 0 1-4.5-4.5v-4.1a5 5 0 0 0 5-5c0-.27-.02-.53-.05-.79h1.83a1.5 1.5 0 0 1 1.49 1.63v11.04a1.5 1.5 0 0 1-1.5 1.5h-6.79a1.5 1.5 0 0 1-1.5-1.5v-4.24a4.5 4.5 0 0 1 4.5-4.5h4.29z"/>
             </svg>
           </a>
         </li>
         <li>
-          <a href="https://tiktok.com/@letshunt.oficial" target="_blank" rel="noopener" 
+          <a href="https://tiktok.com/@codigoebel" target="_blank" rel="noopener" 
              aria-label="Let’s Hunt en TikTok" class="social-link">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.59 8.09a1.49 1.49 0 0 0-1.43-.99c-.84 0-1.69.33-2.29 1.01v8.42a4.5 4.5 0 0 1-4.5-4.5v-4.1a5 5 0 0 0 5-5c0-.27-.02-.53-.05-.79h1.83a1.5 1.5 0 0 1 1.49 1.63v11.04a1.5 1.5 0 0 1-1.5 1.5h-6.79a1.5 1.5 0 0 1-1.5-1.5v-4.24a4.5 4.5 0 0 1 4.5-4.5h4.29z"/>
@@ -486,25 +513,20 @@
       </ul>
     </div>
   </div>
-
-   
 </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
     
-    // ✅ VOZ DE BIENVENIDA OSCURA (masculina, grave, con eco)
-    function playWelcomeVoice() {
-      // Evitar repetición
-      if (localStorage.getItem('lh_welcome_played')) return;
-      
-      const text = "Bienvenidos a LET'S HUNT, a una aventura urbana en el Gran Buenos Aires donde combinas inteligencia, coraje y velocidad. Resuelve pistas históricas en la ciudad, y activa desafíos en vivo por WhatsApp para ganar coordenadas antes que los demás.";
+    // ✅ MENSAJE DEL VIGILANTE (voz no invasiva)
+    function playVigilanteMessage() {
+      const text = "Cazador. El Vigilante te observa desde las sombras. Las calles del Gran Buenos Aires esconden secretos que solo los más astutos pueden descifrar. ¿Tienes el coraje para aceptar el desafío?";
       
       speechSynthesis.getVoices();
       const voices = speechSynthesis.getVoices();
       const voice = voices.find(v => 
         v.lang.includes('es') && 
-        (v.name === 'Juan' || v.name === 'Diego' || v.name.includes('male'))
+        (v.name === 'Juan' || v.name === 'Diego' || v.name.includes('Male'))
       ) || voices.find(v => v.lang.includes('es')) || null;
 
       const u = new SpeechSynthesisUtterance(text);
@@ -524,64 +546,48 @@
             feedback.gain.value = 0.3;
             delay.connect(feedback);
             feedback.connect(delay);
-            setTimeout(() => ctx.close(), 3000);
+            setTimeout(() => ctx.close(), 5000);
           } catch (e) {}
         }
       };
 
-      u.onend = () => {
-        localStorage.setItem('lh_welcome_played', '1');
-      };
-
       speechSynthesis.speak(u);
+      
+      // Cambiar texto del botón temporalmente
+      const btn = document.getElementById('narration-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '🔊 Reproduciendo...';
+      btn.disabled = true;
+      
+      u.onend = () => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      };
     }
 
+    // ✅ Evento para el botón de voz
+    document.getElementById('narration-btn').addEventListener('click', playVigilanteMessage);
+
     // ✅ Typewriter
-    const typewriterText = "Resuelve pistas. Acepta desafíos. Entra al ranking. ¿Ganarás los premios?";
+    const typewriterText = "Un juego urbano gratuito donde resolvés pistas reales en la ciudad para ganar premios.";
     const typewriterEl = document.getElementById('typewriter');
-    const ctaEl = document.getElementById('hero-cta');
     let i = 0;
     const type = () => {
       if (i < typewriterText.length) {
         typewriterEl.textContent = typewriterText.substring(0, i + 1);
         i++;
         setTimeout(type, 60 + Math.random() * 40);
-      } else {
-        ctaEl.classList.add('visible');
-        // Activar voz tras typewriter (en escritorio) o en primer toque (en móvil)
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          document.body.addEventListener('touchstart', playWelcomeVoice, { once: true });
-        } else {
-          setTimeout(playWelcomeVoice, 800);
-        }
       }
     };
     type();
 
-    // ✅ Animación de fondo
-    document.addEventListener('DOMContentLoaded', () => {
-      const body = document.body;
-      let x = 0, y = 0;
-      
-      function animateBg() {
-        x = (x + 0.12) % 100;
-        y = (y + 0.11) % 100;
-        body.style.backgroundPosition = `${x}% ${y}%`;
-        requestAnimationFrame(animateBg);
-      }
-      
-      const img = new Image();
-      img.src = './fondo-hero.png';
-      img.onload = animateBg;
-    });
-
     // ✅ CONTADOR DE JUGADORES ACTIVOS EN TIEMPO REAL (simulado)
     function updatePlayerCounter() {
       const base = 20;
-      const fluctuation = Math.floor(Math.random() * 10) - 2; // -2 a +7
+      const fluctuation = Math.floor(Math.random() * 10) - 2;
       const count = base + fluctuation;
       
-      const counterEl = document.querySelector('.live-counter span');
+      const counterEl = document.getElementById('live-count');
       if (counterEl) {
         counterEl.textContent = count;
       }
@@ -589,36 +595,7 @@
       setTimeout(updatePlayerCounter, 4000);
     }
 
-    if (document.querySelector('.live-counter')) {
-      updatePlayerCounter();
-    }
-
-  // ✅ INTRO: carga fiable en todos los navegadores
-  window.addEventListener('load', () => {
-    const introScreen = document.getElementById('intro-screen');
-    const introVideo = document.getElementById('intro-video');
-
-    const hideIntro = () => {
-      if (!introScreen) return;
-      introScreen.style.opacity = '0';
-      setTimeout(() => {
-        introScreen.remove();
-        // ✅ Asegura que el logo sea visible tras intro
-        document.querySelector('.hero-content')?.classList.add('ready');
-      }, 400);
-    };
-
-    // ✅ Reproducir apenas el video esté listo
-    introVideo?.addEventListener('loadeddata', () => {
-      introVideo.play().catch(() => hideIntro());
-    }, { once: true });
-
-    // ✅ Fallback seguro (7.5s máximo)
-    setTimeout(hideIntro, 7500);
-
-    // ✅ Permitir skip
-    introScreen?.addEventListener('click', hideIntro, { once: true });
-  });
+    updatePlayerCounter();
   </script>
   
 </body>
