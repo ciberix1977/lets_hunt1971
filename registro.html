@@ -149,7 +149,7 @@
     return phoneRegex.test(phone);
   }
 
-  // Manejar envío CON verificación por WhatsApp
+  // Manejar envío SIN verificación por WhatsApp
   document.getElementById('registroForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -165,13 +165,11 @@
       return;
     }
 
-    // Validar que se haya seleccionado una zona
     if (!zona) {
       alert('⚠️ Por favor, selecciona una zona de juego.');
       return;
     }
 
-    // Validar código de equipo
     if (modo === 'equipo' && codigoIngresado) {
       if (!/^[A-Z]{4}[0-9]{3}$/.test(codigoIngresado)) {
         alert('⚠️ Código inválido. Debe ser 4 letras + 3 números. Ej: HUNT245');
@@ -179,7 +177,6 @@
       }
     }
 
-    // Formatear teléfono para WhatsApp
     const telefonoWhatsapp = `+549${telefonoRaw}`;
 
     // Generar hunterId SECUENCIAL con prefijo LH
@@ -188,7 +185,6 @@
     let hunterId = `LH-${String(newId).padStart(4, '0')}`;
     localStorage.setItem('lastHunterId', newId);
 
-    // Gestionar equipo
     let equipo = null;
     if (modo === 'equipo') {
       if (!codigoIngresado) {
@@ -198,135 +194,75 @@
       }
     }
 
-    // Guardar en localStorage temporalmente
     const jugador = { 
       id: hunterId, 
       telefono: telefonoWhatsapp, 
       zona, 
       modo, 
       equipo,
-      whatsapp_verified: false // Pendiente de verificación
+      whatsapp_verified: true // Marcado como verificado inmediatamente
     };
     localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
 
-    // ✅ ENVIAR CÓDIGO DE VERIFICACIÓN POR WHATSAPP (simulado)
-    const verificationCode = Math.random().toString().substr(2, 6);
-    localStorage.setItem('whatsapp_verification_code', verificationCode);
-    
-    // Guardar en Firebase para backend real
+    // Guardar en Firebase
     try {
-      await db.ref(`jugadores_temporales/${hunterId}`).set({
+      await db.ref(`jugadores/${hunterId}`).set({
         hunterId: hunterId,
         telefono: telefonoWhatsapp,
         zona: zona,
         modo: modo,
         equipo: equipo,
-        verification_code: verificationCode,
-        timestamp: Date.now(),
-        verified: false
+        fecha_registro: Date.now(),
+        activo: true,
+        whatsapp_verified: true
       });
     } catch (error) {
       console.error("Error al guardar en Firebase:", error);
     }
 
-    // Mostrar pantalla de verificación
-    mostrarPantallaVerificacion(hunterId, telefonoWhatsapp, verificationCode);
-  });
-
-  function mostrarPantallaVerificacion(hunterId, telefono, verificationCode) {
+    // ✅ Feedback emocional inmediato + redirección directa
     const container = document.querySelector('.form-card');
     container.innerHTML = `
       <div class="logo-container centered">
-        <img src="logo.webp" alt="Let’s Hunt">
+        <img src="code_ebel3.webp" alt="Codigo Ebel">
       </div>
-      <h1 class="section-title">📱 Verificación por WhatsApp</h1>
-      <p style="text-align:center; margin:1rem 0;">
-        Hemos enviado un código de 6 dígitos a:<br>
-        <strong>${telefono}</strong>
-      </p>
-      <div class="form-group" style="margin:2rem 0;">
-        <input type="text" id="verification-code" maxlength="6" placeholder="123456" 
-               style="font-size:1.2rem; padding:12px; text-align:center; width:100%;">
+      <div class="registration-ritual" style="text-align:center; margin-top:1.5rem;">
+        ✅ <span style="color: #4ade80;">¡Registro exitoso!</span><br>
+        <span style="font-size: 1.4rem; margin: 0.4rem 0; display: block; color: #fff;">${hunterId.toUpperCase()}</span>
+        <span style="font-size: 0.95rem; opacity: 0.85; display: block; margin-top: 0.5rem;">
+          Tu cuenta está activa.<br>
+          <!-- 🎖️ BENEFICIO INMEDIATO AL REGISTRARTE -->
+          <div class="instant-reward register-reward" style="margin:1rem 0;">
+            <h3 style="margin-bottom: 0.4rem;">🎖️ Al registrarte ahora</h3>
+            <ul style="list-style: none; padding: 0; margin: 0.6rem 0;">
+              <li>📡 Tu alias aparece en el <strong>radar en vivo</strong>.</li>
+              <li>🎯 Desbloqueás tu <strong>primer desafío</strong>.</li>
+              <li>🏷️ Recibís el badge <strong>“Primer Cazador”</strong>.</li>
+            </ul>
+            <p style="font-size: 0.85rem; opacity: 0.85;">
+              No necesitás ganar el ranking para empezar a jugar.
+            </p>
+          </div>
+          🟢 <span id="live-count-ritual">24</span> cazadores en el GBA ahora.
+        </span>
       </div>
-      <button class="btn-hero" id="verify-btn">✅ Verificar código</button>
-      <p style="font-size:0.9rem; color:#94a3b8; margin-top:1rem;">
-        ¿No recibiste el código? Revisa que el número sea correcto.
-      </p>
     `;
 
-    document.getElementById('verify-btn').addEventListener('click', async () => {
-      const inputCode = document.getElementById('verification-code').value.trim();
-      
-      if (inputCode === verificationCode) {
-        // ✅ Verificación exitosa
-        const jugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`));
-        jugador.whatsapp_verified = true;
-        localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
-        
-        // Actualizar en Firebase
-        try {
-          await db.ref(`jugadores/${hunterId}`).set({
-            hunterId: hunterId,
-            telefono: jugador.telefono,
-            zona: jugador.zona,
-            modo: jugador.modo,
-            equipo: jugador.equipo,
-            fecha_registro: Date.now(),
-            activo: true,
-            whatsapp_verified: true
-          });
-          
-          // Eliminar registro temporal
-          await db.ref(`jugadores_temporales/${hunterId}`).remove();
-        } catch (error) {
-          console.error("Error al actualizar verificación:", error);
-        }
+    // Simular contador
+    function updateRitualCounter() {
+      const base = 20;
+      const fluctuation = Math.floor(Math.random() * 8);
+      document.getElementById('live-count-ritual').textContent = base + fluctuation;
+    }
+    updateRitualCounter();
+    setInterval(updateRitualCounter, 3000);
 
-        // Feedback emocional
-        const successMsg = document.createElement('div');
-        successMsg.className = 'registration-ritual';
-        successMsg.innerHTML = `
-          ✅ <span style="color: #4ade80;">¡Verificación exitosa!</span><br>
-          <span style="font-size: 1.4rem; margin: 0.4rem 0; display: block; color: #fff;">${hunterId.toUpperCase()}</span>
-          <span style="font-size: 0.95rem; opacity: 0.85; display: block; margin-top: 0.5rem;">
-            Tu cuenta está activa.<br>
-            <!-- 🎖️ BENEFICIO INMEDIATO AL REGISTRARTE -->
-<div class="instant-reward register-reward">
-  <h3 style="margin-bottom: 0.4rem;">🎖️ Al registrarte ahora</h3>
-  <ul style="list-style: none; padding: 0; margin: 0.6rem 0;">
-    <li>📡 Tu alias aparece en el <strong>radar en vivo</strong>.</li>
-    <li>🎯 Desbloqueás tu <strong>primer desafío</strong>.</li>
-    <li>🏷️ Recibís el badge <strong>“Primer Cazador”</strong>.</li>
-  </ul>
-  <p style="font-size: 0.85rem; opacity: 0.85;">
-    No necesitás ganar el ranking para empezar a jugar.
-  </p>
-</div>
-
-            🟢 <span id="live-count-ritual">24</span> cazadores en el GBA ahora.
-          </span>
-        `;
-        document.querySelector('.form-card').appendChild(successMsg);
-
-        // Simular contador
-        function updateRitualCounter() {
-          const base = 20;
-          const fluctuation = Math.floor(Math.random() * 8);
-          document.getElementById('live-count-ritual').textContent = base + fluctuation;
-        }
-        updateRitualCounter();
-        setInterval(updateRitualCounter, 3000);
-
-        // Redirigir a app.html
-        setTimeout(() => {
-          window.location.href = `app.html?id=${encodeURIComponent(hunterId)}&zona=${encodeURIComponent(jugador.zona)}`;
-        }, 1200);
-      } else {
-        alert('❌ Código incorrecto. Verifica el mensaje de WhatsApp.');
-      }
-    });
-  }
+    // Redirigir a app.html
+    setTimeout(() => {
+      window.location.href = `app.html?id=${encodeURIComponent(hunterId)}&zona=${encodeURIComponent(zona)}`;
+    }, 1500);
+  });
   </script>
 </body>
 </html>
