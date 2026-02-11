@@ -3,604 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Codigo Ebel · Aventuras Urbanas con Premios Reales</title>
-  <meta name="description" content="Codigo Ebel: Resuelve pistas, completa desafíos en vivo y compite por premios individuales y por equipo. ¿Llegarás al top del ranking?" />
-
-  <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="styles.css"></noscript>
-
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0066ff">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
+  <title>Codigo Ebel · Próximamente</title>
+  <meta name="description" content="Let's Hunt: La cacería urbana está pronto a comenzar en el Gran Buenos Aires." />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a12 0%, #000 100%);
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .logo-container {
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      max-width: 80vw;
+      max-height: 60vh;
+      height: auto;
+      width: auto;
+      /* Filtro eliminado - tu logo se verá en sus colores originales */
+      animation: fadeIn 1.2s ease-out;
+    }
+    
+    .coming-soon {
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1.4;
+      background: linear-gradient(90deg, #0af, #64b5f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 4px rgba(0, 170, 255, 0.1);
+      animation: fadeIn 1.5s ease-out 0.3s both;
+    }
+    
+    .domain {
+      font-size: 1.1rem;
+      opacity: 0.7;
+      margin-top: 1.5rem;
+      animation: fadeIn 1.8s ease-out 0.6s both;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @media (max-width: 768px) {
+      .coming-soon {
+        font-size: 1.4rem;
+        padding: 0 1rem;
+      }
+      
+      .domain {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <main>
-    <section class="hero" role="banner">
-     <header class="hero-content centered">
-          <div class="logo-container">
-  <!-- ✅ RADAR ANIMADO — visible detrás del logo -->
-  <div class="logo-radar" aria-hidden="true">
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="25" fill="none" stroke="#0f0" stroke-width="0.8" opacity="0.5">
-        <animate attributeName="r" values="25;30;25" dur="3s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="50" cy="50" r="35" fill="none" stroke="#0f0" stroke-width="0.6" opacity="0.4">
-        <animate attributeName="r" values="35;40;35" dur="3.5s" repeatCount="indefinite" begin="0.3s"/>
-        <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3.5s" repeatCount="indefinite" begin="0.3s"/>
-      </circle>
-      <circle cx="50" cy="50" r="45" fill="none" stroke="#0f0" stroke-width="0.4" opacity="0.3">
-        <animate attributeName="r" values="45;50;45" dur="4s" repeatCount="indefinite" begin="0.6s"/>
-        <animate attributeName="opacity" values="0.1;0.4;0.1" dur="4s" repeatCount="indefinite" begin="0.6s"/>
-      </circle>
-    </svg>
+  <div class="logo-container">
+    <img src="code_ebel3.webp" alt="Codigo Ebel" class="logo" onerror="this.src='code_ebel3.png'; this.onerror=null;">
   </div>
-  <!-- ✅ LOGO — encima del radar -->
-  <div class="logo-wrapper" style="transform: scale(1.25); transform-origin: center;">
-  <img src="./code_ebel3.webp" alt="Code Ebel" loading="eager">
-</div>
-</div>
-        <div id="typewriter" class="typewriter-text">Un juego urbano gratuito donde resolvés pistas reales en la ciudad para ganar premios.</div>
-        
-        <!-- ✅ BOTÓN DE VOZ NO INVASIVA -->
-        <button id="narration-btn" class="narration-btn" style="
-          background: rgba(0, 102, 255, 0.2);
-          border: 1px solid #0066ff;
-          color: #64b5f6;
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-size: 0.9rem;
-          cursor: pointer;
-          margin: 1rem 0;
-          transition: all 0.3s ease;
-        " aria-label="Escuchá el mensaje del Vigilante">
-          🎧 Escuchá el mensaje del Vigilante
-        </button>
-        
-        <p class="tension-tag">⚠️ Solo el 12% de los jugadores completa las 3 misiones.</p>
-        <div class="counter-banner">
-        <div class="pulse-dot"></div>
-    🟢 <span id="live-count">27</span> jugadores activos ahora
-     </div>
-   </header>
-    </section>
-    
-    <section class="intro-section" aria-labelledby="intro-title">
-      <div class="container">
-        <h2 id="intro-title" class="section-title">Tu Misión, si la Aceptas</h2>
-        <div class="about-summary">
-          <p>
-            <strong>Codigo Ebel</strong> es una aventura urbana en el Gran Buenos Aires donde combinas inteligencia, coraje y velocidad. 
-            Resuelve pistas históricas en la ciudad, <strong>y activa desafíos en vivo por WhatsApp</strong> para ganar coordenadas antes que los demás.
-          </p>
-          <p class="tension-line"><strong>🧠 Cada error te cuesta tiempo. Y el tiempo… no se recarga.</strong></p>
-          <div class="free-callout">
-            <h4>¿Y lo mejor de todo?</h4>
-            <p><strong>Es 100% gratuito participar.</strong> y no descargas nada. Solo necesitas curiosidad, un telefono movil y ganas de ganar. Cargas la mision o desafio y puedes jugarlo con o sin coneccion, hasta cargar el nueva mision/desafio</p>
-          </div>
-          <div class="prizes-callout">
-            <h4>🏆 Premios reales, ranking real</h4>
-            <p><strong>Los primeros puestos del ranking —individuales y por equipo— se llevan premios reales:</strong> 
-            tecnología, experiencias urbanas exclusivas y reconocimiento en la comunidad Let’s Hunt.</p>
-          </div>
-        </div>
-        <div class="live-players" style="margin-top: 2.5rem; padding: 1.5rem; background: rgba(0, 170, 255, 0.08); border-radius: 12px; border: 1px solid rgba(0, 170, 255, 0.2);">
-          <h3 style="color: #4fc3f7; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="background:#00aaff; width:12px; height:12px; border-radius:50%; display:inline-block; animation: pulse 2s infinite;"></span>
-            🟢 Jugadores activos ahora
-          </h3>
-          <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center;">
-            <div style="background: rgba(0, 170, 255, 0.15); padding: 0.6rem 1rem; border-radius: 20px; font-size: 0.95rem;">
-              hunter_0041 • CABA
-            </div>
-            <div style="background: rgba(0, 170, 255, 0.15); padding: 0.6rem 1rem; border-radius: 20px; font-size: 0.95rem;">
-              hunter_0109 • Avellaneda
-            </div>
-            <div style="background: rgba(0, 170, 255, 0.15); padding: 0.6rem 1rem; border-radius: 20px; font-size: 0.95rem;">
-              hunter_0073 • Lanús
-            </div>
-          </div>
-          <p style="margin-top: 1rem; font-size: 0.9rem; color: #94a3b8;">
-            ⏱️ Actualizado hace 24 segundos
-          </p>
-        </div>
-
-        <style>
-        @keyframes pulse {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
-        </style>
   
-   
-
-
-    <!-- ✅ NUEVA SECCIÓN #1: Cómo se juega -->
-   <!-- ✅ SECCIÓN: Cómo se juega — Rediseñada -->
-<section id="como-jugar" class="how-to-play" aria-labelledby="how-to-play-title">
-  <div class="container">
-    <h2 id="how-to-play-title" class="section-title">🧭 Cómo se juega Codigo Ebel</h2>
-    <div class="steps-grid">
-      <div class="step-card" data-step="1">
-        <div class="step-badge">
-          <span class="step-number">1</span>
-          <span class="step-label">Entrada</span>
-        </div>
-        <h3 class="step-title">🔐 Te registrás</h3>
-        <p class="step-desc">
-          Gratis. Sin tarjetas. Elegís jugar <strong>solo o en equipo</strong>.
-          Tu identidad: <code>LH-XXXX</code>.
-        </p>
-      </div>
-      <div class="step-card" data-step="2">
-        <div class="step-badge">
-          <span class="step-number">2</span>
-          <span class="step-label">Operación</span>
-        </div>
-        <h3 class="step-title">🎯 Resolvés pistas</h3>
-        <p class="step-desc">
-          En la ciudad. Si suena el WhatsApp… <strong>¡es un desafío en vivo!</strong>
-          Aceptalo y ganá coordenadas bonus.
-        </p>
-      </div>
-      <div class="step-card" data-step="3">
-        <div class="step-badge">
-          <span class="step-number">3</span>
-          <span class="step-label">Extracción</span>
-        </div>
-        <h3 class="step-title">🏆 Subís al ranking</h3>
-        <p class="step-desc">
-          Los primeros puestos se llevan <strong>premios reales</strong>:
-          tecnología, experiencias urbanas, gloria.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-    <!-- ✅ SECCIÓN: ¿Quién juega? — Rediseñada -->
-<section id="quien-juega" class="who-plays" aria-labelledby="who-plays-title">
-  <div class="container">
-    <h2 id="who-plays-title" class="section-title">👤 Los Cuatro Perfiles del Cazador</h2>
-    <div class="avatars-grid">
-      <div class="avatar-card" data-profile="explorador">
-        <div class="avatar-icon">🗺️</div>
-        <h3 class="avatar-title">El Explorador Urbano</h3>
-        <p class="avatar-desc">
-          Camina la ciudad como si fuera un mapa vivo.  
-          <strong>Para él, Recoleta no es un barrio: es un acertijo de mármol y sombras.</strong>
-        </p>
-      </div>
-     
-      <div class="avatar-card" data-profile="equipo">
-        <div class="avatar-icon">👯</div>
-        <h3 class="avatar-title">El Equipo de Amigos</h3>
-        <p class="avatar-desc">
-          3 o 4 que se juntan “para hacer algo distinto”.  
-          <strong>Sin apps de pago, sin salidas caras: solo inteligencia, risas y un WhatsApp encendido.</strong>
-        </p>
-      </div>
-      <div class="avatar-card" data-profile="competitivo">
-        <div class="avatar-icon">🏆</div>
-        <h3 class="avatar-title">El Competitivo sin Tarjeta</h3>
-        <p class="avatar-desc">
-          Quiere ganar… pero no quiere gastar.  
-          <strong>Su arma no es la billetera: es la velocidad, el ingenio y saber cuándo aceptar un desafío loco por voz.</strong>
-        </p>
-      </div>
-    </div>
-    <p class="identity-closer">
-      ¿Te reconocés en alguno? Probablemente… en <span class="highlight">más de uno</span>.
-    </p>
-  </div>
-</section>
-   <!-- ✅ SECCIÓN: Misiones — Rediseñada en fila -->
-<section id="misiones" class="missions-section" aria-labelledby="misiones-title">
-  <div class="container">
-    <h2 id="misiones-title" class="section-title">🎯 Misiones, Desafíos y el Camino al Ranking</h2>
-    <div class="missions-grid">
-      <article class="mission-card" data-type="mision">
-        <div class="mission-header">
-          <span class="mission-icon">🦁</span>
-          <span class="mission-badge nivel-N2">Nivel 2</span>
-        </div>
-        <h3 class="mission-title">Misión 1: El Guardián de Bronce</h3>
-        <p class="mission-desc">
-          Busca la estatua ecuestre del General Belgrano frente al Congreso.  
-          Resuelve el acertijo oculto en su base.
-        </p>
-        <div class="mission-reward">
-          📍 <strong>Coordenada A</strong> del mapa final.
-        </div>
-      </article>
-
-      <article class="mission-card" data-type="desafio">
-        <div class="mission-header">
-          <span class="mission-icon">⚡</span>
-          <span class="mission-badge nivel-N3">Nivel 3</span>
-        </div>
-        <h3 class="mission-title">Desafío Bonus (WhatsApp)</h3>
-        <p class="mission-desc">
-          El Vigilante te llama. Aceptá y realizá un desafío en vivo.  
-          <strong>Si lo completás, obtenés la coordenada al instante.</strong>
-        </p>
-        <div class="mission-reward">
-          ⚡ <strong>Coordenada A</strong> sin resolver la pista.
-        </div>
-        <div class="mission-risk">
-          ⚠️ Solo 30 segundos para aceptar.
-        </div>
-      </article>
-
-      <article class="mission-card" data-type="ranking">
-        <div class="mission-header">
-          <span class="mission-icon">🏆</span>
-          <span class="mission-badge nivel-N4">Nivel 4</span>
-        </div>
-        <h3 class="mission-title">El Ranking Final</h3>
-        <p class="mission-desc">
-          Quienes completen las 3 misiones entran al ranking.  
-          <strong>Los primeros lugares se llevan premios reales.</strong>
-        </p>
-        <div class="mission-reward">
-          🎁 Tecnología, experiencias y gloria urbana.
-        </div>
-        <div class="mission-risk">
-          ⚠️ Solo los primeros <strong>50</strong> entran al ranking final.
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
-    <section class="register-section" aria-labelledby="register-title">
-      <div class="container">
-        <h2 id="register-title" class="section-title">¿Listo para la cacería urbana?</h2>
-
-        <!-- ✅ BLOQUE: Ranking visible -->
-        <div class="ranking-preview">
-          <h3 style="
-            color: #4fc3f7;
-            margin-bottom: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-          ">
-            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"></polygon>
-            </svg>
-            Ranking actual — Temporada Buenos Aires
-          </h3>
-
-          <div class="top-list" style="text-align: left; margin: 0 auto; max-width: 400px;">
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1);">
-              <span style="
-                background: #ffd700; color: #1a202c; width: 28px; height: 28px; border-radius: 50%;
-                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
-              ">1</span>
-              <span style="flex: 1; font-weight: 600; color: #ffd700;">elcazadordel9</span>
-              <span style="color: #94a3b8; font-size: 0.9rem;">CABA • 2,840 pts</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1);">
-              <span style="
-                background: #c0c0c0; color: #1a202c; width: 28px; height: 28px; border-radius: 50%;
-                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
-              ">2</span>
-              <span style="flex: 1; font-weight: 600; color: #c0c0c0;">team_recoleta</span>
-              <span style="color: #94a3b8; font-size: 0.9rem;">Recoleta • 2,310 pts</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1);">
-              <span style="
-                background: #cd7f32; color: #1a202c; width: 28px; height: 28px; border-radius: 50%;
-                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
-              ">3</span>
-              <span style="flex: 1; font-weight: 600; color: #cd7f32;">pistayfuego</span>
-              <span style="color: #94a3b8; font-size: 0.9rem;">Avellaneda • 1,980 pts</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1);">
-              <span style="
-                background: rgba(255,255,255,0.12); color: #e2e8f0; width: 28px; height: 28px; border-radius: 50%;
-                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
-              ">4</span>
-              <span style="flex: 1; font-weight: 500; color: #e2e8f0;">sanjose_squad</span>
-              <span style="color: #94a3b8; font-size: 0.9rem;">San José • 1,620 pts</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0;">
-              <span style="
-                background: rgba(255,255,255,0.12); color: #e2e8f0; width: 28px; height: 28px; border-radius: 50%;
-                display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;
-              ">5</span>
-              <span style="flex: 1; font-weight: 500; color: #e2e8f0;">la_radarista</span>
-              <span style="color: #94a3b8; font-size: 0.9rem;">Lanús • 1,450 pts</span>
-            </div>
-          </div>
-
-          <p style="
-            margin-top: 1.2rem;
-            font-weight: 600;
-            color: #64b5f6;
-            font-size: 1.05rem;
-          ">
-            🎯 Vos podés estar acá. Solo falta empezar.
-          </p>
-        </div>
-        <!-- ✅ FEATURES: Rediseñado con coherencia -->
-<section class="features-section" aria-labelledby="features-title">
-  <div class="container">
-    <h2 id="features-title" class="section-title">¿Qué obtenés al registrarte?</h2>
-    <div class="features-grid">
-      <div class="feature-card" data-type="whatsapp">
-        <div class="feature-icon">📱</div>
-        <h3 class="feature-title">Notificaciones por WhatsApp</h3>
-        <p class="feature-desc">Desafíos en vivo aleatorios. Acepta, cumple, gana ventaja.</p>
-      </div>
-      <div class="feature-card" data-type="geo">
-        <div class="feature-icon">📍</div>
-        <h3 class="feature-title">Geolocalización precisa</h3>
-        <p class="feature-desc">Las pistas se activan cuando estás en el lugar correcto.</p>
-      </div>
-      <div class="feature-card" data-type="ranking">
-        <div class="feature-icon">📊</div>
-        <h3 class="feature-title">Ranking público</h3>
-        <p class="feature-desc">Ve tu posición en tiempo real. ¿Top 10? Los premios te esperan.</p>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- ✅ SECCIÓN: Tus primeras recompensas -->
-<section class="rewards-preview" aria-labelledby="rewards-title" style="
-  padding: 2.5rem 0;
-  background: rgba(0, 102, 255, 0.04);
-  border-bottom: 1px solid rgba(0, 102, 255, 0.1);
-">
-  <div class="container">
-    <h2 id="rewards-title" class="section-title" style="text-align: center; margin-bottom: 2rem;">
-      🎁 Tus primeras recompensas — ¡desde el minuto 1!
-    </h2>
-    <div style="
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      max-width: 900px;
-      margin: 0 auto;
-    ">
-      <div style="
-        background: rgba(30, 41, 59, 0.6);
-        border-radius: 16px;
-        padding: 1.5rem;
-        text-align: center;
-        border: 1px solid #334155;
-      ">
-        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎖️</div>
-        <h3 style="margin: 0 0 0.75rem; color: #64b5f6;">Primer desafío</h3>
-        <p style="color: #cbd5e1; font-size: 0.95rem;">
-          Badge <strong>“Cazador Novato”</strong> desbloqueado al instante.
-        </p>
-      </div>
-      
-      <div style="
-        background: rgba(30, 41, 59, 0.6);
-        border-radius: 16px;
-        padding: 1.5rem;
-        text-align: center;
-        border: 1px solid #334155;
-      ">
-        <div style="font-size: 2.5rem; margin-bottom: 1rem;">📍</div>
-        <h3 style="margin: 0 0 0.75rem; color: #64b5f6;">Primera misión</h3>
-        <p style="color: #cbd5e1; font-size: 0.95rem;">
-          Tu nombre aparece en el <strong>radar en vivo</strong> para todos los cazadores.
-        </p>
-      </div>
-      
-      <div style="
-        background: rgba(30, 41, 59, 0.6);
-        border-radius: 16px;
-        padding: 1.5rem;
-        text-align: center;
-        border: 1px solid #334155;
-      ">
-        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🏆</div>
-        <h3 style="margin: 0 0 0.75rem; color: #64b5f6;">Top 100</h3>
-        <p style="color: #cbd5e1; font-size: 0.95rem;">
-          Badge exclusivo <strong>“Pionero del GBA”</strong> para los primeros 100.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-        <p class="urgency-note">⏳ Las misiones se cierran cuando los primeros 10 llegan. ¿Vas a ser uno de ellos?</p>
-        <a href="registro.html" class="btn-hero">✅ REGISTRARME Y ENTRAR AL RANKING</a>
-
-        <!-- ✅ NUEVO CTA EMOCIONAL (variante #2) -->
-        <a href="registro.html" class="cta-emocional" style="margin-top: 1.2rem; display: inline-block;">
-          🗺️ Comenzar mi primera misión
-        </a>
-
-       <!-- ✅ CONSENTIMIENTO: Separado y con peso ritual -->
-<div class="consent-section">
-  <div class="consent-box">
-    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-    </svg>
-    <p>
-      Al continuar, aceptas nuestra 
-      <a href="politicas.html#privacidad" target="_blank" rel="noopener">Política de Privacidad</a>
-      y los 
-      <a href="politicas.html#terminos" target="_blank" rel="noopener">Términos y Condiciones</a>.
-    </p>
-  </div>
-</div>
-
-
-  </main>
-
-   <footer class="footer" role="contentinfo">
-  <div class="footer-main">
-   <div class="footer-brand" style="
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-">
-  <img src="./code_ebel3.webp" alt="Let’s Hunt" width="160" height="48" loading="lazy" style="
-    display: block;
-  ">
-  <p style="
-    margin: 0;
-    color: #94a3b8;
-    font-size: 0.95rem;
-    line-height: 1.4;
-  ">Aventuras Urbanas en el Gran Buenos Aires</p>
-</div>
-
-    <div class="footer-legal">
-      <p class="disclaimer">
-        ℹ️ <strong>Codigo Ebel</strong> es un proyecto independiente. 
-        No está afiliado a marcas o series con nombre similar.
-      </p>
-      
-      <!-- ✅ BOTÓN DE CONTACTO MOVIDO AL FOOTER -->
-      <div class="footer-contact" style="margin: 1.2rem 0;">
-<a href="mailto:contacto@codigoebel.com?subject=Contacto%20Code%20Ebel" class="btn-outline">
-  📩 Contacto
-</a>
-      </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; <span id="year">2025</span> Codigo Ebel. Todos los derechos reservados.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ REDES: siempre centradas, fuera del flujo de contenido -->
-  <div class="footer-social-section">
-    <div class="footer-social">
-      <h3 class="sr-only">Síguenos en redes sociales</h3>
-      <ul class="social-list" role="list">
-        <li>
-          <a href="https://facebook.com/codigoebel" target="_blank" rel="noopener" 
-             aria-label="Let’s Hunt en Facebook" class="social-link">
-            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
-          </a>
-        </li>
-        <li>
-          <a href="https://instagram.com/codigo_ebel.ok" target="_blank" rel="noopener" 
-             aria-label="Let’s Hunt en Instagram" class="social-link">
-            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2.163a9.847 9.847 0 0 0-6.934 2.844A9.847 9.847 0 0 0 2.163 12c0 2.722 1.07 5.18 2.843 6.934A9.847 9.847 0 0 0 12 21.837a9.847 9.847 0 0 0 6.934-2.844A9.847 9.847 0 0 0 21.837 12a9.847 9.847 0 0 0-2.843-6.934A9.847 9.847 0 0 0 12 2.163zm0 17.674a7.847 7.847 0 1 1 0-15.694 7.847 7.847 0 0 1 0 15.694zm6.495-9.03a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 0 0 2.5 0zm-6.495 4.28a4.95 4.95 0 1 0 0-9.9 4.95 4.95 0 0 0 0 9.9zm0-8.2a3.25 3.25 0 1 1 0 6.5 3.25 3.25 0 0 1 0-6.5z"/>
-            </svg>
-          </a>
-        </li>
-        <li>
-          <a href="https://x.com/@letshunt_BsAs" target="_blank" rel="noopener" 
-             aria-label="Let’s Hunt en X" class="social-link">
-            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.205 8.09a1.49 1.49 0 0 0-1.43-.99c-.84 0-1.69.33-2.29 1.01v8.42a4.5 4.5 0 0 1-4.5-4.5v-4.1a5 5 0 0 0 5-5c0-.27-.02-.53-.05-.79h1.83a1.5 1.5 0 0 1 1.49 1.63v11.04a1.5 1.5 0 0 1-1.5 1.5h-6.79a1.5 1.5 0 0 1-1.5-1.5v-4.24a4.5 4.5 0 0 1 4.5-4.5h4.29z"/>
-            </svg>
-          </a>
-        </li>
-        <li>
-          <a href="https://tiktok.com/@codigoebel" target="_blank" rel="noopener" 
-             aria-label="Let’s Hunt en TikTok" class="social-link">
-            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.59 8.09a1.49 1.49 0 0 0-1.43-.99c-.84 0-1.69.33-2.29 1.01v8.42a4.5 4.5 0 0 1-4.5-4.5v-4.1a5 5 0 0 0 5-5c0-.27-.02-.53-.05-.79h1.83a1.5 1.5 0 0 1 1.49 1.63v11.04a1.5 1.5 0 0 1-1.5 1.5h-6.79a1.5 1.5 0 0 1-1.5-1.5v-4.24a4.5 4.5 0 0 1 4.5-4.5h4.29z"/>
-            </svg>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</footer>
-
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-    
-    // ✅ MENSAJE DEL VIGILANTE (voz no invasiva)
-    function playVigilanteMessage() {
-      const text = "Cazador. El Vigilante te observa desde las sombras. Las calles del Gran Buenos Aires esconden secretos que solo los más astutos pueden descifrar. ¿Tienes el coraje para aceptar el desafío?";
-      
-      speechSynthesis.getVoices();
-      const voices = speechSynthesis.getVoices();
-      const voice = voices.find(v => 
-        v.lang.includes('es') && 
-        (v.name === 'Juan' || v.name === 'Diego' || v.name.includes('Male'))
-      ) || voices.find(v => v.lang.includes('es')) || null;
-
-      const u = new SpeechSynthesisUtterance(text);
-      if (voice) u.voice = voice;
-      u.rate = 0.60;
-      u.pitch = 0.42;
-      u.volume = 0.95;
-
-      // Eco ligero (0.8s, 30% vol)
-      u.onstart = () => {
-        if (window.AudioContext) {
-          try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const delay = ctx.createDelay(1.5);
-            delay.delayTime.value = 0.8;
-            const feedback = ctx.createGain();
-            feedback.gain.value = 0.3;
-            delay.connect(feedback);
-            feedback.connect(delay);
-            setTimeout(() => ctx.close(), 5000);
-          } catch (e) {}
-        }
-      };
-
-      speechSynthesis.speak(u);
-      
-      // Cambiar texto del botón temporalmente
-      const btn = document.getElementById('narration-btn');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '🔊 Reproduciendo...';
-      btn.disabled = true;
-      
-      u.onend = () => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-      };
-    }
-
-    // ✅ Evento para el botón de voz
-    document.getElementById('narration-btn').addEventListener('click', playVigilanteMessage);
-
-    // ✅ Typewriter
-    const typewriterText = "Un juego urbano gratuito donde resolvés pistas reales en la ciudad para ganar premios.";
-    const typewriterEl = document.getElementById('typewriter');
-    let i = 0;
-    const type = () => {
-      if (i < typewriterText.length) {
-        typewriterEl.textContent = typewriterText.substring(0, i + 1);
-        i++;
-        setTimeout(type, 60 + Math.random() * 40);
-      }
-    };
-    type();
-
-    // ✅ CONTADOR DE JUGADORES ACTIVOS EN TIEMPO REAL (simulado)
-    function updatePlayerCounter() {
-      const base = 20;
-      const fluctuation = Math.floor(Math.random() * 10) - 2;
-      const count = base + fluctuation;
-      
-      const counterEl = document.getElementById('live-count');
-      if (counterEl) {
-        counterEl.textContent = count;
-      }
-      
-      setTimeout(updatePlayerCounter, 4000);
-    }
-
-    updatePlayerCounter();
-  </script>
+  <h1 class="coming-soon">
+  <br>
+    La cacería está pronto a comenzar
+  </h1>
   
+  <p class="domain">codigoebel.com</p>
 </body>
 </html>
