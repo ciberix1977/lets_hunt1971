@@ -94,7 +94,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Let’s Hunt · Panel de Administración</h1>
+    <h1>Codigo Ebel · Panel de Administración</h1>
 
     <div id="loginSection" class="login-form">
       <h2>🔐 Acceso restringido</h2>
@@ -277,22 +277,21 @@
     }
 
     // === BORRAR REGISTROS ===
-    async function borrarRegistros() {
-      if (!confirm("¿Estás seguro de que deseas borrar todos los registros? Esta acción no se puede deshacer.")) {
-        return;
-      }
+async function borrarRegistros() {
+  if (!confirm("¿Estás seguro de que deseas borrar todos los registros? Esta acción no se puede deshacer.")) {
+    return;
+  }
 
-      try {
-        // Borrar todos los registros en Realtime Database
-        await db.ref('registros_nuevos').set(null);
-        loadRegistros();
-        alert("✅ Registros borrados.");
-      } catch (error) {
-        console.error("Error al borrar registros:", error);
-        alert("Error al borrar registros. Intenta nuevamente.");
-      }
-    }
-
+  try {
+    // Borrar todos los jugadores en la ruta correcta
+    await db.ref('jugadores').set(null);
+    loadRegistros();
+    alert("✅ Registros borrados.");
+  } catch (error) {
+    console.error("Error al borrar registros:", error);
+    alert("Error al borrar registros. Intenta nuevamente.");
+  }
+}
     // === EVENTOS ===
     document.getElementById('adminPass').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') login();
