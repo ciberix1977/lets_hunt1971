@@ -263,10 +263,10 @@
           cuerpo += `${r.hunterId || '—'} | ${r.nombre || '—'} | ${r.telefono || '—'} | ${r.zona || '—'} | ${modo} | ${fecha}\n`;
         });
 
-        cuerpo += "\n— Fin del reporte —\nLet’s Hunt · Cacería Urbana GBA";
+        cuerpo += "\n— Fin del reporte —\nCodigo Ebel · Cacería Urbana GBA";
 
-        const destinatario ="lets.hunt2026@gmail.com";
-        const asunto = "🆕 Let's Hunt - Reporte de nuevos cazadores";
+        const destinatario ="admin@codigoebel.com";
+        const asunto = "🆕 Codigo Ebel - Reporte de nuevos cazadores";
         const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
 
         window.location.href = mailtoUrl;
