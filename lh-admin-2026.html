@@ -116,233 +116,200 @@
   </div>
 
   <script>
-    // ========== FIREBASE ==========
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
-      authDomain: "let-s-hunt.firebaseapp.com",
-      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
-      projectId: "let-s-hunt",
-      storageBucket: "let-s-hunt.firebasestorage.app",
-      messagingSenderId: "787017812046",
-      appId: "1:787017812046:web:da098b2361df4dda995b1f"
-    };
-    
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
+  // ========== FIREBASE ==========
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+    authDomain: "let-s-hunt.firebaseapp.com",
+    databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+    projectId: "let-s-hunt",
+    storageBucket: "let-s-hunt.firebasestorage.app",
+    messagingSenderId: "787017812046",
+    appId: "1:787017812046:web:da098b2361df4dda995b1f"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
 
-    // === AUTENTICACIÓN ===
-    async function login() {
-      const email = document.getElementById('adminEmail').value.trim();
-      const password = document.getElementById('adminPass').value;
-      const errorDiv = document.getElementById('loginError');
+  // === AUTENTICACIÓN ===
+  async function login() {
+    const email = document.getElementById('adminEmail').value.trim();
+    const password = document.getElementById('adminPass').value;
+    const errorDiv = document.getElementById('loginError');
+    
+    if (!email || !password) {
+      errorDiv.textContent = "⚠️ Completa todos los campos";
+      errorDiv.style.display = "block";
+      return;
+    }
+    
+    try {
+      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+      const user = userCredential.user;
       
-      if (!email || !password) {
-        errorDiv.textContent = "⚠️ Completa todos los campos";
-        errorDiv.style.display = "block";
+      const userRef = db.ref(`usuarios/${user.uid}`);
+      const snapshot = await userRef.once('value');
+      
+      if (!snapshot.exists()) {
+        throw new Error("Usuario no autorizado");
+      }
+      
+      const userData = snapshot.val();
+      if (userData.rol !== 'admin' || !userData.activo) {
+        throw new Error("Acceso denegado - Rol no válido");
+      }
+      
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('adminSection').style.display = 'block';
+      document.getElementById('loginError').style.display = 'none';
+      
+      loadRegistros();
+      
+    } catch (error) {
+      console.error("Error de autenticación:", error);
+      errorDiv.textContent = "❌ " + (error.message || "Credenciales incorrectas");
+      errorDiv.style.display = "block";
+    }
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      document.getElementById('adminSection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('adminEmail').value = '';
+      document.getElementById('adminPass').value = '';
+      document.getElementById('loginError').style.display = 'none';
+    });
+  }
+
+  // === CARGAR REGISTROS ===
+  async function loadRegistros() {
+    const tableDiv = document.getElementById('registrosTable');
+    tableDiv.innerHTML = '<p>Cargando registros...</p>';
+
+    try {
+      const snapshot = await db.ref('jugadores').once('value');
+      
+      if (!snapshot.exists() || snapshot.val() === null) {
+        tableDiv.innerHTML = '<p class="empty">No hay registros.</p>';
         return;
       }
+
+      const registros = snapshot.val();
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Teléfono</th>
+              <th>Zona</th>
+              <th>Modo</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      const registrosArray = Object.values(registros).sort((a, b) => (b.fecha_registro || 0) - (a.fecha_registro || 0));
       
-      try {
-        // Iniciar sesión
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+      registrosArray.slice(0, 50).forEach(r => {
+        const fecha = r.fecha_registro ? new Date(r.fecha_registro).toLocaleString('es-AR') : 'Sin fecha';
+        const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
         
-        // Verificar rol en Realtime Database
-        const userRef = db.ref(`usuarios/${user.uid}`);
-        const snapshot = await userRef.once('value');
-        
-        if (!snapshot.exists()) {
-          throw new Error("Usuario no autorizado");
-        }
-        
-        const userData = snapshot.val();
-        if (userData.rol !== 'admin' || !userData.activo) {
-          throw new Error("Acceso denegado - Rol no válido");
-        }
-        
-        // Mostrar panel de admin
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminSection').style.display = 'block';
-        document.getElementById('loginError').style.display = 'none';
-        
-        loadRegistros();
-        
-      } catch (error) {
-        console.error("Error de autenticación:", error);
-        errorDiv.textContent = "❌ " + (error.message || "Credenciales incorrectas");
-        errorDiv.style.display = "block";
-      }
-    }
-
-    function logout() {
-      auth.signOut().then(() => {
-        document.getElementById('adminSection').style.display = 'none';
-        document.getElementById('loginSection').style.display = 'block';
-        document.getElementById('adminEmail').value = '';
-        document.getElementById('adminPass').value = '';
-        document.getElementById('loginError').style.display = 'none';
+        html += `
+          <tr>
+            <td>${r.hunterId || '—'}</td>
+            <td>${r.telefono || '—'}</td>
+            <td>${r.zona || '—'}</td>
+            <td>${modo}</td>
+            <td>${fecha}</td>
+          </tr>
+        `;
       });
+
+      html += `</tbody></table>`;
+      tableDiv.innerHTML = html;
+    } catch (error) {
+      console.error("Error al cargar registros:", error);
+      tableDiv.innerHTML = '<p class="empty">Error al cargar registros. Verifica la conexión.</p>';
     }
+  }
 
-    // === CARGAR REGISTROS ===
-async function loadRegistros() {
-  const tableDiv = document.getElementById('registrosTable');
-  tableDiv.innerHTML = '<p>Cargando registros...</p>';
+  // === EXPORTAR POR EMAIL ===
+  async function exportarPorEmail() {
+    try {
+      const snapshot = await db.ref('jugadores').once('value');
+      
+      if (!snapshot.exists() || snapshot.val() === null) {
+        alert("No hay registros para exportar.");
+        return;
+      }
 
-  try {
-    // Obtener jugadores reales
-    const snapshot = await db.ref('jugadores').once('value');
-    
-    if (!snapshot.exists() || snapshot.val() === null) {
-      tableDiv.innerHTML = '<p class="empty">No hay registros.</p>';
+      const registros = Object.values(snapshot.val()).sort((a, b) => (b.fecha_registro || 0) - (a.fecha_registro || 0));
+      let cuerpo = "🆕 *CAZADORES REGISTRADOS*\n\n";
+      cuerpo += "ID | Teléfono | Zona | Modo | Fecha\n";
+      cuerpo += "-".repeat(50) + "\n";
+
+      registros.slice(0, 100).forEach(r => {
+        const fecha = r.fecha_registro ? new Date(r.fecha_registro).toLocaleString('es-AR') : 'Sin fecha';
+        const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
+        cuerpo += `${r.hunterId || '—'} | ${r.telefono || '—'} | ${r.zona || '—'} | ${modo} | ${fecha}\n`;
+      });
+
+      cuerpo += "\n— Fin del reporte —\nCodigo Ebel · Cacería Urbana GBA";
+
+      const destinatario = "admin@codigoebel.com";
+      const asunto = "🆕 Codigo Ebel - Reporte de cazadores";
+      const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+
+      window.location.href = mailtoUrl;
+    } catch (error) {
+      console.error("Error al exportar:", error);
+      alert("Error al exportar registros. Intenta nuevamente.");
+    }
+  }
+
+  // === BORRAR REGISTROS ===
+  async function borrarRegistros() {
+    if (!confirm("¿Estás seguro de que deseas borrar todos los registros? Esta acción no se puede deshacer.")) {
       return;
     }
 
-    const registros = snapshot.val();
-    let html = `
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Teléfono</th>
-            <th>Zona</th>
-            <th>Modo</th>
-            <th>Fecha</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    // Convertir objeto a array y ordenar por fecha
-    const registrosArray = Object.values(registros).sort((a, b) => (b.fecha_registro || 0) - (a.fecha_registro || 0));
-    
-    registrosArray.slice(0, 50).forEach(r => {
-      const fecha = r.fecha_registro ? new Date(r.fecha_registro).toLocaleString('es-AR') : 'Sin fecha';
-      const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
-      
-      html += `
-        <tr>
-          <td>${r.hunterId || '—'}</td>
-          <td>${r.telefono || '—'}</td>
-          <td>${r.zona || '—'}</td>
-          <td>${modo}</td>
-          <td>${fecha}</td>
-        </tr>
-      `;
-    });
-
-    html += `</tbody></table>`;
-    tableDiv.innerHTML = html;
-  } catch (error) {
-    console.error("Error al cargar registros:", error);
-    tableDiv.innerHTML = '<p class="empty">Error al cargar registros. Verifica la conexión.</p>';
-  }
-}
-
-        // Convertir objeto a array y ordenar por timestamp
-        const registrosArray = Object.values(registros).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        
-        registrosArray.slice(0, 50).forEach(r => {
-          const fecha = r.timestamp ? new Date(r.timestamp).toLocaleString('es-AR') : 'Sin fecha';
-          const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
-          
-          html += `
-            <tr>
-              <td>${r.hunterId || '—'}</td>
-              <td>${r.nombre || '—'}</td>
-              <td>${r.telefono || '—'}</td>
-              <td>${r.zona || '—'}</td>
-              <td>${modo}</td>
-              <td>${fecha}</td>
-            </tr>
-          `;
-        });
-
-        html += `</tbody></table>`;
-        tableDiv.innerHTML = html;
-      } catch (error) {
-        console.error("Error al cargar registros:", error);
-        tableDiv.innerHTML = '<p class="empty">Error al cargar registros. Verifica la conexión.</p>';
-      }
+    try {
+      await db.ref('jugadores').set(null);
+      loadRegistros();
+      alert("✅ Registros borrados.");
+    } catch (error) {
+      console.error("Error al borrar registros:", error);
+      alert("Error al borrar registros. Intenta nuevamente.");
     }
-
-    // === EXPORTAR POR EMAIL ===
-    async function exportarPorEmail() {
-      try {
-        const snapshot = await db.ref('registros_nuevos').once('value');
-        
-        if (!snapshot.exists() || snapshot.val() === null) {
-          alert("No hay registros para exportar.");
-          return;
-        }
-
-        const registros = Object.values(snapshot.val()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        let cuerpo = "🆕 *NUEVOS CAZADORES REGISTRADOS*\n\n";
-        cuerpo += "ID | Nombre | Teléfono | Zona | Modo | Fecha\n";
-        cuerpo += "-".repeat(60) + "\n";
-
-        registros.slice(0, 100).forEach(r => {
-          const fecha = r.timestamp ? new Date(r.timestamp).toLocaleString('es-AR') : 'Sin fecha';
-          const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
-          cuerpo += `${r.hunterId || '—'} | ${r.nombre || '—'} | ${r.telefono || '—'} | ${r.zona || '—'} | ${modo} | ${fecha}\n`;
-        });
-
-        cuerpo += "\n— Fin del reporte —\nCodigo Ebel · Cacería Urbana GBA";
-
-        const destinatario ="admin@codigoebel.com";
-        const asunto = "🆕 Codigo Ebel - Reporte de nuevos cazadores";
-        const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-
-        window.location.href = mailtoUrl;
-      } catch (error) {
-        console.error("Error al exportar:", error);
-        alert("Error al exportar registros. Intenta nuevamente.");
-      }
-    }
-
-    // === BORRAR REGISTROS ===
-async function borrarRegistros() {
-  if (!confirm("¿Estás seguro de que deseas borrar todos los registros? Esta acción no se puede deshacer.")) {
-    return;
   }
 
-  try {
-    // Borrar todos los jugadores en la ruta correcta
-    await db.ref('jugadores').set(null);
-    loadRegistros();
-    alert("✅ Registros borrados.");
-  } catch (error) {
-    console.error("Error al borrar registros:", error);
-    alert("Error al borrar registros. Intenta nuevamente.");
-  }
-}
-    // === EVENTOS ===
-    document.getElementById('adminPass').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') login();
-    });
+  // === EVENTOS ===
+  document.getElementById('adminPass').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') login();
+  });
 
-    document.getElementById('adminEmail').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') login();
-    });
+  document.getElementById('adminEmail').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') login();
+  });
 
-    // === SESIÓN PERSISTENTE ===
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        // Verificar rol
-        const userRef = db.ref(`usuarios/${user.uid}`);
-        userRef.once('value').then((snapshot) => {
-          if (snapshot.exists()) {
-            const userData = snapshot.val();
-            if (userData.rol === 'admin' && userData.activo) {
-              document.getElementById('loginSection').style.display = 'none';
-              document.getElementById('adminSection').style.display = 'block';
-              loadRegistros();
-            }
+  // === SESIÓN PERSISTENTE ===
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      const userRef = db.ref(`usuarios/${user.uid}`);
+      userRef.once('value').then((snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          if (userData.rol === 'admin' && userData.activo) {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'block';
+            loadRegistros();
           }
-        });
-      }
-    });
-  </script>
+        }
+      });
+    }
+  });
+</script>
 </body>
 </html>
