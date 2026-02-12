@@ -186,34 +186,59 @@
     }
 
     // === CARGAR REGISTROS ===
-    async function loadRegistros() {
-      const tableDiv = document.getElementById('registrosTable');
-      tableDiv.innerHTML = '<p>Cargando registros...</p>';
+async function loadRegistros() {
+  const tableDiv = document.getElementById('registrosTable');
+  tableDiv.innerHTML = '<p>Cargando registros...</p>';
 
-      try {
-        // Obtener registros recientes de Realtime Database
-        const snapshot = await db.ref('registros_nuevos').once('value');
-        
-        if (!snapshot.exists() || snapshot.val() === null) {
-          tableDiv.innerHTML = '<p class="empty">No hay registros nuevos.</p>';
-          return;
-        }
+  try {
+    // Obtener jugadores reales
+    const snapshot = await db.ref('jugadores').once('value');
+    
+    if (!snapshot.exists() || snapshot.val() === null) {
+      tableDiv.innerHTML = '<p class="empty">No hay registros.</p>';
+      return;
+    }
 
-        const registros = snapshot.val();
-        let html = `
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Zona</th>
-                <th>Modo</th>
-                <th>Fecha</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
+    const registros = snapshot.val();
+    let html = `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Teléfono</th>
+            <th>Zona</th>
+            <th>Modo</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    // Convertir objeto a array y ordenar por fecha
+    const registrosArray = Object.values(registros).sort((a, b) => (b.fecha_registro || 0) - (a.fecha_registro || 0));
+    
+    registrosArray.slice(0, 50).forEach(r => {
+      const fecha = r.fecha_registro ? new Date(r.fecha_registro).toLocaleString('es-AR') : 'Sin fecha';
+      const modo = r.modo === 'equipo' ? `Equipo (${r.equipo || 'nuevo'})` : 'Individual';
+      
+      html += `
+        <tr>
+          <td>${r.hunterId || '—'}</td>
+          <td>${r.telefono || '—'}</td>
+          <td>${r.zona || '—'}</td>
+          <td>${modo}</td>
+          <td>${fecha}</td>
+        </tr>
+      `;
+    });
+
+    html += `</tbody></table>`;
+    tableDiv.innerHTML = html;
+  } catch (error) {
+    console.error("Error al cargar registros:", error);
+    tableDiv.innerHTML = '<p class="empty">Error al cargar registros. Verifica la conexión.</p>';
+  }
+}
 
         // Convertir objeto a array y ordenar por timestamp
         const registrosArray = Object.values(registros).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
