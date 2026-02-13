@@ -19,6 +19,7 @@
       --success: #4caf50;
       --warning: #ff9800;
       --danger: #f44336;
+      --active: #4fc3f7;
     }
     
     * {
@@ -35,7 +36,7 @@
     }
     
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
     
@@ -46,21 +47,50 @@
       margin-bottom: 2rem;
     }
     
+   .logo-container {
+  margin-bottom: 1rem;
+}
+
+.logo {
+  max-width: 200px;
+  max-height: 80px;
+  height: auto;
+  width: auto;
+  /* Filtro eliminado - tu logo se verá en sus colores originales */
+}
+    
     h1 {
       color: var(--border-color);
-      font-size: 2rem;
+      font-size: 1.8rem;
       margin-bottom: 0.5rem;
     }
     
     .dashboard {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+      .dashboard {
+        grid-template-columns: 1fr 1fr;
+      }
     }
     
     @media (max-width: 768px) {
       .dashboard {
         grid-template-columns: 1fr;
+      }
+      
+     @media (max-width: 768px) {
+  .logo {
+    max-width: 150px;
+    max-height: 60px;
+    /* Sin filtro */
+  }
+}
+      h1 {
+        font-size: 1.5rem;
       }
     }
     
@@ -75,9 +105,10 @@
       color: var(--border-color);
       margin-bottom: 1.5rem;
       text-align: center;
+      font-size: 1.3rem;
     }
     
-    .mission-card {
+    .mission-card, .player-card {
       background: rgba(20, 20, 30, 0.8);
       border: 1px solid #333;
       border-radius: 8px;
@@ -85,19 +116,19 @@
       margin-bottom: 1rem;
     }
     
-    .mission-header {
+    .mission-header, .player-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 0.5rem;
     }
     
-    .mission-id {
+    .mission-id, .player-id {
       font-weight: bold;
       color: var(--border-color);
     }
     
-    .mission-status {
+    .mission-status, .player-status {
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 0.85rem;
@@ -106,8 +137,9 @@
     .status-pending { background: var(--warning); color: black; }
     .status-approved { background: var(--success); color: white; }
     .status-rejected { background: var(--danger); color: white; }
+    .status-active { background: var(--active); color: black; }
     
-    .mission-actions {
+    .mission-actions, .player-actions {
       display: flex;
       gap: 0.5rem;
       margin-top: 1rem;
@@ -120,6 +152,7 @@
       cursor: pointer;
       font-weight: bold;
       transition: all 0.2s ease;
+      font-size: 0.9rem;
     }
     
     .btn-whatsapp {
@@ -140,6 +173,11 @@
     .btn-reject {
       background: var(--danger);
       color: white;
+    }
+    
+    .btn-select {
+      background: var(--active);
+      color: black;
     }
     
     button:hover {
@@ -193,17 +231,33 @@
       text-align: center;
       padding: 2rem;
     }
+    
+    .player-info {
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>👁️‍🗨️ Panel del Vigilante · Code Ebel</h1>
+      <div class="logo-container">
+        <img src="code_ebel3.webp" alt="Code Ebel" class="logo" onerror="this.src='code_ebel3.png'; this.onerror=null;">
+      </div>
+      <h1>👁️‍🗨️ Panel del Vigilante · Codigo Ebel</h1>
       <p>Supervisa, verifica y aprueba misiones en tiempo real</p>
     </header>
     
     <div class="dashboard">
-      <!-- Panel izquierdo: Misiones disponibles y asignadas -->
+      <!-- Panel izquierdo: Jugadores activos -->
+      <div class="panel">
+        <h2>👥 Jugadores Activos</h2>
+        <div id="activePlayers">
+          <p>Cargando jugadores...</p>
+        </div>
+      </div>
+      
+      <!-- Panel central: Misiones disponibles y asignadas -->
       <div class="panel">
         <h2>📋 Misiones Disponibles</h2>
         <div id="availableMissions">
@@ -277,6 +331,7 @@
     </div>
   </div>
 
+  <!-- RESTO DEL CÓDIGO JAVASCRIPT IGUAL (sin cambios) -->
   <script>
     // ========== FIREBASE ==========
     const firebaseConfig = {
@@ -308,10 +363,71 @@
           auth.signOut();
           return;
         }
+        loadActivePlayers();
         loadAvailableMissions();
         loadAssignedMissions();
       });
     });
+
+    // === CARGAR JUGADORES ACTIVOS ===
+    function loadActivePlayers() {
+      const playersDiv = document.getElementById('activePlayers');
+      playersDiv.innerHTML = '<p>Cargando jugadores...</p>';
+      
+      // Obtener jugadores activos (última actividad en las últimas 2 horas)
+      const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
+      
+      db.ref('jugadores').orderByChild('fecha_registro').startAt(twoHoursAgo).once('value')
+        .then((snapshot) => {
+          if (!snapshot.exists()) {
+            playersDiv.innerHTML = '<p class="empty">No hay jugadores activos.</p>';
+            return;
+          }
+          
+          let html = '';
+          const players = snapshot.val();
+          Object.values(players).forEach(player => {
+            const lastActivity = player.fecha_registro ? new Date(player.fecha_registro).toLocaleString('es-AR') : 'Sin actividad';
+            const modo = player.modo === 'equipo' ? `Equipo (${player.equipo || 'nuevo'})` : 'Individual';
+            
+            html += `
+              <div class="player-card">
+                <div class="player-header">
+                  <span class="player-id">${player.hunterId}</span>
+                  <span class="player-status status-active">Activo</span>
+                </div>
+                <div class="player-info">
+                  <strong>Teléfono:</strong> ${player.telefono || '—'}<br>
+                  <strong>Zona:</strong> ${player.zona || '—'}<br>
+                  <strong>Modo:</strong> ${modo}<br>
+                  <strong>Última actividad:</strong> ${lastActivity}
+                </div>
+                <div class="player-actions">
+                  <button class="btn-select" onclick="selectPlayer('${player.hunterId}', '${player.zona}')">
+                    🎯 Seleccionar
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+          
+          playersDiv.innerHTML = html;
+        })
+        .catch(error => {
+          console.error('Error al cargar jugadores:', error);
+          playersDiv.innerHTML = '<p class="empty">Error al cargar jugadores.</p>';
+        });
+    }
+
+    // === SELECCIONAR JUGADOR ===
+    function selectPlayer(hunterId, zona) {
+      document.getElementById('hunterIdAssign').value = hunterId;
+      // Establecer la zona automáticamente
+      document.getElementById('zoneAssign').value = zona;
+      
+      // Scroll to assignment panel
+      document.querySelector('.panel:last-child').scrollIntoView({ behavior: 'smooth' });
+    }
 
     // === CARGAR MISIONES DISPONIBLES ===
     function loadAvailableMissions() {
@@ -595,6 +711,16 @@
 
     // === ACTUALIZACIÓN EN TIEMPO REAL ===
     function setupRealtimeUpdates() {
+      // Escuchar nuevos jugadores
+      db.ref('jugadores').on('child_added', (snapshot) => {
+        loadActivePlayers();
+      });
+      
+      // Escuchar cambios en jugadores
+      db.ref('jugadores').on('child_changed', (snapshot) => {
+        loadActivePlayers();
+      });
+      
       // Escuchar nuevas misiones asignadas
       db.ref('misiones_asignadas').on('child_added', (snapshot) => {
         loadAssignedMissions();
