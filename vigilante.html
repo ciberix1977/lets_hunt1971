@@ -305,7 +305,7 @@
           <img src="code_ebel3.webp" alt="Code Ebel" class="logo" onerror="this.src='code_ebel3.png'; this.onerror=null;">
         </div>
         <h1>👁️‍🗨️ Panel del Vigilante · Code Ebel</h1>
-        <p>Supervisa, verifica y aprueba misiones en tiempo real</p>
+        <p>Supervisa, verifica y aprueba desafíos en tiempo real</p>
       </header>
       
       <div class="dashboard">
@@ -317,22 +317,22 @@
           </div>
         </div>
         
-        <!-- Panel central: Misiones disponibles y asignadas -->
+        <!-- Panel central: Desafíos disponibles y asignados -->
         <div class="panel">
-          <h2>📋 Misiones Disponibles</h2>
+          <h2>📋 Desafíos Disponibles</h2>
           <div id="availableMissions">
-            <p>Cargando misiones...</p>
+            <p>Cargando desafíos...</p>
           </div>
           
-          <h2 style="margin-top: 2rem;">🎯 Misiones Asignadas</h2>
+          <h2 style="margin-top: 2rem;">🎯 Desafíos Asignados</h2>
           <div id="assignedMissions">
-            <p>No hay misiones asignadas.</p>
+            <p>No hay desafíos asignados.</p>
           </div>
         </div>
         
         <!-- Panel derecho: Asignación y verificación -->
         <div class="panel">
-          <h2>📤 Asignar Misión</h2>
+          <h2>📤 Asignar Desafío</h2>
           
           <div class="input-group">
             <label for="hunterIdAssign">ID del Cazador:</label>
@@ -340,9 +340,9 @@
           </div>
           
           <div class="input-group">
-            <label for="missionSelect">Seleccionar Misión:</label>
+            <label for="missionSelect">Seleccionar Desafío:</label>
             <select id="missionSelect">
-              <option value="">Cargando misiones...</option>
+              <option value="">Cargando desafíos...</option>
             </select>
           </div>
           
@@ -357,7 +357,7 @@
           </div>
           
           <button class="btn-assign" onclick="asignarMision()">
-            📤 Asignar Misión al Cazador
+            📤 Asignar Desafío al Cazador
           </button>
           
           <div class="verification-section">
@@ -369,8 +369,8 @@
             </div>
             
             <div class="input-group">
-              <label for="missionType">Tipo de Misión:</label>
-              <input type="text" id="missionType" placeholder="Selecciona una misión primero" readonly>
+              <label for="missionType">Tipo de Desafío:</label>
+              <input type="text" id="missionType" placeholder="Selecciona un desafío primero" readonly>
             </div>
             
             <button class="btn-whatsapp" onclick="solicitarConsentimiento()">
@@ -382,8 +382,8 @@
               <p><span class="live-indicator"></span> Esperando respuesta del cazador...</p>
               
               <div class="mission-actions">
-                <button class="btn-approve" onclick="aprobarMision()">✅ Aprobar Misión</button>
-                <button class="btn-reject" onclick="rechazarMision()">❌ Rechazar Misión</button>
+                <button class="btn-approve" onclick="aprobarMision()">✅ Aprobar Desafío</button>
+                <button class="btn-reject" onclick="rechazarMision()">❌ Rechazar Desafío</button>
               </div>
             </div>
           </div>
@@ -392,7 +392,6 @@
     </div>
   </div>
 
-  <!-- SCRIPT COMPLETO (igual que antes, pero con función login actualizada) -->
   <script>
     // ========== FIREBASE ==========
     const firebaseConfig = {
@@ -522,19 +521,19 @@
       document.querySelector('.panel:last-child').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // === CARGAR MISIONES DISPONIBLES ===
+    // === CARGAR DESAFÍOS DISPONIBLES ===
     function loadAvailableMissions() {
       const missionsDiv = document.getElementById('availableMissions');
       const select = document.getElementById('missionSelect');
       
-      missionsDiv.innerHTML = '<p>Cargando misiones...</p>';
-      select.innerHTML = '<option value="">Cargando misiones...</option>';
+      missionsDiv.innerHTML = '<p>Cargando desafíos...</p>';
+      select.innerHTML = '<option value="">Cargando desafíos...</option>';
       
       db.ref('misiones').once('value')
         .then((snapshot) => {
           if (!snapshot.exists()) {
-            missionsDiv.innerHTML = '<p class="empty">No hay misiones disponibles.</p>';
-            select.innerHTML = '<option value="">No hay misiones</option>';
+            missionsDiv.innerHTML = '<p class="empty">No hay desafíos disponibles.</p>';
+            select.innerHTML = '<option value="">No hay desafíos</option>';
             return;
           }
           
@@ -544,37 +543,43 @@
           
           Object.keys(missions).forEach(key => {
             const mission = missions[key];
+            // Usar los campos correctos de tus desafíos
+            const titulo = mission.titulo || 'Desafío sin título';
+            const descripcion = mission.descripcion || 'Sin descripción';
+            const duracion = mission.duracion || 'Sin duración';
+            const puntos = mission.puntos || 0;
+            
             html += `
               <div class="mission-card">
                 <div class="mission-header">
-                  <span class="mission-id">${mission.titulo}</span>
+                  <span class="mission-id">${titulo}</span>
                 </div>
-                <p>${mission.descripcion}</p>
-                <p><strong>Duración:</strong> ${mission.duracion} | <strong>Puntos:</strong> ${mission.puntos}</p>
+                <p>${descripcion}</p>
+                <p><strong>Duración:</strong> ${duracion} | <strong>Puntos:</strong> ${puntos}</p>
               </div>
             `;
-            options += `<option value="${key}">${mission.titulo}</option>`;
+            options += `<option value="${key}">${titulo}</option>`;
           });
           
           missionsDiv.innerHTML = html;
-          select.innerHTML = '<option value="">Selecciona una misión...</option>' + options;
+          select.innerHTML = '<option value="">Selecciona un desafío...</option>' + options;
         })
         .catch(error => {
-          console.error('Error al cargar misiones:', error);
-          missionsDiv.innerHTML = '<p class="empty">Error al cargar misiones.</p>';
+          console.error('Error al cargar desafíos:', error);
+          missionsDiv.innerHTML = '<p class="empty">Error al cargar desafíos.</p>';
           select.innerHTML = '<option value="">Error al cargar</option>';
         });
     }
 
-    // === CARGAR MISIONES ASIGNADAS ===
+    // === CARGAR DESAFÍOS ASIGNADOS ===
     function loadAssignedMissions() {
       const missionsDiv = document.getElementById('assignedMissions');
-      missionsDiv.innerHTML = '<p>Cargando misiones asignadas...</p>';
+      missionsDiv.innerHTML = '<p>Cargando desafíos asignados...</p>';
       
       db.ref('misiones_asignadas').orderByChild('timestamp').limitToLast(10).once('value')
         .then((snapshot) => {
           if (!snapshot.exists()) {
-            missionsDiv.innerHTML = '<p class="empty">No hay misiones asignadas.</p>';
+            missionsDiv.innerHTML = '<p class="empty">No hay desafíos asignados.</p>';
             return;
           }
           
@@ -583,8 +588,8 @@
           Object.values(missions).reverse().forEach(mission => {
             const statusClass = mission.status === 'approved' ? 'status-approved' : 
                               mission.status === 'rejected' ? 'status-rejected' : 'status-pending';
-            const statusText = mission.status === 'approved' ? 'Aprobada' : 
-                             mission.status === 'rejected' ? 'Rechazada' : 'Pendiente';
+            const statusText = mission.status === 'approved' ? 'Aprobado' : 
+                             mission.status === 'rejected' ? 'Rechazado' : 'Pendiente';
             
             html += `
               <div class="mission-card">
@@ -592,9 +597,9 @@
                   <span class="mission-id">${mission.hunterId}</span>
                   <span class="mission-status ${statusClass}">${statusText}</span>
                 </div>
-                <p><strong>Misión:</strong> ${mission.missionTitle}</p>
+                <p><strong>Desafío:</strong> ${mission.missionTitle}</p>
                 <p><strong>Zona:</strong> ${mission.zona}</p>
-                <p><strong>Asignada:</strong> ${new Date(mission.timestamp).toLocaleString('es-AR')}</p>
+                <p><strong>Asignado:</strong> ${new Date(mission.timestamp).toLocaleString('es-AR')}</p>
                 <div class="mission-actions">
                   <button class="btn-whatsapp" onclick="iniciarVerificacion('${mission.hunterId}', '${mission.missionTitle}')">
                     👁️ Verificar
@@ -606,12 +611,12 @@
           missionsDiv.innerHTML = html;
         })
         .catch(error => {
-          console.error('Error al cargar misiones asignadas:', error);
-          missionsDiv.innerHTML = '<p class="empty">Error al cargar misiones asignadas.</p>';
+          console.error('Error al cargar desafíos asignados:', error);
+          missionsDiv.innerHTML = '<p class="empty">Error al cargar desafíos asignados.</p>';
         });
     }
 
-    // === ASIGNAR MISIÓN ===
+    // === ASIGNAR DESAFÍO ===
     function asignarMision() {
       const hunterId = document.getElementById('hunterIdAssign').value.trim().toUpperCase();
       const missionKey = document.getElementById('missionSelect').value;
@@ -623,7 +628,7 @@
       }
       
       if (!missionKey) {
-        alert('⚠️ Selecciona una misión');
+        alert('⚠️ Selecciona un desafío');
         return;
       }
       
@@ -635,7 +640,7 @@
       db.ref(`misiones/${missionKey}`).once('value')
         .then((snapshot) => {
           if (!snapshot.exists()) {
-            alert('❌ Misión no encontrada');
+            alert('❌ Desafío no encontrado');
             return;
           }
           
@@ -644,8 +649,8 @@
           const assignmentData = {
             hunterId: hunterId,
             missionKey: missionKey,
-            missionTitle: missionData.titulo,
-            missionDescription: missionData.descripcion,
+            missionTitle: missionData.titulo || 'Desafío sin título',
+            missionDescription: missionData.descripcion || 'Sin descripción',
             zona: zona,
             status: 'pending',
             assigned_by: auth.currentUser.uid,
@@ -654,14 +659,14 @@
           
           db.ref(`misiones_asignadas/${assignmentKey}`).set(assignmentData)
             .then(() => {
-              alert(`✅ Misión "${missionData.titulo}" asignada a ${hunterId}`);
+              alert(`✅ Desafío "${missionData.titulo || 'Sin título'}" asignado a ${hunterId}`);
               loadAssignedMissions();
               document.getElementById('hunterIdAssign').value = '';
               document.getElementById('missionSelect').selectedIndex = 0;
             })
             .catch(error => {
-              console.error('Error al asignar misión:', error);
-              alert('❌ Error al asignar misión');
+              console.error('Error al asignar desafío:', error);
+              alert('❌ Error al asignar desafío');
             });
         });
     }
@@ -684,21 +689,21 @@
       }
       
       if (!missionType) {
-        alert('⚠️ Selecciona una misión primero');
+        alert('⚠️ Selecciona un desafío primero');
         return;
       }
       
       const numeroSoporte = "1125082484";
       const mensaje = encodeURIComponent(
         `👁️‍🗨️ *EL VIGILANTE OSCURO*\n\n` +
-        `Cazador ${hunterId}, has sido seleccionado para una misión exclusiva:\n\n` +
+        `Cazador ${hunterId}, has sido seleccionado para un desafío exclusivo:\n\n` +
         `"${missionType}"\n\n` +
         `Para verificar tu cumplimiento en tiempo real, necesito realizar una videollamada de supervisión.\n\n` +
         `✅ *¿AUTORIZAS la videollamada de verificación?*\n\n` +
         `Responde:\n` +
         `- *SÍ* para autorizar\n` +
-        `- *NO* para cancelar la misión\n\n` +
-        `⚠️ Esta verificación es obligatoria para completar la misión y recibir tu recompensa.`
+        `- *NO* para cancelar el desafío\n\n` +
+        `⚠️ Esta verificación es obligatoria para completar el desafío y recibir tu recompensa.`
       );
       
       window.open(`https://wa.me/54${numeroSoporte}?text=${mensaje}`, '_blank');
@@ -713,7 +718,7 @@
       });
     }
 
-    // === APROBAR MISIÓN ===
+    // === APROBAR DESAFÍO ===
     function aprobarMision() {
       const hunterId = document.getElementById('hunterIdVerify').value.trim().toUpperCase();
       
@@ -722,11 +727,11 @@
         return;
       }
       
-      if (confirm(`¿Estás seguro de aprobar la misión de ${hunterId}?`)) {
+      if (confirm(`¿Estás seguro de aprobar el desafío de ${hunterId}?`)) {
         db.ref('misiones_asignadas').orderByChild('hunterId').equalTo(hunterId).once('value')
           .then((snapshot) => {
             if (!snapshot.exists()) {
-              alert('❌ Misión no encontrada');
+              alert('❌ Desafío no encontrado');
               return;
             }
             
@@ -739,18 +744,18 @@
               approved_at: Date.now()
             })
             .then(() => {
-              alert(`✅ Misión de ${hunterId} aprobada exitosamente`);
+              alert(`✅ Desafío de ${hunterId} aprobado exitosamente`);
               loadAssignedMissions();
             })
             .catch(error => {
-              console.error('Error al aprobar misión:', error);
-              alert('❌ Error al aprobar misión');
+              console.error('Error al aprobar desafío:', error);
+              alert('❌ Error al aprobar desafío');
             });
           });
       }
     }
 
-    // === RECHAZAR MISIÓN ===
+    // === RECHAZAR DESAFÍO ===
     function rechazarMision() {
       const hunterId = document.getElementById('hunterIdVerify').value.trim().toUpperCase();
       
@@ -759,12 +764,12 @@
         return;
       }
       
-      const reason = prompt(`¿Por qué rechazas la misión de ${hunterId}?`);
+      const reason = prompt(`¿Por qué rechazas el desafío de ${hunterId}?`);
       if (reason) {
         db.ref('misiones_asignadas').orderByChild('hunterId').equalTo(hunterId).once('value')
           .then((snapshot) => {
             if (!snapshot.exists()) {
-              alert('❌ Misión no encontrada');
+              alert('❌ Desafío no encontrado');
               return;
             }
             
@@ -778,12 +783,12 @@
               rejected_at: Date.now()
             })
             .then(() => {
-              alert(`❌ Misión de ${hunterId} rechazada`);
+              alert(`❌ Desafío de ${hunterId} rechazado`);
               loadAssignedMissions();
             })
             .catch(error => {
-              console.error('Error al rechazar misión:', error);
-              alert('❌ Error al rechazar misión');
+              console.error('Error al rechazar desafío:', error);
+              alert('❌ Error al rechazar desafío');
             });
           });
       }

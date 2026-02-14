@@ -35,6 +35,37 @@
       Tu número de WhatsApp será tu identidad única en Codigo Ebel.
     </p>
 
+    <!-- Antes del botón de registro -->
+<div class="consent-section" style="margin:1.5rem 0; padding:1.5rem; background:#1a1a2e; border-radius:8px;">
+  <h3>👁️‍🗨️ Términos del Vigilante Oscuro</h3>
+  
+  <div style="margin:1rem 0;">
+    <input type="checkbox" id="whatsappConsent" required>
+    <label for="whatsappConsent" style="margin-left:10px;">
+      <strong>Acepto ser contactado por WhatsApp</strong> (+54 11 2508-2484) para recibir misiones exclusivas del Vigilante Oscuro.
+    </label>
+  </div>
+  
+  <div style="margin:1rem 0;">
+    <input type="checkbox" id="videoConsent" required>
+    <label for="videoConsent" style="margin-left:10px;">
+      <strong>Acepto participar en videollamadas de verificación</strong> durante las misiones, con consentimiento previo en cada ocasión.
+    </label>
+  </div>
+  
+  <div style="margin:1rem 0; font-size:0.9rem; color:#999;">
+    <p>⚠️ <strong>Importante:</strong> No todos los registrados reciben misiones. El Vigilante Oscuro selecciona cazadores específicos basado en su perfil y disponibilidad.</p>
+    <p>🔒 Tus datos están protegidos y puedes cancelar tu participación en cualquier momento respondiendo "SALIR" en WhatsApp.</p>
+  </div>
+</div>
+
+<style>
+.consent-section input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-right: 8px;
+}
+</style>
+
     <form id="registroForm">
       <div class="form-group">
         <label for="telefono">📱 Número de WhatsApp (10 dígitos) *</label>
