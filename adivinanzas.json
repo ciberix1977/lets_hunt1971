@@ -1,0 +1,304 @@
+{
+  "adivinanzas": {
+    "adivinanza_01": {
+      "pista": "Soy alto cuando soy joven, y bajo cuando soy viejo. ¿Qué soy?",
+      "respuesta_hash": "dW5hIHZlbGE",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_02": {
+      "pista": "Tengo ciudades, pero no casas; montañas, pero no árboles; agua, pero no peces. ¿Qué soy?",
+      "respuesta_hash": "dW4gbWFwYQ",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_03": {
+      "pista": "Avanzo y nunca vuelvo atrás. Nadie me ve, pero todos me oyen. ¿Qué soy?",
+      "respuesta_hash": "ZWwgdGllbXBv",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_04": {
+      "pista": "Si me nombras, ya no existo. ¿Qué soy?",
+      "respuesta_hash": "ZWwgc2lsZW5jaW8",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_05": {
+      "pista": "Blanco por dentro, verde por fuera. Si quieres saber mi nombre, espera.",
+      "respuesta_hash": "bGEgcGVyYQ",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_06": {
+      "pista": "Sube llena y baja vacía. Si no se apresura, la sopa se enfría.",
+      "respuesta_hash": "bGEgY3VjaGFyYQ",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_07": {
+      "pista": "En el campo me crié, atada con eslabones, y aquel que llora por mí, es que me saca las tripas.",
+      "respuesta_hash": "bGEgY2Vib2xsYQ",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_08": {
+      "pista": "Por fuera da vueltas, por dentro no se mueve.",
+      "respuesta_hash": "ZWwgbW9saW5v",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_09": {
+      "pista": "Vuelo sin alas, lloro sin ojos. Donde hay luz, no estoy; donde hay sombra, me encuentro.",
+      "respuesta_hash": "bGEgc29tYnJh",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_10": {
+      "pista": "Cuanto más seco, más mojo. ¿Qué soy?",
+      "respuesta_hash": "dW4gdGFsbG9u",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_11": {
+      "pista": "Tiene hojas, pero no es árbol; tiene espinas, pero no es pez. ¿Qué es?",
+      "respuesta_hash": "dW4gbGlicm8",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_12": {
+      "pista": "Nace en el mar, muere en el río. Eso es lo que yo digo.",
+      "respuesta_hash": "bGEgbGFndW5h",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_13": {
+      "pista": "Doy vueltas y vueltas sin salir del lugar. ¿Qué soy?",
+      "respuesta_hash": "dW4gcmVsb2ogZGUg",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_14": {
+      "pista": "No soy pájaro, pero tengo alas; no soy hombre, pero tengo brazos.",
+      "respuesta_hash": "dW4gbW9saW5vIGRl",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_15": {
+      "pista": "Me rompen para usarme, me queman para salvarme. ¿Qué soy?",
+      "respuesta_hash": "dW5hIGFudG9yY2hh",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_16": {
+      "pista": "Corro sin tener patas, murmuro sin tener boca.",
+      "respuesta_hash": "dW4gcmlv",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_17": {
+      "pista": "Llevo siglos en pie, sin moverme jamás. Tengo agujas, pero no coso. ¿Qué soy?",
+      "respuesta_hash": "dW4gcGluYXI",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_18": {
+      "pista": "Tiene dientes y no come, tiene cabeza y no es hombre.",
+      "respuesta_hash": "dW5hIGNvbWJh",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_19": {
+      "pista": "Cuando estoy lleno, peso menos que cuando estoy vacío. ¿Qué soy?",
+      "respuesta_hash": "dW4gYmFsZG8gZGUg",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_20": {
+      "pista": "Entro duro, salgo blando, y si me quedo mucho tiempo, me derrito.",
+      "respuesta_hash": "dW4gaGlwbw",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_21": {
+      "pista": "Soy redondo como una taza, hondo como una olla, y todos los días me llenan de agua.",
+      "respuesta_hash": "dW4gcmVjaXBpZW50",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_22": {
+      "pista": "Tiene cuello, pero no cabeza; tiene brazos, pero no manos.",
+      "respuesta_hash": "dW5hIGNhbWlzYQ",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_23": {
+      "pista": "Soy blanco y frágil, escribo sin voz. Si me rompes, no podrás leerme.",
+      "respuesta_hash": "dW4gcGFwZWw",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_24": {
+      "pista": "Tengo ojos, pero no veo; agua, pero no bebo; carne, pero no como.",
+      "respuesta_hash": "dW5hIHBhcGEgeWEg",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_25": {
+      "pista": "Voy por el mundo entero, pero siempre en un rincón.",
+      "respuesta_hash": "dW4gc29icmU",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_26": {
+      "pista": "Tengo pies, pero no camino; tengo espalda, pero no soy persona.",
+      "respuesta_hash": "dW5hIHNpbGxh",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_27": {
+      "pista": "Soy pequeño, redondo y brillante. Todos me quieren, pero nadie me guarda.",
+      "respuesta_hash": "dW4gY2VudGF2bw",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_28": {
+      "pista": "Tengo llave, pero no cerrojo; espacio, pero no habitación.",
+      "respuesta_hash": "dW4gdGVjbGFkbw",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_29": {
+      "pista": "Soy negro cuando me compras, rojo cuando me usas, y gris cuando me tiras.",
+      "respuesta_hash": "dW4gY2FyYm9uY2ls",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_30": {
+      "pista": "Tengo anillos, pero no son de oro; cuento años, pero no soy reloj.",
+      "respuesta_hash": "dW4gcmVib2w",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_31": {
+      "pista": "Soy ligero como una pluma, pero el más fuerte no puede sostenerme mucho tiempo.",
+      "respuesta_hash": "ZWwgYWlyZQ",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_32": {
+      "pista": "Tengo raíces invisibles, soy más alta que los árboles, subo y subo, pero nunca crezco.",
+      "respuesta_hash": "dW5hIG1vbnRhbmE",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_33": {
+      "pista": "No tengo boca, pero hablo; no tengo oídos, pero escucho.",
+      "respuesta_hash": "dW5hIGNhcnRh",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_34": {
+      "pista": "Soy redondo, amarillo y dulce. Nací en una flor y terminé en tu mano.",
+      "respuesta_hash": "dW5hIG1hbnphbmE",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_35": {
+      "pista": "Tengo agujas, pero no coso; tengo números, pero no cuento.",
+      "respuesta_hash": "dW4gcmVsb2ogZGUg",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_36": {
+      "pista": "Soy frío en verano, caliente en invierno, y siempre estoy contigo.",
+      "respuesta_hash": "dW4gY2FmZSBjb24g",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_37": {
+      "pista": "Tengo puertas, pero no entro ni salgo; tengo ventanas, pero no veo.",
+      "respuesta_hash": "dW4gY29jaGU",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_38": {
+      "pista": "Soy redondo, plateado y sueno cuando me tocas.",
+      "respuesta_hash": "dW5hIG1vbmVkYQ",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_39": {
+      "pista": "Tengo plumas, pero no vuelo; tengo tinta, pero no escribo.",
+      "respuesta_hash": "dW5hIHBsdW1hIGRl",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_40": {
+      "pista": "Soy pequeño, útil y me guardas en el bolsillo. Abro puertas sin llave.",
+      "respuesta_hash": "dW5hIG1vbmVkYSBk",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_41": {
+      "pista": "Tengo botones, pero no abro nada; tengo pantalla, pero no soy tele.",
+      "respuesta_hash": "dW4gc21hcnRwaG9u",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_42": {
+      "pista": "Soy redondo, giro y te llevo lejos sin moverme.",
+      "respuesta_hash": "dW5hIHZlbnRhbmEg",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_43": {
+      "pista": "Tengo brújula, pero no navego; tengo mapa, pero no viajo.",
+      "respuesta_hash": "dW4gcGhvbmUgbW9i",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_44": {
+      "pista": "Soy invisible, pero te doy forma; te rodeo, pero no te toco.",
+      "respuesta_hash": "ZWwgdmlkcmlv",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_45": {
+      "pista": "Tengo letras, pero no palabras; tengo números, pero no matemáticas.",
+      "respuesta_hash": "dW5hIHRlY2xh",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_46": {
+      "pista": "Soy pequeño, brillante y te guío en la oscuridad.",
+      "respuesta_hash": "dW5hIGxhbXBhcml0",
+      "zona": "Avellaneda",
+      "activo": true
+    },
+    "adivinanza_47": {
+      "pista": "Tengo alas, pero no vuelo; tengo motor, pero no corro.",
+      "respuesta_hash": "dW4gYXV0b2J1cw",
+      "zona": "Lanús",
+      "activo": true
+    },
+    "adivinanza_48": {
+      "pista": "Soy redondo, suave y te abrazo en la noche.",
+      "respuesta_hash": "dW4gYWxtb2hhZG9u",
+      "zona": "Lomas de Zamora",
+      "activo": true
+    },
+    "adivinanza_49": {
+      "pista": "Tengo teclas, pero no música; tengo pantalla, pero no películas.",
+      "respuesta_hash": "dW4gb3JkZW5hZG9y",
+      "zona": "CABA",
+      "activo": true
+    },
+    "adivinanza_50": {
+      "pista": "Soy pequeño, útil y te conecto al mundo entero.",
+      "respuesta_hash": "dW4gd2lmaQ",
+      "zona": "Avellaneda",
+      "activo": true
+    }
+  }
+}

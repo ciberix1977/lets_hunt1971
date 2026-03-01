@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔍 Adivinanza Zonal · Code Ebel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0a12;
+      color: #e0e0e0;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #12121e;
+      padding: 30px;
+      border-radius: 16px;
+      border: 2px solid #4fc3f7;
+    }
+    h1 {
+      color: #4fc3f7;
+      margin-bottom: 20px;
+    }
+    .pista {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin: 20px 0;
+      color: #cbd5e1;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+      border: 2px solid #4fc3f7;
+      border-radius: 8px;
+      background: #1a1a2e;
+      color: white;
+      font-size: 1rem;
+    }
+    button {
+      background: #25d366;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .timer {
+      color: #ff6b6b;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>👁️‍🗨️ El Vigilante Oscuro</h1>
+    
+    <div class="pista" id="pistaTexto">
+      Cargando adivinanza...
+    </div>
+
+    <div class="timer" id="timer">⏳ Tiempo restante: --</div>
+
+    <input type="text" id="respuestaInput" placeholder="Escribe tu respuesta aquí..." maxlength="50" disabled>
+    <button id="submitBtn" onclick="verificarRespuesta()" disabled>✅ Enviar respuesta</button>
+    
+    <div id="mensaje"></div>
+  </div>
+
+  <script>
+    // ========== FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // ========== VARIABLES GLOBALES ==========
+    let currentAdivinanza = null;
+    let sessionToken = null;
+    let timeLeft = 90; // 90 segundos
+    let timerInterval = null;
+
+    // ========== FUNCIONES DE UTILIDAD ==========
+    function generarHash(respuesta) {
+      return btoa(respuesta.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim())
+        .replace(/=/g, "")
+        .substring(0, 16);
+    }
+
+    function generarToken() {
+      return Math.random().toString(36).substring(2, 15) + 
+             Math.random().toString(36).substring(2, 15);
+    }
+
+    // ========== CARGAR ADIVINANZA ALEATORIA ==========
+    async function cargarAdivinanzaAleatoria(zona) {
+      try {
+        const snapshot = await db.ref('adivinanzas').once('value');
+        if (!snapshot.exists()) {
+          document.getElementById('pistaTexto').innerHTML = "❌ No hay adivinanzas disponibles.";
+          return;
+        }
+        
+        const todasAdivinanzas = snapshot.val();
+        const adivinanzasZona = Object.entries(todasAdivinanzas)
+          .filter(([key, adiv]) => adiv.zona === zona && adiv.activo)
+          .map(([key, adiv]) => ({ id: key, ...adiv }));
+        
+        if (adivinanzasZona.length === 0) {
+          document.getElementById('pistaTexto').innerHTML = "❌ No hay adivinanzas en esta zona.";
+          return;
+        }
+        
+        // Seleccionar aleatoria
+        const randomIndex = Math.floor(Math.random() * adivinanzasZona.length);
+        currentAdivinanza = adivinanzasZona[randomIndex];
+        document.getElementById('pistaTexto').textContent = currentAdivinanza.pista;
+        
+        // Habilitar inputs
+        document.getElementById('respuestaInput').disabled = false;
+        document.getElementById('submitBtn').disabled = false;
+        
+      } catch (error) {
+        console.error("Error al cargar adivinanza:", error);
+        document.getElementById('pistaTexto').innerHTML = "⚠️ Error al cargar la adivinanza.";
+      }
+    }
+
+    // ========== INICIAR TEMPORIZADOR ==========
+    function iniciarTemporizador() {
+      document.getElementById('timer').textContent = `⏳ Tiempo restante: ${timeLeft}s`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `⏳ Tiempo restante: ${timeLeft}s`;
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          finalizarSesion('timeout');
+        }
+      }, 1000);
+    }
+
+    // ========== VERIFICAR RESPUESTA ==========
+    async function verificarRespuesta() {
+      const input = document.getElementById('respuestaInput');
+      const respuesta = input.value.trim();
+      const mensajeDiv = document.getElementById('mensaje');
+      
+      if (!respuesta) {
+        mensajeDiv.textContent = "⚠️ Escribe una respuesta primero.";
+        mensajeDiv.style.color = "#ff9800";
+        return;
+      }
+
+      if (!currentAdivinanza) {
+        mensajeDiv.textContent = "❌ No hay adivinanza cargada.";
+        mensajeDiv.style.color = "#f44336";
+        return;
+      }
+
+      const hashIngresado = generarHash(respuesta);
+      
+      try {
+        if (hashIngresado === currentAdivinanza.respuesta_hash) {
+          // ✅ Respuesta correcta
+          clearInterval(timerInterval);
+          await registrarRespuestaCorrecta(currentAdivinanza.id, respuesta);
+          mostrarExito(respuesta);
+        } else {
+          mensajeDiv.textContent = "❌ Incorrecto. ¡Inténtalo de nuevo!";
+          mensajeDiv.style.color = "#f44336";
+        }
+      } catch (error) {
+        console.error("Error al verificar:", error);
+        mensajeDiv.textContent = "⚠️ Error de conexión.";
+        mensajeDiv.style.color = "#f44336";
+      }
+    }
+
+    // ========== REGISTRAR RESPUESTA CORRECTA ==========
+    async function registrarRespuestaCorrecta(adivinanzaId, respuesta) {
+      const registro = {
+        adivinanza_id: adivinanzaId,
+        respuesta: respuesta.substring(0, 20),
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        session_token: sessionToken,
+        ip: "anonimo"
+      };
+      
+      const newRef = db.ref('registro_adivinanzas').push();
+      await newRef.set(registro);
+    }
+
+    // ========== MOSTRAR ÉXITO ==========
+    function mostrarExito(respuesta) {
+      document.getElementById('respuestaInput').disabled = true;
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('mensaje').innerHTML = `
+        ✅ ¡Correcto! Abriendo WhatsApp...
+        <br><br>
+        <button onclick="enviarWhatsApp('${respuesta}')" style="
+          background: #25d366; color: white; border: none;
+          padding: 10px 20px; border-radius: 6px; font-weight: bold;
+          margin-top: 10px;">
+          💬 Enviar por WhatsApp
+        </button>
+      `;
+    }
+
+    // ========== ENVIAR POR WHATSAPP ==========
+    function enviarWhatsApp(respuesta) {
+      const numeroVigilante = "1125082484";
+      const mensaje = encodeURIComponent(
+        `👁️‍🗨️ *ADIVINANZA RESUELTA*\n\n` +
+        `He resuelto la adivinanza:\n"${currentAdivinanza.pista}"\n\n` +
+        `Mi respuesta: *${respuesta}*\n\n` +
+        `¡Listo para el siguiente desafío!`
+      );
+      window.open(`https://wa.me/54${numeroVigilante}?text=${mensaje}`, '_blank');
+    }
+
+    // ========== FINALIZAR SESIÓN ==========
+    function finalizarSesion(motivo) {
+      document.getElementById('respuestaInput').disabled = true;
+      document.getElementById('submitBtn').disabled = true;
+      
+      const mensajes = {
+        timeout: "⏰ ¡Tiempo agotado! La adivinanza ha caducado.",
+        completed: "✅ Sesión completada."
+      };
+      
+      document.getElementById('mensaje').textContent = mensajes[motivo] || "Sesión finalizada.";
+      document.getElementById('mensaje').style.color = motivo === 'timeout' ? "#ff9800" : "#4caf50";
+    }
+
+    // ========== INICIAR APLICACIÓN ==========
+    async function initApp() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const zona = urlParams.get('zona') || 'CABA';
+      
+      // Generar token de sesión único
+      sessionToken = generarToken();
+      
+      // Cargar adivinanza
+      await cargarAdivinanzaAleatoria(zona);
+      
+      // Iniciar temporizador
+      iniciarTemporizador();
+    }
+
+    // Iniciar
+    window.addEventListener('load', initApp);
+  </script>
+</body>
+</html>

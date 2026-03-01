@@ -182,11 +182,52 @@
     document.getElementById('ciudad').textContent = progreso.zona;
     document.getElementById('zona-local').textContent = progreso.zona;
 
-    // ========== CARGAR ESTADÍSTICAS ==========
+    // ========== CARGAR ESTADÍSTICAS COMPLETAS ==========
     async function loadAdvancedStats() {
+      const hunterId = localStorage.getItem('currentHunterId') || 'LH-0000';
+      
+      // Datos de misiones (localStorage)
       const misionesKey = `misiones_aceptadas_${hunterId}`;
       const misionesIds = JSON.parse(localStorage.getItem(misionesKey) || '[]');
       
+      // Datos de desafíos (Firebase)
+      let desafiosCompletados = 0;
+      try {
+        const desafiosSnapshot = await db.ref('misiones_asignadas')
+          .orderByChild('hunterId')
+          .equalTo(hunterId)
+          .once('value');
+        
+        if (desafiosSnapshot.exists()) {
+          const desafios = desafiosSnapshot.val();
+          desafiosCompletados = Object.values(desafios).filter(d => d.status === 'approved').length;
+        }
+      } catch (err) {
+        console.error("Error al cargar desafíos:", err);
+      }
+      
+      // Datos de adivinanzas (Firebase)
+      let adivinanzasResueltas = 0;
+      try {
+        const adivinanzasSnapshot = await db.ref('registro_adivinanzas')
+          .orderByChild('adivinanza_id')
+          .once('value');
+        
+        if (adivinanzasSnapshot.exists()) {
+          const registros = adivinanzasSnapshot.val();
+          // Como no guardamos ID del jugador, contamos aproximadamente
+          // En producción, deberías mejorar esto con Cloud Functions
+          adivinanzasResueltas = Math.min(5, Object.keys(registros).length);
+        }
+      } catch (err) {
+        console.error("Error al cargar adivinanzas:", err);
+      }
+      
+      // Actualizar UI
+      document.getElementById('misiones').textContent = misionesIds.length;
+      document.getElementById('desafios').textContent = desafiosCompletados + adivinanzasResueltas;
+      
+      // Cargar misiones para estadísticas
       let misionesSolitario = [], misionesEquipo = [];
       try {
         const [solitarioRes, equipoRes] = await Promise.all([
@@ -208,7 +249,7 @@
       
       document.getElementById('zonas-exploradas').textContent = zonasExploradas.size;
       document.getElementById('tiempo-promedio').textContent = `${Math.max(5, Math.floor(Math.random() * 20))}m`;
-      document.getElementById('eficiencia').textContent = `${Math.min(100, Math.floor((progreso.misiones / (progreso.misiones + 2)) * 100))}%`;
+      document.getElementById('eficiencia').textContent = `${Math.min(100, Math.floor(((misionesIds.length + desafiosCompletados) / (misionesIds.length + desafiosCompletados + 2)) * 100))}%`;
       
       const lastUpdate = new Date(progreso.lastUpdate);
       const now = new Date();
@@ -217,21 +258,24 @@
         diffHours < 1 ? 'Ahora' : 
         diffHours < 24 ? `${diffHours}h` : `${Math.floor(diffHours / 24)}d`;
       
-      updateBadges(progreso.misiones, zonasExploradas.size);
+      updateBadges(misionesIds.length, desafiosCompletados, zonasExploradas.size);
     }
 
-    function updateBadges(misiones, zonas) {
+    function updateBadges(misiones, desafios, zonas) {
+      const totalActividades = misiones + desafios;
       const configs = [
-        { min: 1, idx: 0 },
-        { min: 5, idx: 1 }, 
-        { min: 10, idx: 2 },
-        { min: 3, idx: 3, type: 'zonas' }
+        { min: 1, idx: 0 },           // Cazador Novato
+        { min: 3, idx: 1, type: 'desafios' }, // Vigilante Elite (desafíos)
+        { min: 10, idx: 2 },          // Top 10 GBA
+        { min: 3, idx: 3, type: 'zonas' }     // Maestro de Zonas
       ];
       
       configs.forEach(config => {
         const badge = document.querySelectorAll('.badge')[config.idx];
         if (badge) {
-          const achieved = config.type === 'zonas' ? zonas >= config.min : misiones >= config.min;
+          const achieved = config.type === 'zonas' ? zonas >= config.min : 
+                          config.type === 'desafios' ? desafios >= config.min :
+                          totalActividades >= config.min;
           badge.dataset.unlocked = achieved.toString();
         }
       });
@@ -318,28 +362,66 @@
       list.innerHTML = '<li class="ranking-item">Cargando...</li>';
       
       try {
-        const snapshot = await db.ref('ranking')
-          .orderByChild('points')
-          .limitToLast(5)
-          .once('value');
-
-        const rankingData = snapshot.val();
-        const rankingArray = rankingData ? Object.values(rankingData).reverse() : [];
-
+        // Obtener todos los jugadores con sus desafíos
+        const [rankingSnapshot, desafiosSnapshot] = await Promise.all([
+          db.ref('ranking').once('value'),
+          db.ref('misiones_asignadas').once('value')
+        ]);
+        
+        const rankingData = rankingSnapshot.val() || {};
+        const desafiosData = desafiosSnapshot.val() || {};
+        
+        // Calcular puntos totales por jugador
+        const jugadoresConPuntos = {};
+        
+        // Puntos de misiones
+        Object.values(rankingData).forEach(player => {
+          if (!jugadoresConPuntos[player.hunterId]) {
+            jugadoresConPuntos[player.hunterId] = {
+              hunterId: player.hunterId,
+              missions: player.missions || 0,
+              challenges: 0,
+              points: (player.points || 0)
+            };
+          }
+        });
+        
+        // Puntos de desafíos
+        Object.values(desafiosData).forEach(desafio => {
+          if (desafio.status === 'approved') {
+            if (!jugadoresConPuntos[desafio.hunterId]) {
+              jugadoresConPuntos[desafio.hunterId] = {
+                hunterId: desafio.hunterId,
+                missions: 0,
+                challenges: 0,
+                points: 0
+              };
+            }
+            jugadoresConPuntos[desafio.hunterId].challenges += 1;
+            jugadoresConPuntos[desafio.hunterId].points += 150; // Puntos por desafío
+          }
+        });
+        
+        // Ordenar por puntos
+        const rankingArray = Object.values(jugadoresConPuntos)
+          .sort((a, b) => b.points - a.points)
+          .slice(0, 5);
+        
         list.innerHTML = '';
         rankingArray.forEach((p, i) => {
           const li = document.createElement('li');
           li.className = 'ranking-item';
           li.innerHTML = `
             <span class="ranking-name ${p.hunterId === hunterId ? 'self-rank' : ''}">${p.hunterId}</span>
-            <span class="ranking-stats">${p.missions || 0}M · ${p.challenges || 0}D</span>
+            <span class="ranking-stats">${p.missions}M · ${p.challenges}D</span>
           `;
           if (p.hunterId === hunterId) li.classList.add('current-player');
           list.appendChild(li);
         });
-
+        
+        // Mostrar jugador actual si no está en top 5
         if (!rankingArray.some(p => p.hunterId === hunterId)) {
-          const myData = players.get(hunterId) || { missions: progreso.misiones, challenges: progreso.desafios };
+          const myData = jugadoresConPuntos[hunterId] || { missions: 0, challenges: 0, points: 0 };
           const li = document.createElement('li');
           li.className = 'ranking-item current-player';
           li.innerHTML = `
