@@ -401,42 +401,36 @@ return true; // Fallback seguro
 
 // ✅ FUNCIÓN ACTUALIZADA CON TRANSACCIÓN ATÓMICA
 async function completarMision(misionId, zona, hunterId) {
-  try {
-    const misionRef = db.ref(`misiones/${misionId}-${zona}`);
-    
-    // Usar transacción atómica de Firebase
-    const transactionResult = await misionRef.transaction((currentData) => {
-      // Si no existe → somos los primeros
-      if (currentData === null) {
-        return {
-          estado: 'completada',
-          hunter_ganador: hunterId,
-          timestamp: firebase.database.ServerValue.TIMESTAMP
-        };
-      }
-      
-      // Si ya está completada → no modificar
-      if (currentData.estado === 'completada') {
-        return; // Devuelve undefined = no cambios
-      }
-      
-      // Caso imprevisto → mantener estado actual
-      return currentData;
-    });
-    
-    // Verificar si fuimos los ganadores
-    if (transactionResult.committed && 
-        transactionResult.snapshot.val()?.hunter_ganador === hunterId) {
-      return true; // Éxito - somos los primeros
-    }
-    
-    return false; // Alguien más llegó primero o hubo error
-    
-  } catch (err) {
-    console.error("Error en transacción atómica:", err);
-    // En caso de error, asumir que falló (seguro para el jugador)
-    return false;
-  }
+try {
+const misionRef = db.ref(`misiones/${misionId}-${zona}`);
+// Usar transacción atómica de Firebase
+const transactionResult = await misionRef.transaction((currentData) => {
+// Si no existe → somos los primeros
+if (currentData === null) {
+return {
+estado: 'completada',
+hunter_ganador: hunterId,
+timestamp: firebase.database.ServerValue.TIMESTAMP
+};
+}
+// Si ya está completada → no modificar
+if (currentData.estado === 'completada') {
+return; // Devuelve undefined = no cambios
+}
+// Caso imprevisto → mantener estado actual
+return currentData;
+});
+// Verificar si fuimos los ganadores
+if (transactionResult.committed &&
+transactionResult.snapshot.val()?.hunter_ganador === hunterId) {
+return true; // Éxito - somos los primeros
+}
+return false; // Alguien más llegó primero o hubo error
+} catch (err) {
+console.error("Error en transacción atómica:", err);
+// En caso de error, asumir que falló (seguro para el jugador)
+return false;
+}
 }
 
 // Función para ocultar todas las fases
@@ -826,161 +820,73 @@ timeLeft--;
 // ========== ESCÁNER QR ==========
 let scannerActive = false;
 let stream = null;
+
+// ✅ FUNCIÓN ACTUALIZADA: Detecta URLs y redirige a qr-zona.html
 async function openQRScanner() {
-let qrExpected;
-if (jugador.modo === 'equipo' && currentTeamMission) {
-qrExpected = {
-A: `LH-${currentTeamMission.id}-A-${jugador.id.split('-')[1]}`,
-B: `LH-${currentTeamMission.id}-B-${jugador.id.split('-')[1]}`
-};
-localStorage.setItem('qrCodeEsperado', JSON.stringify(qrExpected));
-} else {
-qrExpected = `LH-${currentMission.id}-${jugador.id.split('-')[1]}`;
-localStorage.setItem('qrCodeEsperado', qrExpected);
+  const overlay = document.getElementById('scannerOverlay');
+  const video = document.getElementById('scannerVideo');
+  const canvas = document.getElementById('scannerCanvas');
+  
+  try {
+    const constraints = { 
+      video: { facingMode: { ideal: "environment" } }
+    };
+    
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+    video.onloadedmetadata = () => {
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+    };
+    
+    overlay.style.display = 'block';
+    scannerActive = true;
+    
+    const scanInterval = setInterval(async () => {
+      if (!scannerActive || !video.videoWidth) return;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: "dontInvert" });
+      
+      if (code && code.data) {
+        clearInterval(scanInterval);
+        stopScanner();
+        
+        const scannedData = code.data.trim();
+        
+        // Verificar si es una URL válida
+        try {
+          const url = new URL(scannedData);
+          // Si es una URL de qr-zona.html, redirigir
+          if (url.pathname.includes('qr-zona.html')) {
+            window.location.href = scannedData;
+            return;
+          }
+        } catch (e) {
+          // No es una URL válida → ignorar
+        }
+        
+        // Si llega aquí, no es una URL válida
+        showToast("❌ Código no reconocido. Escanea el QR del Vigilante Oscuro.");
+      }
+    }, 300);
+    
+  } catch (err) {
+    stopScanner();
+    console.error("Error de cámara:", err);
+    
+    if (err.name === 'NotAllowedError') {
+      showToast("⚠️ Necesitas permitir el acceso a la cámara para escanear QR.");
+    } else if (err.name === 'NotFoundError') {
+      showToast("⚠️ No se encontró ninguna cámara en tu dispositivo.");
+    } else {
+      showToast("⚠️ Error de cámara: " + (err.message || "dispositivo no compatible"));
+    }
+  }
 }
-const overlay = document.getElementById('scannerOverlay');
-const video = document.getElementById('scannerVideo');
-const canvas = document.getElementById('scannerCanvas');
-try {
-const constraints = { video: { facingMode: { ideal: "environment" } } };
-stream = await navigator.mediaDevices.getUserMedia(constraints);
-video.srcObject = stream;
-video.onloadedmetadata = () => {
-canvas.width = video.videoWidth;
-canvas.height = video.videoHeight;
-};
-overlay.style.display = 'block';
-scannerActive = true;
-const scanInterval = setInterval(async () => {
-if (!scannerActive || !video.videoWidth) return;
-const ctx = canvas.getContext('2d');
-ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: "dontInvert" });
-if (code && code.data) {
-clearInterval(scanInterval);
-stopScanner();
-const codigoEscaneado = code.data.trim();
-let exito = false;
-if (jugador.modo === 'equipo') {
-// Para equipos, verificar QR individual
-exito = true; // Simplificado para equipos
-handleTeamQRScan(codigoEscaneado, qrExpected);
-} else {
-// Para individuales, verificar con Firebase
-if (codigoEscaneado === qrExpected) {
-exito = await completarMision(currentMission.id, jugador.zona, jugador.id);
-}
-}
-if (!exito && jugador.modo !== 'equipo') {
-analytics.logEvent('qr_escaneo_fallido', {
-zona: jugador.zona,
-hunter_id: jugador.id
-});
-showToast("❌ ¡Demasiado tarde! Alguien ya encontró el código.");
-setTimeout(showPhase1, 3000);
-return;
-}
-if (exito || jugador.modo === 'equipo') {
-completeMission();
-} else {
-showToast("❌ Código incorrecto. ¿Estás en el lugar correcto?");
-setTimeout(() => scannerActive && (overlay.style.display = 'block'), 1500);
-}
-}
-}, 300);
-} catch (err) {
-stopScanner();
-showToast("⚠️ Error de cámara. Usa ingreso manual.");
-}
-}
-// ✅ MANEJO DE RESULTADOS (con soporte offline)
-async function handleScanResult(success, scannedCode) {
-if (jugador.modo === 'equipo') {
-return;
-}
-if (!success) {
-const expectedPattern = new RegExp(`^LH-${currentMission.id}-[0-9]{4}$`);
-if (expectedPattern.test(scannedCode)) {
-// Código válido pero ya usado
-if (isOnline) {
-analytics.logEvent('qr_escaneo_fallido', {
-zona: jugador.zona,
-hunter_id: jugador.id,
-motivo: 'ya_usado'
-});
-playConsolationNarration('already_completed');
-showToast("❌ ¡Demasiado tarde! Este código ya fue usado.");
-// Mostrar opciones de recuperación
-setTimeout(() => {
-document.querySelector('#phase1-consigna .mission-card').innerHTML = `
-<div class="mission-title">
-<span class="icon">❌</span>
-Código ya utilizado
-</div>
-<div class="tension-bar" style="margin: 1rem 0; background: rgba(255, 170, 51, 0.15);">
-⏳ Demasiado tarde
-</div>
-<p class="pista">
-${getSuggestionBasedOnContext('already_completed')}
-<br><br>
-Pero los verdaderos cazadores siempre encuentran otra presa.
-</p>
-<button class="btn btn-primary" id="redemption-used-btn">🕊️ Misión de redención</button>
-<button class="btn btn-outline" id="new-mission-used-btn" style="margin-top: 10px;">🎯 Nueva misión</button>
-`;
-document.getElementById('phase1-consigna').style.display = 'block';
-document.getElementById('phase3-pista').style.display = 'none';
-document.getElementById('redemption-used-btn').addEventListener('click', showRedemptionMission);
-document.getElementById('new-mission-used-btn').addEventListener('click', () => {
-window.location.href = 'registro.html';
-});
-}, 3000);
-} else {
-// Offline: asumir que es válido y procesar al reconectar
-showToast("✅ Código escaneado. Se validará al recuperar conexión.");
-completeMission();
-}
-} else {
-analytics.logEvent('qr_escaneo_fallido', {
-zona: jugador.zona,
-hunter_id: jugador.id,
-motivo: 'codigo_incorrecto'
-});
-playConsolationNarration('wrong_code');
-showToast("❌ Código incorrecto. ¿Estás en el lugar correcto?");
-// Mostrar sugerencia inmediata
-setTimeout(() => {
-showToast(getSuggestionBasedOnContext('wrong_code'));
-}, 2000);
-setTimeout(showPhase1, 5000);
-}
-return;
-}
-// Éxito
-completeMission();
-}
-function handleTeamQRScan(scannedCode, expectedCodes) {
-const key = `teamScan_${jugador.id}_${currentTeamMission.id}`;
-let scans = JSON.parse(localStorage.getItem(key) || '{}');
-if (scannedCode === expectedCodes.A) {
-scans.A = Date.now();
-localStorage.setItem(key, JSON.stringify(scans));
-showToast("✅ QR A escaneado. ¡Ahora busca el QR B!");
-} else if (scannedCode === expectedCodes.B) {
-scans.B = Date.now();
-localStorage.setItem(key, JSON.stringify(scans));
-showToast("✅ QR B escaneado. ¡Ahora busca el QR A!");
-}
-if (scans.A && scans.B) {
-const diff = Math.abs(scans.B - scans.A);
-if (diff <= 15000) {
-completeMission();
-} else {
-showToast("❌ Los escaneos no fueron sincronizados. Inténtalo de nuevo.");
-}
-}
-}
+
 function completeMission() {
 const misionId = jugador.modo === 'equipo' ? currentTeamMission.id : currentMission.id;
 guardarProgreso(null, `${misionId}_desafio_1`);
@@ -1128,33 +1034,7 @@ showToast(isOff ? '✅ Narración activada' : '🔇 Narración desactivada');
 document.getElementById('closeScannerBtn')?.addEventListener('click', stopScanner);
 document.getElementById('manualInputBtn')?.addEventListener('click', () => {
 stopScanner();
-const qrExpected = localStorage.getItem('qrCodeEsperado');
-if (!qrExpected) return showToast("⚠️ Acepta una misión primero");
-const input = prompt("Ingresa el código QR:", "");
-if (!input) return;
-if (jugador.modo === 'equipo') {
-const expected = JSON.parse(qrExpected);
-if (input.trim() === expected.A || input.trim() === expected.B) {
-handleTeamQRScan(input.trim(), expected);
-} else {
-showToast("❌ Código inválido.");
-}
-} else {
-// Verificar con Firebase
-(async () => {
-if (input.trim() === qrExpected) {
-const exito = await completarMision(currentMission.id, jugador.zona, jugador.id);
-if (exito) {
-completeMission();
-} else {
-showToast("❌ ¡Demasiado tarde! Alguien ya encontró el código.");
-setTimeout(showPhase1, 3000);
-}
-} else {
-showToast("❌ Código inválido. ¿Estás en el lugar correcto?");
-}
-})();
-}
+showToast("⚠️ Usa el escáner QR para leer el código del Vigilante Oscuro.");
 });
 document.addEventListener('keydown', (e) => {
 if (e.key === 'Escape' && scannerActive) stopScanner();
