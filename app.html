@@ -821,7 +821,6 @@ timeLeft--;
 let scannerActive = false;
 let stream = null;
 
-// ✅ FUNCIÓN ACTUALIZADA: Detecta URLs y redirige a qr-zona.html
 async function openQRScanner() {
   const overlay = document.getElementById('scannerOverlay');
   const video = document.getElementById('scannerVideo');
@@ -860,7 +859,7 @@ async function openQRScanner() {
         try {
           const url = new URL(scannedData);
           // Si es una URL de qr-zona.html, redirigir
-          if (url.pathname.includes('qr-zona.html')) {
+          if (url.hostname === 'codigoebel.com' && url.pathname.includes('qr-zona.html')) {
             window.location.href = scannedData;
             return;
           }
