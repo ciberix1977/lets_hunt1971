@@ -2,92 +2,177 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Codigo Ebel · Próximamente</title>
-  <meta name="description" content="Let's Hunt: La cacería urbana está pronto a comenzar en el Gran Buenos Aires." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Codigo Ebel · Aventuras Urbanas</title>
+  <meta name="description" content="Juego urbano gratuito en Buenos Aires. Resolvé pistas, completá desafíos y competí por premios reales." />
+  <meta name="theme-color" content="#0a0e17" />
+  
+  <!-- Favicon -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;800&display=swap" rel="stylesheet">
+  
+  <!-- ✅ CSS EXTERNO -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- ✅ CSS ESPECÍFICO PARA LANDING (sobrescribe conflictos) -->
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* Forzar hero full screen para landing */
+    header.hero.landing-page {
+      min-height: 100vh !important;
+      height: 100vh !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 2rem 1rem !important;
+      position: relative !important;
+      background: rgba(0, 0, 0, 0.3) !important;
     }
     
-    body {
-      background: linear-gradient(135deg, #0a0a12 0%, #000 100%);
-      color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 2rem;
+    /* Logo EXTRA GRANDE para landing */
+    header.hero.landing-page .logo-container.centered {
+      position: relative !important; /* ✅ Necesario para posicionar radar */
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 700px !important; /* ✅ Logo grande */
+      margin: 0 auto 2.5rem !important;
+      min-height: 175px; /* ✅ Espacio para altura del logo */
     }
     
-    .logo-container {
-      margin-bottom: 2rem;
+    /* Radar: ABSOLUTO y CENTRADO detrás del logo */
+    header.hero.landing-page .logo-container.centered .logo-radar {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important; /* ✅ Centrado perfecto */
+      width: 120% !important;
+      height: 120% !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      z-index: 1 !important; /* ✅ DETRÁS */
+      pointer-events: none !important;
     }
     
-    .logo {
-      max-width: 80vw;
-      max-height: 60vh;
-      height: auto;
-      width: auto;
-      /* Filtro eliminado - tu logo se verá en sus colores originales */
-      animation: fadeIn 1.2s ease-out;
+    header.hero.landing-page .logo-container.centered .logo-radar svg {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 800px !important;
+      filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.5)) !important;
+      opacity: 0.7 !important;
     }
     
-    .coming-soon {
-      font-size: 1.8rem;
-      font-weight: 700;
-      line-height: 1.4;
-      background: linear-gradient(90deg, #0af, #64b5f6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: 0 2px 4px rgba(0, 170, 255, 0.1);
-      animation: fadeIn 1.5s ease-out 0.3s both;
+    /* Wrapper del logo: RELATIVO y DELANTE */
+    header.hero.landing-page .logo-container.centered .logo-wrapper {
+      position: relative !important;
+      z-index: 2 !important; /* ✅ DELANTE del radar */
+      display: block !important;
+      width: 100% !important;
+      max-width: 700px !important;
+      margin: 0 auto !important;
     }
     
-    .domain {
-      font-size: 1.1rem;
-      opacity: 0.7;
-      margin-top: 1.5rem;
-      animation: fadeIn 1.8s ease-out 0.6s both;
+    /* Imagen del logo: GRANDE */
+    header.hero.landing-page .logo-container.centered .logo-wrapper img {
+      width: 100% !important;
+      max-width: 700px !important; /* ✅ Logo grande */
+      height: auto !important;
+      max-height: none !important;
+      display: block !important;
+      margin: 0 auto !important;
+      filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.7)) !important;
     }
     
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
+    /* Responsive para landing */
     @media (max-width: 768px) {
-      .coming-soon {
-        font-size: 1.4rem;
-        padding: 0 1rem;
+      header.hero.landing-page .logo-container.centered,
+      header.hero.landing-page .logo-container.centered .logo-wrapper,
+      header.hero.landing-page .logo-container.centered .logo-wrapper img {
+        max-width: 500px !important;
       }
-      
-      .domain {
-        font-size: 0.95rem;
+    }
+    @media (max-width: 480px) {
+      header.hero.landing-page .logo-container.centered,
+      header.hero.landing-page .logo-container.centered .logo-wrapper,
+      header.hero.landing-page .logo-container.centered .logo-wrapper img {
+        max-width: 350px !important;
+      }
+    }
+    @media (max-width: 360px) {
+      header.hero.landing-page .logo-container.centered,
+      header.hero.landing-page .logo-container.centered .logo-wrapper,
+      header.hero.landing-page .logo-container.centered .logo-wrapper img {
+        max-width: 300px !important;
       }
     }
   </style>
 </head>
+
 <body>
-  <div class="logo-container">
-    <img src="code_ebel3.webp" alt="Codigo Ebel" class="logo" onerror="this.src='code_ebel3.png'; this.onerror=null;">
-  </div>
   
-  <h1 class="coming-soon">
-  <br>
-    La cacería está pronto a comenzar
-  </h1>
-  
-  <p class="domain">codigoebel.com</p>
+  <!-- HERO: Landing page con logo GRANDE -->
+  <header class="hero landing-page" role="banner">
+    <div class="hero-content centered">
+      
+      <!-- Logo con radar - ESTRUCTURA CORREGIDA -->
+      <div class="logo-container centered">
+        
+        <!-- Radar: DETRÁS del logo (z-index: 1) + CENTRADO -->
+        <div class="logo-radar" aria-hidden="true">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="25" fill="none" stroke="#0f0" stroke-width="0.8" opacity="0.5">
+              <animate attributeName="r" values="25;30;25" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="#0f0" stroke-width="0.6" opacity="0.4">
+              <animate attributeName="r" values="35;40;35" dur="3.5s" repeatCount="indefinite" begin="0.3s"/>
+              <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3.5s" repeatCount="indefinite" begin="0.3s"/>
+            </circle>
+          </svg>
+        </div>
+        
+        <!-- Logo: DELANTE del radar (z-index: 2) -->
+        <div class="logo-wrapper">
+          <img src="./code_ebel3.webp" alt="Codigo Ebel" loading="eager">
+        </div>
+        
+      </div>
+      
+      <!-- Título principal -->
+     <h1 class="landing-title">
+  Jugá en Buenos Aires. Encontrá pistas. Ganá premios.
+</h1>
+      
+      <!-- Botón principal -->
+      <a href="home.html" class="btn-continue">
+        ⚡ Comenzar ahora
+      </a>
+      
+      <!-- Features rápidas -->
+      <div class="landing-features">
+        <div class="feature-item">
+          <span>🎮</span>
+          <span>100% Gratis</span>
+        </div>
+        <div class="feature-item">
+          <span>📱</span>
+          <span>Sin descarga</span>
+        </div>
+        <div class="feature-item">
+          <span>🏆</span>
+          <span>Premios reales</span>
+        </div>
+      </div>
+      
+    </div>
+  </header>
+
 </body>
 </html>

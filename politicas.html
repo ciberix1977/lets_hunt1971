@@ -11,10 +11,9 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-  
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
   
   <noscript>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&display=swap">
@@ -30,28 +29,28 @@
   position: relative;
 ">
 
-  <!-- ✅ Logo pequeño en esquina superior izquierda -->
-  <div style="
-    position: absolute;
-    top: 1.2rem;
-    left: 1.2rem;
-    z-index: 10;
-  ">
+  <!-- ✅ Logo pequeño en esquina superior izquierda (opcional) -->
+  <div style="position: absolute; top: 1.2rem; left: 1.2rem; z-index: 10;">
+    <!-- Dejar vacío o agregar logo si se desea -->
   </div>
 
   <main style="max-width: 1000px; margin: 0 auto;">
-    <!-- Logo chico centrado -->
+    
+    <!-- ✅ Logo centrado CORREGIDO -->
     <div style="text-align: center; margin-bottom: 2.5rem;">
       <img 
         src="./code_ebel3.webp" 
         alt="Codigo Ebel" 
-        width="32"
-        height="32"
+        width="200"
+        height="50"
         style="
-        filter: brightness(0) invert(1) opacity(0.8);
-        transition: opacity 0.2s;
-      "
-      onerror="this.src='./code_ebel3.png'; this.onerror=null;"
+          /* ✅ Sin filtros que alteren colores */
+          opacity: 0.9;
+          transition: opacity 0.2s;
+          /* ✅ Sombra sutil para mejor contraste */
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        "
+        onerror="this.src='./code_ebel3.png'; this.style.filter='none'; this.onerror=null;"
       >
       <h1 style="
         font-size: 1.8rem;
@@ -60,7 +59,7 @@
         color: #fff;
       ">Política de Privacidad y Términos</h1>
       <p style="color: #94a3b8; font-size: 0.95rem;">
-        Última actualización: 17 de diciembre de 2025
+        Última actualización: 17 de marzo de 2026
       </p>
     </div>
 
@@ -101,7 +100,7 @@
       ">← Volver al inicio</a>
     </nav>
 
-    <!-- Contenido -->
+    <!-- Contenido: Política de Privacidad -->
     <article id="privacidad" style="background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 2rem; margin-bottom: 2.5rem; backdrop-filter: blur(10px);">
       <h2 style="color: #0af; font-size: 1.6rem; margin-bottom: 1.2rem;">🔒 Política de Privacidad</h2>
       
@@ -118,15 +117,16 @@
       <h3 style="margin: 1.4rem 0 0.8rem; color: #0af;">Tus derechos (Ley 25.326)</h3>
       <p>Tienes derecho a: <strong>Acceder • Rectificar • Suprimir • Oponerte • Portabilidad</strong>.</p>
       <p>Ejercelos escribiendo a: 
-  <a href="mailto:privacidad@codigoebel.com" style="color: #0af;">
-    privacidad@codigoebel.com
-  </a>
-</p>
+        <a href="mailto:privacidad@codigoebel.com" style="color: #0af;">
+          privacidad@codigoebel.com
+        </a>
+      </p>
 
       <h3 style="margin: 1.4rem 0 0.8rem; color: #0af;">Menores de edad</h3>
       <p>Dirigido a mayores de <strong>13 años</strong>. Entre 13 y 18, se requiere consentimiento de un tutor.</p>
     </article>
 
+    <!-- Contenido: Términos y Condiciones -->
     <article id="terminos" style="background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 2rem; backdrop-filter: blur(10px);">
       <h2 style="color: #a855f7; font-size: 1.6rem; margin-bottom: 1.2rem;">📜 Términos y Condiciones</h2>
 
@@ -147,7 +147,7 @@
 
       <h3 style="margin: 1.4rem 0 0.8rem; color: #a855f7;">Responsabilidades</h3>
       <p>Eres <strong>totalmente responsable</strong> de tus actos durante la experiencia. No dañes monumentos, no ingreses a propiedades privadas, y respeta el espacio público.</p>
-      <p><em>Let’s Hunt no asume responsabilidad por accidentes o daños derivados del incumplimiento.</em></p>
+      <p><em>Let's Hunt no asume responsabilidad por accidentes o daños derivados del incumplimiento.</em></p>
 
       <h3 style="margin: 1.4rem 0 0.8rem; color: #a855f7;">Aceptación</h3>
       <p>Al registrarte en <a href="registro.html" style="color: #a855f7;">registro.html</a>, aceptas estos términos.</p>

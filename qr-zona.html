@@ -98,7 +98,7 @@
     const firebaseConfig = {
       apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
       authDomain: "let-s-hunt.firebaseapp.com",
-      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com", // ✅ Sin espacios
       projectId: "let-s-hunt",
       storageBucket: "let-s-hunt.firebasestorage.app",
       messagingSenderId: "787017812046",
@@ -109,7 +109,7 @@
 
     // ========== VARIABLES GLOBALES ==========
     let currentAdivinanza = null;
-    let timeLeft = 90; // 90 segundos
+    let timeLeft = 300; // ✅ 5 minutos (300 segundos)
     let timerInterval = null;
 
     // ========== FUNCIONES DE UTILIDAD ==========
@@ -124,41 +124,52 @@
       try {
         const snapshot = await db.ref('adivinanzas').once('value');
         if (!snapshot.exists()) {
-          document.getElementById('pistaTexto').innerHTML = "❌ No hay adivinanzas disponibles.";
-          return;
+          throw new Error("No hay adivinanzas disponibles.");
         }
         
         const todasAdivinanzas = snapshot.val();
+        // Normalizar comparación de zonas
+        const zonaNormalizada = zona.trim().toLowerCase();
         const adivinanzasZona = Object.entries(todasAdivinanzas)
-          .filter(([key, adiv]) => adiv.zona === zona && adiv.activo)
+          .filter(([key, adiv]) => 
+            adiv.zona?.trim().toLowerCase() === zonaNormalizada && 
+            adiv.activo
+          )
           .map(([key, adiv]) => ({ id: key, ...adiv }));
         
         if (adivinanzasZona.length === 0) {
-          document.getElementById('pistaTexto').innerHTML = "❌ No hay adivinanzas en esta zona.";
-          return;
+          throw new Error(`No hay adivinanzas en la zona "${zona}".`);
         }
         
-        // Seleccionar aleatoria
         const randomIndex = Math.floor(Math.random() * adivinanzasZona.length);
         currentAdivinanza = adivinanzasZona[randomIndex];
         document.getElementById('pistaTexto').textContent = currentAdivinanza.pista;
         
-        // Habilitar inputs
         document.getElementById('respuestaInput').disabled = false;
         document.getElementById('submitBtn').disabled = false;
         
       } catch (error) {
         console.error("Error al cargar adivinanza:", error);
-        document.getElementById('pistaTexto').innerHTML = "⚠️ Error al cargar la adivinanza.";
+        document.getElementById('pistaTexto').innerHTML = `❌ ${error.message || "Error al cargar la adivinanza."}`;
+        document.getElementById('respuestaInput').disabled = true;
+        document.getElementById('submitBtn').disabled = true;
+        throw error;
       }
     }
 
     // ========== INICIAR TEMPORIZADOR ==========
     function iniciarTemporizador() {
-      document.getElementById('timer').textContent = `⏳ Tiempo restante: ${timeLeft}s`;
+      const actualizarDisplay = () => {
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        document.getElementById('timer').textContent = 
+          `⏳ Tiempo restante: ${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      actualizarDisplay();
       timerInterval = setInterval(() => {
         timeLeft--;
-        document.getElementById('timer').textContent = `⏳ Tiempo restante: ${timeLeft}s`;
+        actualizarDisplay();
         
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
@@ -188,7 +199,6 @@
       const hashIngresado = generarHash(respuesta);
       
       if (hashIngresado === currentAdivinanza.respuesta_hash) {
-        // ✅ Respuesta correcta
         clearInterval(timerInterval);
         await registrarRespuestaCorrecta(currentAdivinanza.id, respuesta);
         mostrarBotonWhatsApp(respuesta);
@@ -235,7 +245,7 @@
         `Mi respuesta: *${respuesta}*\n\n` +
         `¡Listo para el siguiente desafío!`
       );
-      window.open(`https://wa.me/54${numeroVigilante}?text=${mensaje}`, '_blank');
+      window.open(`https://wa.me/54${numeroVigilante}?text=${mensaje}`, '_blank'); // ✅ Sin espacios
     }
 
     // ========== FINALIZAR SESIÓN ==========
@@ -256,11 +266,15 @@
       const urlParams = new URLSearchParams(window.location.search);
       const zona = urlParams.get('zona') || 'CABA';
       
-      // Cargar adivinanza
-      await cargarAdivinanzaAleatoria(zona);
-      
-      // Iniciar temporizador
-      iniciarTemporizador();
+      try {
+        await cargarAdivinanzaAleatoria(zona);
+        if (currentAdivinanza) {
+          iniciarTemporizador();
+        }
+      } catch (error) {
+        console.error("Error al inicializar:", error);
+        // El error ya se muestra en cargarAdivinanzaAleatoria
+      }
     }
 
     // Iniciar

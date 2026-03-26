@@ -1,302 +1,568 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <!-- ========== BÁSICOS ========== -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Registro · Codigo Ebel</title>
   <meta name="description" content="Únete a la cacería urbana en el Gran Buenos Aires. Gratis. Inmersivo. Real." />
   
-  <!-- ✅ PWA Manifest -->
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0066ff">
+  <!-- Canonical URL (limpia) -->
+  <link rel="canonical" href="https://codigoebel.com/registro.html" />
   
-  <!-- Firebase SDK (legacy v8.10.1) -->
+  <!-- Robots -->
+  <meta name="robots" content="noindex, follow" />
+  
+  <!-- Idioma -->
+  <meta name="language" content="es" />
+  <meta http-equiv="content-language" content="es-AR" />
+  
+  <!-- ========== OPEN GRAPH ========== -->
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Registro · Codigo Ebel" />
+  <meta property="og:description" content="Únete a la cacería urbana en el Gran Buenos Aires. Gratis. Inmersivo. Real." />
+  <meta property="og:url" content="https://codigoebel.com/registro.html" />
+  <meta property="og:site_name" content="Codigo Ebel" />
+  <meta property="og:image" content="https://codigoebel.com/og-image.jpg" />
+  <meta property="og:image:alt" content="Codigo Ebel: Registro de cazadores urbanos" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  
+  <!-- ========== TWITTER CARDS ========== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@letshunt_BsAs" />
+  <meta name="twitter:creator" content="@letshunt_BsAs" />
+  <meta name="twitter:title" content="Registro · Codigo Ebel" />
+  <meta name="twitter:description" content="Únete a la cacería urbana en el Gran Buenos Aires. Gratis. Inmersivo. Real." />
+  <meta name="twitter:image" content="https://codigoebel.com/twitter-image.jpg" />
+  
+  <!-- ========== FAVICON & PWA ========== -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#0a0e17" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Codigo Ebel" />
+  
+  <!-- ========== PRECONNECT & PERFORMANCE ========== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="styles.css"></noscript>
+  
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a href="index.html" class="back-link" aria-label="Volver a la página principal">
-    ← Volver a Inicio
+
+  <!-- Back Link -->
+  <a href="home.html" class="back-link" aria-label="Volver a la página principal">
+    ← Volver
   </a>
 
-  <div class="form-card mission-card" data-type="registro">
-    <div class="logo-container centered">
-      <img src="code_ebel3.webp" alt="Codigo Ebel">
-    </div>
-
-    <h1 class="section-title">🔐 Regístrate con WhatsApp</h1>
-    <p class="subtitle">
-      Tu número de WhatsApp será tu identidad única en Codigo Ebel.
-    </p>
-
-    <!-- Antes del botón de registro -->
-<div class="consent-section" style="margin:1.5rem 0; padding:1.5rem; background:#1a1a2e; border-radius:8px;">
-  <h3>👁️‍🗨️ Términos del Vigilante Oscuro</h3>
-  
-  <div style="margin:1rem 0;">
-    <input type="checkbox" id="whatsappConsent" required>
-    <label for="whatsappConsent" style="margin-left:10px;">
-      <strong>Acepto ser contactado por WhatsApp</strong> (+54 11 2508-2484) para recibir misiones exclusivas del Vigilante Oscuro.
-    </label>
-  </div>
-  
-  <div style="margin:1rem 0;">
-    <input type="checkbox" id="videoConsent" required>
-    <label for="videoConsent" style="margin-left:10px;">
-      <strong>Acepto participar en videollamadas de verificación</strong> durante las misiones, con consentimiento previo en cada ocasión.
-    </label>
-  </div>
-  
-  <div style="margin:1rem 0; font-size:0.9rem; color:#999;">
-    <p>⚠️ <strong>Importante:</strong> No todos los registrados reciben misiones. El Vigilante Oscuro selecciona cazadores específicos basado en su perfil y disponibilidad.</p>
-    <p>🔒 Tus datos están protegidos y puedes cancelar tu participación en cualquier momento respondiendo "SALIR" en WhatsApp.</p>
-  </div>
-</div>
-
-<style>
-.consent-section input[type="checkbox"] {
-  transform: scale(1.2);
-  margin-right: 8px;
-}
-</style>
-
-    <form id="registroForm">
-      <div class="form-group">
-        <label for="telefono">📱 Número de WhatsApp (10 dígitos) *</label>
-        <input 
-          type="tel" 
-          id="telefono" 
-          name="telefono"
-          required
-          inputmode="numeric"
-          pattern="[0-9]{10}"
-          placeholder="1112345678"
-          title="Solo 10 dígitos. Ej: 1112345678">
-        <p class="privacy-note">Usamos WhatsApp para enviar pistas y verificar tu identidad. Solo números móviles argentinos (+549...).</p>
-      </div>
-
-      <!-- ✅ Modo de juego -->
-      <div class="form-group">
-        <label>¿Cómo querés jugar? *</label>
-        <div class="modo-radio-group">
-          <label>
-            <input type="radio" name="modo" value="individual" checked required>
-            🧍‍♂️ Solo (3 misiones)
-          </label>
-          <label>
-            <input type="radio" name="modo" value="equipo" required>
-            👥 Equipo (4+ misiones)
-          </label>
-        </div>
-      </div>
-
-      <div class="form-group equipo-info">
-        <label for="codigo-equipo">Código de equipo (opcional)</label>
-        <input 
-          type="text" 
-          id="codigo-equipo" 
-          name="codigo_equipo"
-          placeholder="Ej: ALPHA7"
-          maxlength="7"
-          pattern="[A-Z]{4}[0-9]{3}"
-          title="4 letras mayúsculas + 3 números. Ej: HUNT245">
-        <p class="privacy-note">¿No tenés código? ¡Podés crear un equipo nuevo después del registro!</p>
-      </div>
-
-      <div class="form-group">
-        <label for="zona">Zona de juego *</label>
-        <select id="zona" name="zona" required>
-          <option value="">Selecciona tu zona...</option>
-          <option value="CABA">📍 Ciudad de Buenos Aires (CABA)</option>
-          <option value="Avellaneda">🚂 Avellaneda (incluye Dock Sud, Wilde, Sarandí)</option>
-          <option value="Lanús">🌳 Lanús (incluye Remedios de Escalada, Valentín Alsina)</option>
-          <option value="Lomas de Zamora">🏘️ Lomas de Zamora (incluye Banfield, Temperley, Llavallol)</option>
-        </select>
-      </div>
-
-      <div class="form-group checkbox-group">
-        <label>
-          <input 
-            type="checkbox" 
-            id="consent" 
-            required>
-          Acepto los <a href="politicas.html#terminos" target="_blank" rel="noopener">Términos</a> y la 
-          <a href="politicas.html#privacidad" target="_blank" rel="noopener">Política de Privacidad</a> *
-        </label>
-      </div>
-
-      <button type="submit" class="btn-hero" id="submitBtn">
-        🔒 Registrarme con WhatsApp
-      </button>
-    </form>
-  </div>
-
-  <script>
-  // ========== FIREBASE ==========
-  const firebaseConfig = {
-    apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
-    authDomain: "let-s-hunt.firebaseapp.com",
-    databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
-    projectId: "let-s-hunt",
-    storageBucket: "let-s-hunt.firebasestorage.app",
-    messagingSenderId: "787017812046",
-    appId: "1:787017812046:web:da098b2361df4dda995b1f"
-  };
-  
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
-
-  // Mostrar/ocultar campo de equipo
-  document.querySelectorAll('input[name="modo"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      const equipoInfo = document.querySelector('.equipo-info');
-      if (radio.value === 'equipo') {
-        equipoInfo.classList.add('show');
-      } else {
-        equipoInfo.classList.remove('show');
-      }
-    });
-  });
-
-  // Generar código único
-  function generarCodigoEquipo() {
-    const letras = "BCDFGHJKMNPQRSTVWXYZ";
-    const nums = "23456789";
-    let codigo = "";
-    for (let i = 0; i < 4; i++) 
-      codigo += letras.charAt(Math.floor(Math.random() * letras.length));
-    for (let i = 0; i < 3; i++) 
-      codigo += nums.charAt(Math.floor(Math.random() * nums.length));
-    return codigo;
-  }
-
-  // Validar número argentino
-  function validarNumeroArgentino(phone) {
-    const phoneRegex = /^[0-9]{10}$/;
-    return phoneRegex.test(phone);
-  }
-
-  // Manejar envío SIN verificación por WhatsApp
-  document.getElementById('registroForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    let telefonoRaw = document.getElementById('telefono').value.trim().replace(/\D/g, '');
-    const zona = document.getElementById('zona').value;
-    const modo = document.querySelector('input[name="modo"]:checked').value;
-    const codigoIngresado = modo === 'equipo' 
-      ? document.getElementById('codigo-equipo').value.trim().toUpperCase() 
-      : null;
-
-    if (!validarNumeroArgentino(telefonoRaw)) {
-      alert('⚠️ El número debe tener 10 dígitos (sin código de país). Ej: 1112345678');
-      return;
-    }
-
-    if (!zona) {
-      alert('⚠️ Por favor, selecciona una zona de juego.');
-      return;
-    }
-
-    if (modo === 'equipo' && codigoIngresado) {
-      if (!/^[A-Z]{4}[0-9]{3}$/.test(codigoIngresado)) {
-        alert('⚠️ Código inválido. Debe ser 4 letras + 3 números. Ej: HUNT245');
-        return;
-      }
-    }
-
-    const telefonoWhatsapp = `+549${telefonoRaw}`;
-
-    // Generar hunterId SECUENCIAL con prefijo LH
-    let lastId = parseInt(localStorage.getItem('lastHunterId') || '0');
-    let newId = lastId + 1;
-    let hunterId = `LH-${String(newId).padStart(4, '0')}`;
-    localStorage.setItem('lastHunterId', newId);
-
-    let equipo = null;
-    if (modo === 'equipo') {
-      if (!codigoIngresado) {
-        equipo = generarCodigoEquipo();
-      } else {
-        equipo = codigoIngresado;
-      }
-    }
-
-    const jugador = { 
-      id: hunterId, 
-      telefono: telefonoWhatsapp, 
-      zona, 
-      modo, 
-      equipo,
-      whatsapp_verified: true // Marcado como verificado inmediatamente
-    };
-    localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
-    localStorage.setItem('currentHunterId', hunterId);
-
-    // Guardar en Firebase
-    try {
-      await db.ref(`jugadores/${hunterId}`).set({
-        hunterId: hunterId,
-        telefono: telefonoWhatsapp,
-        zona: zona,
-        modo: modo,
-        equipo: equipo,
-        fecha_registro: Date.now(),
-        activo: true,
-        whatsapp_verified: true
-      });
-    } catch (error) {
-      console.error("Error al guardar en Firebase:", error);
-    }
-
-    // ✅ Feedback emocional inmediato + redirección directa
-    const container = document.querySelector('.form-card');
-    container.innerHTML = `
+  <!-- FORM CARD -->
+  <main class="container">
+    <div class="form-card mission-card" data-type="registro">
+      
+      <!-- Logo -->
       <div class="logo-container centered">
-        <img src="code_ebel3.webp" alt="Codigo Ebel">
+        <img src="code_ebel3.webp" alt="Codigo Ebel" loading="eager" width="180" height="54">
       </div>
-      <div class="registration-ritual" style="text-align:center; margin-top:1.5rem;">
-        ✅ <span style="color: #4ade80;">¡Registro exitoso!</span><br>
-        <span style="font-size: 1.4rem; margin: 0.4rem 0; display: block; color: #fff;">${hunterId.toUpperCase()}</span>
-        <span style="font-size: 0.95rem; opacity: 0.85; display: block; margin-top: 0.5rem;">
-          Tu cuenta está activa.<br>
-          <!-- 🎖️ BENEFICIO INMEDIATO AL REGISTRARTE -->
-          <div class="instant-reward register-reward" style="margin:1rem 0;">
-            <h3 style="margin-bottom: 0.4rem;">🎖️ Al registrarte ahora</h3>
-            <ul style="list-style: none; padding: 0; margin: 0.6rem 0;">
+
+      <!-- Título -->
+      <h1 class="section-title">🔐 Únete a la Cacería</h1>
+      
+      <!-- ✅ Señal "live" visible (prueba social) -->
+      <p class="live-signal">
+        🟢 <span id="liveCountHeader">27</span> cazadores activos ahora en GBA
+      </p>
+      
+      <!-- ========== PASO 1: TELÉFONO (Simple y rápido) ========== -->
+      <div id="step1">
+        <p class="subtitle">
+          Tu WhatsApp será tu identidad única. Sin contraseñas, sin emails.
+        </p>
+        
+        <!-- Micro-confianza para el teléfono -->
+        <div class="trust-note">
+          <span>🔒</span>
+          <p>Aceptamos: +54, 15, espacios. Nosotros lo limpiamos.</p>
+        </div>
+
+        <form id="phoneForm" novalidate>
+          <div class="form-group">
+            <label for="telefono">📱 Tu número de WhatsApp *</label>
+            <input 
+              type="tel" 
+              id="telefono" 
+              name="telefono"
+              required
+              inputmode="numeric"
+              pattern="[0-9\s\+\-\(\)]{8,15}"
+              placeholder="Ej: 11 1234-5678 o +54 9 11..."
+              title="Tu número de WhatsApp argentino"
+              autocomplete="tel"
+              autofocus>
+            <p class="privacy-note">Formato flexible: aceptamos con/sin código de país, con/sin 15.</p>
+          </div>
+
+          <!-- Botón Paso 1 -->
+          <button type="submit" class="btn-hero" id="continueBtn">
+            Continuar →
+          </button>
+        </form>
+      </div>
+
+      <!-- ========== PASO 2: DETALLES (Después del compromiso) ========== -->
+      <div id="step2" hidden>
+        
+        <!-- Consentimientos agrupados (1 obligatorio + 1 opcional) -->
+        <div class="consent-section">
+          <div class="consent-box">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <div class="consent-content">
+              <h3 class="consent-title">👁️‍🗨️ Términos del Vigilante</h3>
+              
+              <!-- ✅ 1 obligatorio -->
+              <label class="consent-checkbox">
+                <input type="checkbox" id="gameConsent" required>
+                <span><strong>Acepto participar en la cacería urbana</strong> y recibir pistas por WhatsApp del Vigilante Oscuro.</span>
+              </label>
+              
+              <!-- ✅ 1 opcional (agrupado) -->
+              <label class="consent-checkbox optional">
+                <input type="checkbox" id="liveConsent">
+                <span><strong>Interacción en vivo opcional</strong>: Algunos desafíos pueden incluir videollamada (siempre avisado, nunca obligatorio).</span>
+              </label>
+              
+              <p class="consent-note">
+                🔒 Tus datos están protegidos. Podés cancelar respondiendo "SALIR" en cualquier momento.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORMULARIO COMPLETO -->
+        <form id="registroForm" novalidate>
+          
+          <!-- Zona (con texto "sugerida" para evitar desconfianza) -->
+          <div class="form-group">
+            <label for="zona">📍 Tu zona de juego *</label>
+            <select id="zona" name="zona" required>
+              <option value="">Seleccioná tu zona...</option>
+              <option value="CABA">📍 Ciudad de Buenos Aires (CABA)</option>
+              <option value="Avellaneda">🚂 Avellaneda (Dock Sud, Wilde, Sarandí)</option>
+              <option value="Lanús">🌳 Lanús (Remedios, Valentín Alsina)</option>
+              <option value="Lomas de Zamora">🏘️ Lomas de Zamora (Banfield, Temperley)</option>
+            </select>
+            <p class="privacy-note" id="zoneHint" style="display:none;">💡 Zona sugerida: <strong id="detectedZone">CABA</strong>. ¿Es correcta?</p>
+          </div>
+
+          <!-- Modo de juego -->
+          <div class="form-group">
+            <label>¿Cómo querés jugar? *</label>
+            <div class="modo-radio-group" role="radiogroup">
+              <label class="radio-option">
+                <input type="radio" name="modo" value="individual" checked required>
+                <span>🧍‍♂️ Solo (3 misiones)</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="modo" value="equipo" required>
+                <span>👥 Equipo (4+ misiones)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Código de equipo (condicional) -->
+          <div class="form-group equipo-info" id="equipoField" hidden>
+            <label for="codigo-equipo">Código de equipo (opcional)</label>
+            <input 
+              type="text" 
+              id="codigo-equipo" 
+              name="codigo_equipo"
+              placeholder="Ej: ALPHA7"
+              maxlength="7"
+              pattern="[A-Z]{4}[0-9]{3}"
+              title="4 letras mayúsculas + 3 números. Ej: HUNT245"
+              autocomplete="off">
+            <p class="privacy-note">¿No tenés código? ¡Podés crear uno después!</p>
+          </div>
+
+          <!-- CTA Final (más emocional) -->
+          <button type="submit" class="btn-hero" id="submitBtn">
+            🎯 Entrar a la Cacería
+          </button>
+        </form>
+
+        <!-- Botón para volver al paso 1 -->
+        <button type="button" id="backToStep1" class="btn-outline" style="margin-top: 1rem; width: 100%;">
+          ← Cambiar número
+        </button>
+      </div>
+
+      <!-- ✅ Feedback post-registro DINÁMICO (con animación) -->
+      <div id="registrationSuccess" class="registration-ritual" hidden>
+        <p class="success-message">
+          ✅ <span class="success-highlight">Has sido marcado por el Vigilante</span><br>
+          <span class="hunter-id-display" id="displayHunterId">LH-0001</span>
+          <span class="success-subtext">
+            <span id="dynamicStatus">Conectando con el sistema...</span><br><br>
+            🎖️ <strong>Al registrarte ahora:</strong>
+            <ul class="instant-rewards">
               <li>📡 Tu alias aparece en el <strong>radar en vivo</strong>.</li>
               <li>🎯 Desbloqueás tu <strong>primer desafío</strong>.</li>
-              <li>🏷️ Recibís el badge <strong>“Primer Cazador”</strong>.</li>
+              <li>🏷️ Recibís el badge <strong>"Primer Cazador"</strong>.</li>
             </ul>
-            <p style="font-size: 0.85rem; opacity: 0.85;">
-              No necesitás ganar el ranking para empezar a jugar.
-            </p>
-          </div>
-          🟢 <span id="live-count-ritual">24</span> cazadores en el GBA ahora.
-        </span>
+          </span>
+        </p>
       </div>
-    `;
 
-    // Simular contador
-    function updateRitualCounter() {
-      const base = 20;
-      const fluctuation = Math.floor(Math.random() * 8);
-      document.getElementById('live-count-ritual').textContent = base + fluctuation;
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <img src="code_ebel3.webp" alt="Codigo Ebel" width="52" height="52" loading="lazy">
+        <p>Aventuras Urbanas en el Gran Buenos Aires</p>
+      </div>
+      <div class="footer-legal">
+        <p class="disclaimer">ℹ️ <strong>Codigo Ebel</strong> es un proyecto independiente.</p>
+        <div class="footer-contact">
+          <a href="mailto:contacto@codigoebel.com?subject=Contacto%20Code%20Ebel" class="btn-outline">📩 Contacto</a>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; <span id="year">2025</span> Codigo Ebel.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="app.js" defer></script>
+  
+  <!-- ========== LÓGICA DE REGISTRO OPTIMIZADA ========== -->
+  <script>
+    // ========== AÑO DINÁMICO ==========
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ========== FIREBASE CONFIG ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // ========== VARIABLES GLOBALES ==========
+    let telefonoGuardado = '';
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+
+    // ========== LIMPIAR TELÉFONO (acepta +54, 15, espacios, etc.) ==========
+    function limpiarTelefono(input) {
+      // Remover todo lo que no sea número
+      let num = input.replace(/\D/g, '');
+      
+      // Remover prefijos internacionales o de operador
+      if (num.startsWith('54')) num = num.slice(2);      // +54
+      if (num.startsWith('9')) num = num.slice(1);        // 9 de móvil
+      if (num.startsWith('15')) num = num.slice(2);       // 15 de Buenos Aires
+      
+      // Tomar últimos 10 dígitos (formato argentino estándar)
+      return num.slice(-10);
     }
-    updateRitualCounter();
-    setInterval(updateRitualCounter, 3000);
 
-    // Redirigir a app.html
-    setTimeout(() => {
-      window.location.href = `app.html?id=${encodeURIComponent(hunterId)}&zona=${encodeURIComponent(zona)}`;
-    }, 1500);
-  });
+    // ========== VALIDAR NÚMERO ARGENTINO (más flexible) ==========
+    function validarNumeroArgentino(phone) {
+      const limpio = limpiarTelefono(phone);
+      return /^[0-9]{10}$/.test(limpio);
+    }
+
+    // ========== GENERAR HUNTER ID ÚNICO (sin localStorage conflictivo) ==========
+    function generarHunterId(firebaseUid) {
+      // Usar primeros 6 caracteres del UID de Firebase + timestamp corto
+      // Esto garantiza unicidad sin depender de localStorage
+      const prefix = firebaseUid ? firebaseUid.slice(0, 6).toUpperCase() : 'CE';
+      const suffix = Date.now().toString(36).slice(-4).toUpperCase();
+      return `${prefix}-${suffix}`;
+    }
+
+    // ========== RECUPERAR TELÉFONO Y SALTAR PASO 1 SI YA EMPEZÓ ==========
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedPhone = localStorage.getItem('telefonoDraft');
+      
+      // ✅ Si hay teléfono guardado, saltar directo al paso 2
+      if (savedPhone && validarNumeroArgentino(savedPhone)) {
+        telefonoGuardado = limpiarTelefono(savedPhone);
+        document.getElementById('telefono').value = savedPhone;
+        step1.hidden = true;
+        step2.hidden = false;
+        step2.classList.add('show');
+      }
+      
+      // Contador "live" visible
+      updateLiveCounter();
+      setInterval(updateLiveCounter, 30000);
+      
+      // Hint de zona (texto "sugerida" para evitar desconfianza)
+      const hint = document.getElementById('zoneHint');
+      const detectedZone = document.getElementById('detectedZone');
+      if (hint && detectedZone) {
+        detectedZone.textContent = 'CABA'; // En producción: usar geolocalización real
+        hint.style.display = 'block';
+      }
+    });
+
+    // ========== CONTADOR "LIVE" ==========
+    function updateLiveCounter() {
+      const base = 27;
+      const fluctuation = Math.floor(Math.random() * 8);
+      const count = base + fluctuation;
+      
+      // Actualizar en header y en ritual
+      const headerEl = document.getElementById('liveCountHeader');
+      const ritualEl = document.getElementById('liveCountRitual');
+      if (headerEl) headerEl.textContent = count;
+      if (ritualEl) ritualEl.textContent = count;
+    }
+
+    // ========== PASO 1 → PASO 2 ==========
+    document.getElementById('phoneForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const telefonoRaw = document.getElementById('telefono').value.trim();
+      
+      // Validación flexible
+      if (!validarNumeroArgentino(telefonoRaw)) {
+        showToast('⚠️ Ingresá un número de WhatsApp argentino válido.');
+        return;
+      }
+      
+      // Limpiar y guardar
+      telefonoGuardado = limpiarTelefono(telefonoRaw);
+      localStorage.setItem('telefonoDraft', telefonoRaw); // Guardar formato original para UX
+      
+      // Transición suave al paso 2
+      const continueBtn = document.getElementById('continueBtn');
+      continueBtn.textContent = '✓ Verificando...';
+      continueBtn.disabled = true;
+      
+      setTimeout(() => {
+        step1.hidden = true;
+        step2.hidden = false;
+        step2.classList.add('show');
+        step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 600);
+    });
+
+    // ========== VOLVER AL PASO 1 ==========
+    document.getElementById('backToStep1')?.addEventListener('click', function() {
+      step2.hidden = true;
+      step1.hidden = false;
+      step1.classList.add('show');
+      document.getElementById('continueBtn').disabled = false;
+      document.getElementById('continueBtn').textContent = 'Continuar →';
+    });
+
+    // ========== TOGGLE CAMPO EQUIPO ==========
+    document.querySelectorAll('input[name="modo"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        const equipoField = document.getElementById('equipoField');
+        equipoField.hidden = radio.value !== 'equipo';
+        if (radio.value === 'equipo') {
+          equipoField.classList.add('show');
+        } else {
+          equipoField.classList.remove('show');
+        }
+      });
+    });
+
+    // ========== TOAST NOTIFICATION ==========
+    function showToast(msg) {
+      let toast = document.getElementById('toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.style.cssText = `
+          position: fixed;
+          bottom: 80px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: var(--primary);
+          color: white;
+          padding: 0.75rem 1.5rem;
+          border-radius: 12px;
+          font-weight: 600;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s;
+          z-index: 1000;
+          max-width: 90%;
+          word-break: break-word;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 16px var(--primary-glow);
+        `;
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // ========== SUBMIT FINAL CON FIREBASE ==========
+    document.getElementById('registroForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const zona = document.getElementById('zona').value;
+      const modo = document.querySelector('input[name="modo"]:checked').value;
+      const codigoIngresado = modo === 'equipo' 
+        ? document.getElementById('codigo-equipo')?.value.trim().toUpperCase() 
+        : null;
+      const gameConsent = document.getElementById('gameConsent').checked;
+      const liveConsent = document.getElementById('liveConsent').checked;
+
+      // Validaciones mínimas (enfoque volumen)
+      if (!zona) {
+        showToast('⚠️ Por favor, selecciona una zona de juego.');
+        return;
+      }
+      if (!gameConsent) {
+        showToast('⚠️ Debes aceptar participar en la cacería para continuar.');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      
+      // Micro-animación de carga + texto emocional
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="pulse-dot"></span> Conectando...';
+      submitBtn.classList.add('loading');
+
+      try {
+        // Login anónimo con Firebase
+        const userCredential = await auth.signInAnonymously();
+        const firebaseUid = userCredential.user.uid;
+        
+        // ✅ Hunter ID único basado en Firebase UID (no localStorage)
+        const hunterId = generarHunterId(firebaseUid);
+
+        // Generar código de equipo si es necesario
+        let equipo = null;
+        if (modo === 'equipo') {
+          equipo = codigoIngresado || generarCodigoEquipo();
+        }
+
+        // Guardar en Firebase
+        const jugadorData = {
+          hunterId: hunterId,
+          telefono: `+549${telefonoGuardado}`,
+          zona: zona,
+          modo: modo,
+          equipo: equipo,
+          fecha_registro: Date.now(),
+          activo: true,
+          whatsapp_verified: true,
+          consents: {
+            game: gameConsent,
+            live: liveConsent // opcional
+          }
+        };
+
+        await db.ref(`jugadores/${firebaseUid}`).set(jugadorData);
+        
+        // Guardar en localStorage para referencia rápida (solo este usuario)
+        localStorage.setItem('currentFirebaseUid', firebaseUid);
+        localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugadorData));
+        localStorage.setItem('currentHunterId', hunterId);
+        localStorage.removeItem('telefonoDraft'); // Limpiar draft
+
+        // ✅ Feedback inmersivo + animación dinámica
+        mostrarRegistroExitoso(hunterId, zona);
+
+      } catch (error) {
+        console.error("Error en registro:", error);
+        showToast('⚠️ Error al conectar. Intentá de nuevo.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🎯 Entrar a la Cacería';
+        submitBtn.classList.remove('loading');
+      }
+    });
+
+    // ========== GENERAR CÓDIGO DE EQUIPO ==========
+    function generarCodigoEquipo() {
+      const letras = "BCDFGHJKMNPQRSTVWXYZ";
+      const nums = "23456789";
+      let codigo = "";
+      for (let i = 0; i < 4; i++) 
+        codigo += letras.charAt(Math.floor(Math.random() * letras.length));
+      for (let i = 0; i < 3; i++) 
+        codigo += nums.charAt(Math.floor(Math.random() * nums.length));
+      return codigo;
+    }
+
+    // ========== FEEDBACK POST-REGISTRO CON ANIMACIÓN DINÁMICA ==========
+    function mostrarRegistroExitoso(hunterId, zona) {
+      const formCard = document.querySelector('.form-card');
+      const successPanel = document.getElementById('registrationSuccess');
+      const dynamicStatus = document.getElementById('dynamicStatus');
+      
+      // Actualizar ID mostrado
+      document.getElementById('displayHunterId').textContent = hunterId;
+      
+      // Ocultar formularios
+      if (formCard.querySelector('#step1')) formCard.querySelector('#step1').hidden = true;
+      if (formCard.querySelector('#step2')) formCard.querySelector('#step2').hidden = true;
+      if (formCard.querySelector('#phoneForm')) formCard.querySelector('#phoneForm').hidden = true;
+      if (formCard.querySelector('#registroForm')) formCard.querySelector('#registroForm').hidden = true;
+      
+      // Mostrar panel de éxito
+      successPanel.hidden = false;
+      successPanel.classList.add('show');
+      
+      // ✅ Animación dinámica de estados (genera expectativa)
+      const estados = [
+        "Conectando con el sistema...",
+        "Verificando tu zona...",
+        "Asignando misión inicial...",
+        "Buscando desafíos disponibles...",
+        "¡Listo para empezar!"
+      ];
+      
+      let paso = 0;
+      const interval = setInterval(() => {
+        if (dynamicStatus && paso < estados.length) {
+          dynamicStatus.textContent = estados[paso];
+          paso++;
+        }
+      }, 800);
+      
+      // ✅ Redirección con delay extendido (4.5s para procesar la experiencia)
+      setTimeout(() => {
+        clearInterval(interval);
+        successPanel.style.opacity = '0.7';
+        setTimeout(() => {
+          window.location.href = `app.html?id=${encodeURIComponent(hunterId)}&zona=${encodeURIComponent(zona)}`;
+        }, 300);
+      }, 4500);
+    }
   </script>
 </body>
 </html>

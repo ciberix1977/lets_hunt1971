@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- ========== BÁSICOS ========== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Codigo Ebel · Aventuras Urbanas con Premios Reales | Buenos Aires</title>
+  <meta name="description" content="Resolvé pistas en la ciudad, completá desafíos en vivo por WhatsApp y competí por premios reales. Gratis. Sin descarga. Jugá en CABA, Avellaneda, Lanús y Lomas." />
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://codigoebel.com/" />
+  
+  <!-- Robots -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  
+  <!-- Idioma -->
+  <meta name="language" content="es" />
+  <meta http-equiv="content-language" content="es-AR" />
+  
+  <!-- ========== OPEN GRAPH ========== -->
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Codigo Ebel · Aventuras Urbanas con Premios Reales" />
+  <meta property="og:description" content="Resolvé pistas en Buenos Aires, completá desafíos en vivo por WhatsApp y competí por premios reales. Gratis. Sin descarga." />
+  <meta property="og:url" content="https://codigoebel.com/" />
+  <meta property="og:site_name" content="Codigo Ebel" />
+  <meta property="og:image" content="https://codigoebel.com/og-image.jpg" />
+  <meta property="og:image:alt" content="Codigo Ebel: Logo con radar verde sobre fondo urbano nocturno" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
+  
+  <!-- ========== TWITTER CARDS ========== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@letshunt_BsAs" />
+  <meta name="twitter:creator" content="@letshunt_BsAs" />
+  <meta name="twitter:title" content="Codigo Ebel · Aventuras Urbanas con Premios Reales" />
+  <meta name="twitter:description" content="Resolvé pistas en la ciudad, completá desafíos en vivo por WhatsApp y competí por premios reales. Gratis. Sin descarga." />
+  <meta name="twitter:image" content="https://codigoebel.com/twitter-image.jpg" />
+  <meta name="twitter:image:alt" content="Codigo Ebel: Juego urbano en Buenos Aires" />
+  
+  <!-- ========== FAVICON & PWA ========== -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#0a0e17" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Codigo Ebel" />
+  
+  <!-- ========== PRECONNECT & PERFORMANCE ========== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="styles.css"></noscript>
+  
+  <!-- ========== STRUCTURED DATA ========== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Codigo Ebel",
+        "alternateName": "Let's Hunt",
+        "applicationCategory": "GameApplication",
+        "applicationSubCategory": "Urban Adventure Game",
+        "operatingSystem": "Any",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "ARS",
+          "availability": "https://schema.org/InStock"
+        },
+        "description": "Juego urbano gratuito en el Gran Buenos Aires donde resolvés pistas reales, completás desafíos en vivo por WhatsApp y competís por premios reales.",
+        "url": "https://codigoebel.com/",
+        "image": "https://codigoebel.com/og-image.jpg",
+        "featureList": [
+          "Pistas geolocalizadas",
+          "Desafíos en vivo por WhatsApp",
+          "Ranking en tiempo real",
+          "Premios reales"
+        ],
+        "gamePlatform": "Web, Mobile Web",
+        "playMode": ["MultiPlayer", "SinglePlayer"],
+        "genre": ["Adventure", "Puzzle", "Location-based"],
+        "author": { "@type": "Organization", "name": "Codigo Ebel" },
+        "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "127", "bestRating": "5", "worstRating": "1" },
+        "contentRating": "Teen",
+        "inLanguage": "es-AR"
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+  
+  <!-- ===== HERO: Minimalista y Directo ===== -->
+  <header class="hero" role="banner">
+    <div class="hero-content centered">
+      
+      <!-- Logo (único elemento visual principal) -->
+      <div class="logo-container centered">
+        <div class="logo-wrapper">
+          <img src="./code_ebel3.webp" alt="Codigo Ebel" loading="eager">
+        </div>
+      </div>
+      
+      <!-- Título + Hook emocional -->
+      <h1 class="landing-title">
+        Resolvé pistas reales y ganá premios en Buenos Aires
+      </h1>
+      
+      <!-- Hook emocional -->
+      <p class="emotion-hook">
+        Convertí la ciudad en tu juego
+      </p>
+      
+      <!-- Estado vivo (con contexto completo) -->
+      <div class="live-status">
+        <span class="pulse-dot"></span>
+        <span id="live-count">27</span> jugadores activos ahora
+      </div>
+      
+      <!-- CTA Principal (más agresivo) -->
+      <a href="registro.html" class="btn-hero btn-primary">
+        🚀 Empezar ahora gratis
+      </a>
+      
+      <!-- Micro-confianza (elimina fricción) -->
+      <p class="micro-trust">
+        No necesitás tarjeta ni descarga
+      </p>
+      
+    </div>
+  </header>
+
+  <!-- ===== MAIN: Contenido principal (SEMÁNTICA CORRECTA) ===== -->
+  <main role="main">
+    
+    <!-- Pasos del juego (movido abajo, más chico) -->
+    <section class="section-steps-compact" aria-label="Cómo jugar">
+      <div class="container">
+        <div class="steps-compact-grid">
+          <div class="step-compact"><span>📍</span> Caminás</div>
+          <div class="step-compact"><span>📱</span> Escaneás QR</div>
+          <div class="step-compact"><span>🧩</span> Resolvés</div>
+          <div class="step-compact"><span>🏆</span> Ganás</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CÓMO SE JUEGA (explicación completa) -->
+    <section id="como-jugar" class="section-howto" aria-labelledby="howto-title">
+      <div class="container">
+        <h2 id="howto-title" class="section-title">🧭 Cómo funciona en 3 pasos</h2>
+        <div class="steps-grid">
+          <article class="step-card">
+            <span class="step-number">1</span>
+            <h3>Te registrás</h3>
+            <p>Gratis. Elegís jugar solo o en equipo. Recibís tu ID único.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">2</span>
+            <h3>Resolvés pistas</h3>
+            <p>Buscá lugares con claves. Si suena WhatsApp: ¡desafío en vivo!</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">3</span>
+            <h3>Ganás premios</h3>
+            <p>Subí al ranking. Los primeros ganan tecnología y experiencias.</p>
+          </article>
+        </div>
+        <div class="section-cta">
+          <a href="registro.html" class="btn-hero btn-primary">✅ Quiero empezar ahora</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- RANKING -->
+    <section id="ranking" class="section-ranking" aria-labelledby="ranking-title">
+      <div class="container">
+        <h2 id="ranking-title" class="section-title">
+          🏆 Ranking Actual <span class="badge-small beta">Beta</span>
+        </h2>
+        <p class="ranking-note">🧪 Datos de prueba — El ranking real se activa al lanzar</p>
+        <div class="ranking-preview">
+          <ol class="ranking-list">
+            <li class="ranking-item ranking-item--gold"><span class="ranking-rank">1</span><span class="ranking-name">elcazadordel9</span><span class="ranking-stats">CABA • 2,840 pts</span></li>
+            <li class="ranking-item ranking-item--silver"><span class="ranking-rank">2</span><span class="ranking-name">team_recoleta</span><span class="ranking-stats">Recoleta • 2,310 pts</span></li>
+            <li class="ranking-item ranking-item--bronze"><span class="ranking-rank">3</span><span class="ranking-name">pistayfuego</span><span class="ranking-stats">Avellaneda • 1,980 pts</span></li>
+          </ol>
+          <p class="ranking-cta">🎯 Vos podés estar acá. Solo falta empezar.</p>
+        </div>
+        <div class="section-cta">
+          <a href="registro.html" class="btn-hero btn-primary">✅ Entrar al ranking</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES (WhatsApp primero) -->
+    <section class="section-features" aria-labelledby="features-title">
+      <div class="container">
+        <h2 id="features-title" class="section-title">¿Por qué Codigo Ebel?</h2>
+        <div class="features-grid">
+          <div class="feature-card featured">
+            <span class="feature-icon">💬</span>
+            <h3>Desafíos en vivo por WhatsApp</h3>
+            <p>Recibí retos en tiempo real. Aceptalos, cumplilos con videollamada y ganá ventaja.</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">📍</span>
+            <h3>Pistas geolocalizadas</h3>
+            <p>Las misiones se activan solo cuando estás en el lugar correcto. Sin spoilers.</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">🎁</span>
+            <h3>Premios reales</h3>
+            <p>Tecnología, experiencias urbanas y reconocimiento en la comunidad.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MISIONES -->
+    <section class="section-missions" aria-labelledby="missions-title">
+      <div class="container">
+        <h2 id="missions-title" class="section-title">🎯 Ejemplo de misión</h2>
+        <article class="mission-card mission-card--featured">
+          <div class="mission-header"><span class="mission-icon">🦁</span><span class="mission-badge">Nivel 2</span></div>
+          <h3>El Guardián de Bronce</h3>
+          <p>Buscá la estatua de Belgrano frente al Congreso. Resolvé el acertijo en su base.</p>
+          <div class="mission-reward">📍 Recibí la Coordenada A del mapa final</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PERFILES -->
+    <section class="section-profiles" aria-labelledby="profiles-title">
+      <div class="container">
+        <h2 id="profiles-title" class="section-title">👤 ¿Cuál es tu estilo?</h2>
+        <div class="profiles-grid">
+          <div class="profile-card"><span class="profile-icon">🗺️</span><h4>El Explorador</h4><p>La ciudad es tu mapa.</p></div>
+          <div class="profile-card"><span class="profile-icon">👯</span><h4>El Equipo</h4><p>3 o 4 amigos, un WhatsApp.</p></div>
+          <div class="profile-card"><span class="profile-icon">⚡</span><h4>El Competitivo</h4><p>Tu arma es la velocidad.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONSENT -->
+    <section class="section-consent" aria-label="Términos y privacidad">
+      <div class="container">
+        <div class="consent-box">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <p>Al registrarte, aceptás nuestra <a href="politicas.html#privacidad" target="_blank" rel="noopener">Política de Privacidad</a> y los <a href="politicas.html#terminos" target="_blank" rel="noopener">Términos y Condiciones</a>.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <img src="./code_ebel3.webp" alt="Codigo Ebel" width="140" height="42" loading="lazy">
+        <p>Aventuras Urbanas en el Gran Buenos Aires</p>
+      </div>
+      <div class="footer-legal">
+        <p class="disclaimer">ℹ️ <strong>Codigo Ebel</strong> es un proyecto independiente.</p>
+        <div class="footer-contact"><a href="mailto:contacto@codigoebel.com?subject=Contacto%20Code%20Ebel" class="btn-outline">📩 Contacto</a></div>
+        <div class="footer-bottom"><p>&copy; <span id="year">2025</span> Codigo Ebel.</p></div>
+      </div>
+    </div>
+    <div class="footer-social-section">
+      <ul class="social-list" role="list">
+        <li><a href="https://facebook.com/codigoebel" target="_blank" rel="noopener" aria-label="Facebook" class="social-link">📘</a></li>
+        <li><a href="https://instagram.com/codigo_ebel.ok" target="_blank" rel="noopener" aria-label="Instagram" class="social-link">📸</a></li>
+        <li><a href="https://x.com/@letshunt_BsAs" target="_blank" rel="noopener" aria-label="X" class="social-link">𝕏</a></li>
+        <li><a href="https://tiktok.com/@codigoebel" target="_blank" rel="noopener" aria-label="TikTok" class="social-link">🎵</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="app.js" defer></script>
+  
+  <!-- Script para contador y año -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+      
+      const liveCountEl = document.getElementById('live-count');
+      if (liveCountEl) {
+        const baseCount = 27;
+        const fluctuation = Math.floor(Math.random() * 25) - 12;
+        liveCountEl.textContent = baseCount + fluctuation;
+        setInterval(() => {
+          const newFluctuation = Math.floor(Math.random() * 25) - 12;
+          liveCountEl.textContent = baseCount + newFluctuation;
+        }, 30000);
+      }
+    });
+  </script>
+</body>
+</html>

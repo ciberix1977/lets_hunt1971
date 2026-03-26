@@ -1,838 +1,1133 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Codigo Ebel · App</title>
-<meta name="description" content="Tu cacería urbana en el Gran Buenos Aires" />
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<!-- Firebase SDK (legacy v8.10.1) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
-<!-- Librerías externas -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#000000">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Codigo Ebel · App</title>
+  <meta name="description" content="Tu cacería urbana en el Gran Buenos Aires" />
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- Firebase SDK (legacy v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+  
+  <!-- Librerías externas -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#000000">
 </head>
 <body>
+
+<!-- 🔐 PANTALLA DE ACTIVACIÓN (NUEVO) -->
+<div id="activation-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a0a12,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:2rem;text-align:center;">
+  <div class="logo-container centered" style="margin-bottom:2rem;">
+    <img src="code_ebel3.webp" alt="Codigo Ebel" style="max-width:200px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.6));">
+  </div>
+  <h2 style="color:var(--primary);font-size:1.5rem;margin-bottom:1rem;">🕶️ Bienvenido, cazador</h2>
+  <p id="activation-zone" style="color:var(--text-muted);margin-bottom:1.5rem;font-size:1.1rem;">Tu señal ha sido detectada en <strong>CABA</strong></p>
+  <div class="activation-status" style="margin-bottom:2rem;">
+    <span class="pulse-dot" style="display:inline-block;margin-right:0.5rem;"></span>
+    <span id="activation-text">Sincronizando misiones activas...</span>
+  </div>
+  <button id="enter-system-btn" class="btn-hero" style="opacity:0;pointer-events:none;transition:opacity 0.3s;">
+    🎯 Entrar al sistema
+  </button>
+</div>
+
+<!-- HEADER -->
 <header>
-<div class="header-left">
-<div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
-</div>
-<div class="header-center">
-<img src="code_ebel3.webp" alt="Codigo Ebel" class="app-logo">
-</div>
-<div class="header-right">
-<div class="hunter-id" id="hunterIdDisplay">ID: LH-0000</div>
-</div>
+  <div class="header-left">
+    <div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
+    <!-- ✅ Timer global para tensión -->
+    <div id="global-timer" class="global-timer" style="display:none;font-size:0.75rem;color:#ff6b6b;margin-top:0.3rem;">⏰ Expira en: <span id="global-time">12:00</span></div>
+  </div>
+  <div class="header-center">
+    <div class="logo-container centered">
+      <img src="code_ebel3.webp" alt="Codigo Ebel" class="app-logo">
+    </div>
+  </div>
+  <div class="header-right">
+    <!-- ✅ Progresión visible -->
+    <div class="hunter-id" id="hunterIdDisplay">ID: LH-0000</div>
+    <div id="level-display" class="level-badge" style="font-size:0.7rem;margin-top:0.3rem;color:var(--primary);">N1</div>
+  </div>
 </header>
+
+<!-- MAIN CONTENT -->
 <main>
-<div class="container">
-<!-- FASE 1: Consigna inicial -->
-<div id="phase1-consigna" class="mission-phase">
-<div class="mission-card"></div>
-</div>
-<!-- FASE 2: Mapa de aproximación -->
-<div id="phase2-mapa" class="mission-phase" style="display: none;">
-<div class="mission-card"></div>
-<div id="proximity-status" style="text-align:center; margin-top:1rem; color:#64b5f7; font-size:0.9rem;"></div>
-</div>
-<!-- FASE 3: Pista final + QR -->
-<div id="phase3-pista" class="mission-phase" style="display: none;">
-<div class="mission-card"></div>
-</div>
-<!-- FASE 4: Misión completada -->
-<div id="phase4-completed" class="mission-phase" style="display: none;">
-<div class="mission-card"></div>
-</div>
-<!-- SECCIÓN PARA EQUIPOS -->
-<div id="teamSection" class="mission-phase" style="display: none;">
-<div class="mission-card"></div>
-<div id="team-proximity-status" style="text-align:center; margin-top:1rem; color:#64b5f7; font-size:0.9rem;"></div>
-</div>
-</div>
+  <div class="container">
+    
+    <!-- ✅ RADAR DE JUGADORES (NUEVO) -->
+    <div id="radar-section" class="mission-phase" style="display:none;">
+      <div class="mission-card">
+        <h3 style="margin-bottom:1rem;">📡 Cazadores cercanos</h3>
+        <div id="nearby-players" style="min-height:60px;">
+          <p style="color:var(--text-muted);font-size:0.9rem;">Busando señales...</p>
+        </div>
+        <div id="radar-urgency" style="margin-top:1rem;font-size:0.85rem;color:#ff6b6b;display:none;">
+          ⚠️ <span id="urgency-text">2 cazadores en tu zona</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 0: Consigna inicial con narrativa mínima -->
+    <div id="phase0-intro" class="mission-phase" style="display:none;">
+      <div class="mission-card">
+        <div class="mission-title"><span class="icon">🦁</span><span class="title-text" id="intro-mission-title">Cargando...</span></div>
+        <p class="pista" id="intro-mission-desc" style="margin:1rem 0;font-size:0.95rem;line-height:1.4;"></p>
+        <div class="actions">
+          <button class="btn btn-primary" id="accept-intro-btn">✅ Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 1: Consigna -->
+    <div id="phase1-consigna" class="mission-phase" style="display:none;">
+      <div class="mission-card"></div>
+    </div>
+
+    <!-- FASE 2: Mapa de aproximación -->
+    <div id="phase2-mapa" class="mission-phase" style="display:none;">
+      <div class="mission-card"></div>
+      <div id="proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
+      <!-- ✅ Fallback manual siempre visible -->
+      <button id="manual-code-btn" class="btn btn-outline" style="margin-top:1rem;width:100%;">⌨️ Ingresar código manual</button>
+    </div>
+
+    <!-- FASE 3: Pista final + QR -->
+    <div id="phase3-pista" class="mission-phase" style="display:none;">
+      <div class="mission-card"></div>
+    </div>
+
+    <!-- FASE 4: Misión completada (sin redirección) -->
+    <div id="phase4-completed" class="mission-phase" style="display:none;">
+      <div class="mission-card"></div>
+    </div>
+
+    <!-- SECCIÓN PARA EQUIPOS (con coordinación real) -->
+    <div id="teamSection" class="mission-phase" style="display:none;">
+      <div class="mission-card"></div>
+      <div id="team-coordination" style="margin-top:1rem;padding:1rem;background:rgba(168,85,247,0.1);border-radius:12px;display:none;">
+        <p style="font-size:0.9rem;margin-bottom:0.5rem;"><strong>👥 Coordinación de equipo:</strong></p>
+        <p id="team-task" style="font-size:0.85rem;color:var(--text-muted);"></p>
+        <div id="team-timer" style="margin-top:0.5rem;font-size:0.9rem;color:#ff6b6b;font-weight:600;"></div>
+      </div>
+      <div id="team-proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
+    </div>
+
+    <!-- ✅ PROGRESO VISUAL (siempre visible) -->
+    <div id="progress-summary" style="margin-top:2rem;text-align:center;">
+      <div style="display:inline-flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+        <span style="background:rgba(0,170,255,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+          🎯 Misiones: <strong id="missions-count">0</strong>
+        </span>
+        <span style="background:rgba(168,85,247,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+          🔥 Racha: <strong id="streak-count">0</strong> días
+        </span>
+        <span style="background:rgba(255,215,0,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+          🏆 Nivel: <strong id="current-level">N1</strong>
+        </span>
+      </div>
+    </div>
+
+  </div>
 </main>
+
 <!-- Modal de invitación (equipo) -->
 <div id="inviteModal" class="modal-overlay">
-<div class="modal-content">
-<h3>👥 Invitar a tu equipo</h3>
-<p>Compartí este código para que otros se unan:</p>
-<div id="codigoInvitacion">CARGANDO...</div>
-<div class="modal-actions">
-<button id="copyCodeBtn" class="btn btn-outline">📋 Copiar código</button>
-<button id="shareWaBtn" class="btn btn-primary">💬 WhatsApp</button>
+  <div class="modal-content">
+    <h3>👥 Invitar a tu equipo</h3>
+    <p>Compartí este código para que otros se unan:</p>
+    <div id="codigoInvitacion">CARGANDO...</div>
+    <div class="modal-actions">
+      <button id="copyCodeBtn" class="btn btn-outline">📋 Copiar código</button>
+      <button id="shareWaBtn" class="btn btn-primary">💬 WhatsApp</button>
+    </div>
+    <button id="closeModalBtn" class="modal-close">Cerrar</button>
+  </div>
 </div>
-<button id="closeModalBtn" class="modal-close">Cerrar</button>
-</div>
-</div>
+
 <!-- Escáner QR -->
 <div id="scannerOverlay" class="modal-overlay">
-<div class="scanner-container">
-<h3>🔍 Escanea el Código QR</h3>
-<video id="scannerVideo" autoplay playsinline></video>
-<canvas id="scannerCanvas" style="display: none;"></canvas>
-<div class="scanner-frame">
-<div class="scanner-corner tl"></div>
-<div class="scanner-corner tr"></div>
-<div class="scanner-corner bl"></div>
-<div class="scanner-corner br"></div>
+  <div class="scanner-container">
+    <h3>🔍 Escanea el Código QR</h3>
+    <video id="scannerVideo" autoplay playsinline></video>
+    <canvas id="scannerCanvas" style="display:none;"></canvas>
+    <div class="scanner-frame">
+      <div class="scanner-corner tl"></div>
+      <div class="scanner-corner tr"></div>
+      <div class="scanner-corner bl"></div>
+      <div class="scanner-corner br"></div>
+    </div>
+    <div class="scanner-actions">
+      <button id="closeScannerBtn" class="btn btn-outline">❌ Cancelar</button>
+      <button id="manualInputBtn" class="btn btn-primary">⌨️ Ingresar manualmente</button>
+    </div>
+  </div>
 </div>
-<div class="scanner-actions">
-<button id="closeScannerBtn" class="btn btn-outline">❌ Cancelar</button>
-<button id="manualInputBtn" class="btn btn-primary">⌨️ Ingresar manualmente</button>
+
+<!-- Modal de código manual -->
+<div id="manualCodeModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>⌨️ Ingresar código manualmente</h3>
+    <p style="margin-bottom:1rem;font-size:0.9rem;color:var(--text-muted);">Si el QR no funciona, ingresá el código de 6 caracteres:</p>
+    <input type="text" id="manual-code-input" maxlength="6" placeholder="Ej: AB12CD" style="width:100%;padding:0.8rem;margin-bottom:1rem;border-radius:8px;border:1px solid var(--surface-border);background:var(--surface);color:var(--text);font-size:1.1rem;text-align:center;letter-spacing:2px;text-transform:uppercase;">
+    <div class="modal-actions">
+      <button id="submit-manual-code" class="btn btn-primary">✅ Validar</button>
+      <button id="cancel-manual-code" class="btn btn-outline">Cancelar</button>
+    </div>
+  </div>
 </div>
-</div>
-</div>
+
 <!-- NAVEGACIÓN MÓVIL -->
 <nav class="mobile-nav">
-<a href="progreso.html#radar"><i>📡</i>Señal</a>
-<a href="#misiones"><i>🎯</i>Misiones</a>
-<a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
-<a href="progreso.html"><i>📊</i>Progreso</a>
+  <a href="#radar" id="nav-radar"><i>📡</i>Radar</a>
+  <a href="#misiones" id="nav-missions"><i>🎯</i>Misiones</a>
+  <a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
+  <a href="progreso.html" id="nav-progress"><i>📊</i>Progreso</a>
 </nav>
-<!-- BOTONES COORDINADOS -->
-<div id="floating-controls" style="
-position: fixed;
-right: 20px;
-bottom: 20px;
-z-index: 999;
-display: flex;
-flex-direction: column;
-gap: 10px;
-">
-<button id="narration-toggle"
-title="Activar/Desactivar narración"
-style="
-background: rgba(0,0,0,0.7);
-color: white;
-border: none;
-width: 50px;
-height: 50px;
-border-radius: 50%;
-font-size: 1.2rem;
-cursor: pointer;
-transition: all 0.3s ease;
-">🔊</button>
-<button id="accessibility-toggle"
-title="Modo normal"
-style="
-background: rgba(0,0,0,0.7);
-color: white;
-border: none;
-width: 50px;
-height: 50px;
-border-radius: 50%;
-font-size: 1.2rem;
-cursor: pointer;
-transition: all 0.3s ease;
-">👁️</button>
+
+<!-- BOTONES FLOTANTES -->
+<div id="floating-controls" style="position:fixed;right:20px;bottom:20px;z-index:999;display:flex;flex-direction:column;gap:10px;">
+  <button id="narration-toggle" title="Activar/Desactivar narración" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🔊</button>
+  <button id="accessibility-toggle" title="Modo normal" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">👁️</button>
 </div>
-<!-- Contenedor del banner de instalación -->
+
+<!-- Banner PWA -->
 <div id="pwa-install-banner"></div>
+
+<!-- Toast Notification -->
+<div id="toast"></div>
+
 <!-- LÓGICA PRINCIPAL -->
 <script>
 // ========== FIREBASE ==========
 const firebaseConfig = {
-apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
-authDomain: "let-s-hunt.firebaseapp.com",
-databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
-projectId: "let-s-hunt",
-storageBucket: "let-s-hunt.firebasestorage.app",
-messagingSenderId: "787017812046",
-appId: "1:787017812046:web:da098b2361df4dda995b1f",
-measurementId: "G-07SR9WR8NV"
+  apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+  authDomain: "let-s-hunt.firebaseapp.com",
+  databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+  projectId: "let-s-hunt",
+  storageBucket: "let-s-hunt.firebasestorage.app",
+  messagingSenderId: "787017812046",
+  appId: "1:787017812046:web:da098b2361df4dda995b1f",
+  measurementId: "G-07SR9WR8NV"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();
 const analytics = firebase.analytics();
-// ========== ACCESIBILIDAD EN MOVIMIENTO ==========
+
+// ========== VARIABLES GLOBALES ==========
 let accessibilityMode = localStorage.getItem('lh_accessibility_mode') || 'normal';
-// Aplicar modo de accesibilidad
-function applyAccessibilityMode() {
-const body = document.body;
-const buttons = document.querySelectorAll('button, .btn');
-const textElements = document.querySelectorAll('p, h1, h2, h3, h4, .pista, .mission-title, .tension-bar');
-// Remover clases previas
-body.classList.remove('accessibility-high-contrast', 'accessibility-large-text');
-if (accessibilityMode === 'high-contrast') {
-// Modo exterior - alto contraste
-body.classList.add('accessibility-high-contrast');
-// Aplicar estilos de alto contraste
-const style = document.createElement('style');
-style.id = 'accessibility-high-contrast-styles';
-style.textContent = `
-.accessibility-high-contrast {
-background: black !important;
-color: yellow !important;
-}
-.accessibility-high-contrast .mission-card,
-.accessibility-high-contrast .modal-content {
-background: #111 !important;
-border: 2px solid yellow !important;
-color: yellow !important;
-}
-.accessibility-high-contrast button,
-.accessibility-high-contrast .btn {
-background: yellow !important;
-color: black !important;
-border: 2px solid yellow !important;
-font-weight: bold !important;
-}
-.accessibility-high-contrast .btn-outline {
-background: transparent !important;
-color: yellow !important;
-}
-.accessibility-high-contrast .pista,
-.accessibility-high-contrast .tension-bar {
-color: #ffaa33 !important;
-}
-.accessibility-high-contrast .hunter-id {
-color: lime !important;
-font-weight: bold !important;
-}
-`;
-document.head.appendChild(style);
-} else if (accessibilityMode === 'large-text') {
-// Modo texto grande
-body.classList.add('accessibility-large-text');
-const style = document.createElement('style');
-style.id = 'accessibility-large-text-styles';
-style.textContent = `
-.accessibility-large-text {
-font-size: 110% !important;
-}
-.accessibility-large-text h1 { font-size: 180% !important; }
-.accessibility-large-text h2 { font-size: 160% !important; }
-.accessibility-large-text h3 { font-size: 140% !important; }
-.accessibility-large-text h4 { font-size: 130% !important; }
-.accessibility-large-text p,
-.accessibility-large-text .pista { font-size: 120% !important; }
-.accessibility-large-text button,
-.accessibility-large-text .btn {
-padding: 12px 20px !important;
-font-size: 110% !important;
-min-height: 50px !important;
-}
-.accessibility-large-text .mission-card {
-padding: 20px !important;
-}
-`;
-document.head.appendChild(style);
-}
-// Actualizar botón de accesibilidad
-updateAccessibilityButton();
-}
-// Actualizar botón de accesibilidad
-function updateAccessibilityButton() {
-const btn = document.getElementById('accessibility-toggle');
-if (!btn) return;
-const modes = {
-'normal': '👁️',
-'high-contrast': '☀️',
-'large-text': '🅰️'
-};
-btn.textContent = modes[accessibilityMode] || '👁️';
-btn.title = getAccessibilityModeName(accessibilityMode);
-}
-function getAccessibilityModeName(mode) {
-const names = {
-'normal': 'Modo normal',
-'high-contrast': 'Modo exterior (alto contraste)',
-'large-text': 'Texto grande'
-};
-return names[mode] || 'Accesibilidad';
-}
-// Alternar modo de accesibilidad
-function toggleAccessibilityMode() {
-const modes = ['normal', 'high-contrast', 'large-text'];
-const currentIndex = modes.indexOf(accessibilityMode);
-const nextIndex = (currentIndex + 1) % modes.length;
-accessibilityMode = modes[nextIndex];
-localStorage.setItem('lh_accessibility_mode', accessibilityMode);
-// Limpiar estilos anteriores
-const oldStyle1 = document.getElementById('accessibility-high-contrast-styles');
-const oldStyle2 = document.getElementById('accessibility-large-text-styles');
-if (oldStyle1) oldStyle1.remove();
-if (oldStyle2) oldStyle2.remove();
-// Aplicar nuevo modo
-applyAccessibilityMode();
-showToast(`✅ ${getAccessibilityModeName(accessibilityMode)}`);
-}
-// ========== POSICIONAMIENTO COORDINADO DE BOTONES ==========
-function updateFloatingControlsPosition() {
-const controls = document.getElementById('floating-controls');
-if (!controls) return;
-// Detectar navegación móvil
-const mobileNav = document.querySelector('.mobile-nav');
-const isMobileNavVisible = mobileNav &&
-(window.getComputedStyle(mobileNav).display !== 'none');
-// Calcular posición
-if (isMobileNavVisible) {
-const navHeight = mobileNav.offsetHeight || 60;
-controls.style.bottom = `${navHeight + 20}px`;
-} else {
-controls.style.bottom = '20px';
-}
-}
-// ========== RECUPERACIÓN POST-ERROR ==========
 let redemptionOffered = false;
-// Mostrar misión de redención
-async function showRedemptionMission() {
-if (redemptionOffered) return;
-// Obtener misión alternativa en otra zona
-const allZones = ['CABA', 'Avellaneda', 'Lanús', 'Lomas de Zamora'];
-const otherZones = allZones.filter(z => z !== jugador.zona);
-const randomZone = otherZones[Math.floor(Math.random() * otherZones.length)];
-const redemptionMission = selectRandomMission(randomZone, 'solitario');
-// Mostrar mensaje de redención
-document.querySelector('#phase1-consigna .mission-card').innerHTML = `
-<div class="mission-title">
-<span class="icon">🕊️</span>
-Misión de Redención
-</div>
-<div class="tension-bar" style="margin: 1rem 0; background: rgba(106, 170, 255, 0.15);">
-🌟 Segunda oportunidad
-</div>
-<p class="pista">
-No todos los cazadores triunfan a la primera. Pero tú... tienes el instinto necesario.
-<br><br>
-<strong>${redemptionMission.titulo}</strong><br>
-${redemptionMission.descripcion_narrativa || redemptionMission.pista_al_llegar}
-</p>
-<button class="btn btn-primary" id="accept-redemption-btn">✅ Aceptar misión de redención</button>
-<button class="btn btn-outline" id="retry-original-btn" style="margin-top: 10px;">🔄 Intentar original</button>
-`;
-redemptionOffered = true;
-// Eventos para botones
-document.getElementById('accept-redemption-btn').addEventListener('click', () => {
-currentMission = redemptionMission;
-jugador.zona = randomZone;
-localStorage.setItem(`jugador_${jugador.id}`, JSON.stringify(jugador));
-missionStartTime = Date.now();
-startTimer();
-guardarProgreso(currentMission.id);
-showPhase2();
-});
-document.getElementById('retry-original-btn').addEventListener('click', () => {
-showPhase1(); // Intentar nuevamente la misión original
-});
-}
-// Consuelo narrativo inteligente
-function playConsolationNarration(failureReason) {
-const consolations = {
-'timeout': "El tiempo se agotó, pero tu instinto de caza permanece. Hay otras presas esperando.",
-'already_completed': "Alguien fue más rápido, pero eso no define tu habilidad. El verdadero cazador siempre encuentra otra oportunidad.",
-'wrong_code': "El código no era correcto, pero cada error te acerca más a la verdad. Confía en tu instinto.",
-'general': "No todos los cazadores triunfan a la primera. Pero los verdaderos nunca se rinden."
-};
-const message = consolations[failureReason] || consolations.general;
-playNarration(message);
-}
-// Sugerencia inteligente basada en contexto
-function getSuggestionBasedOnContext(failureReason) {
-let suggestion = "";
-if (failureReason === 'timeout') {
-suggestion = "💡 Consejo: Prueba en horario de menor tráfico peatonal.";
-} else if (failureReason === 'already_completed') {
-suggestion = "💡 Consejo: Activa notificaciones para saber cuándo hay nuevas misiones disponibles.";
-} else if (failureReason === 'wrong_code') {
-suggestion = "💡 Consejo: Asegúrate de estar en el lugar exacto antes de escanear.";
-} else {
-suggestion = "💡 Consejo: Cada cacería te hace más fuerte. ¡Intenta de nuevo!";
-}
-return suggestion;
-}
-// ========== DATOS DINÁMICOS ==========
 let misionesSolitario = [];
 let misionesEquipo = [];
 let currentMission = null;
-let missionStartTime = null;
-let deferredPrompt;
-// ========== INICIALIZACIÓN ==========
-async function initApp() {
-try {
-const [solitarioRes, equipoRes] = await Promise.all([
-fetch('misiones-solitario.json'),
-fetch('misiones-equipo-local.json')
-]);
-if (!solitarioRes.ok) throw new Error(`Error ${solitarioRes.status}: misiones-solitario.json`);
-if (!equipoRes.ok) throw new Error(`Error ${equipoRes.status}: misiones-equipo-local.json`);
-misionesSolitario = await solitarioRes.json();
-misionesEquipo = await equipoRes.json();
-} catch (err) {
-console.error("⚠️ Error crítico:", err);
-showToast("⚠️ Error al cargar misiones. Verifica los archivos JSON.");
-misionesSolitario = [
-{ id: 1, zona: "CABA", titulo: "Misión de prueba", ubicacion_mapa: "Plaza de Mayo", pista_al_llegar: "Busca la pista final.", coordenadas: { lat: -34.6037, lng: -58.3816 } }
-];
-}
-// Aplicar modo de accesibilidad
-applyAccessibilityMode();
-setupJugador();
-}
-// ========== VERIFICACIÓN DE MISIÓN EN TIEMPO REAL ==========
-async function isMisionDisponible(misionId, zona) {
-try {
-const misionRef = db.ref(`misiones/${misionId}-${zona}`);
-const snapshot = await misionRef.once('value');
-if (!snapshot.exists()) {
-return true; // Disponible si no existe
-}
-const data = snapshot.val();
-return data.estado !== 'completada';
-} catch (err) {
-console.error("Error en Firebase:", err);
-return true; // Fallback seguro
-}
-}
-
-// ✅ FUNCIÓN ACTUALIZADA CON TRANSACCIÓN ATÓMICA
-async function completarMision(misionId, zona, hunterId) {
-try {
-const misionRef = db.ref(`misiones/${misionId}-${zona}`);
-// Usar transacción atómica de Firebase
-const transactionResult = await misionRef.transaction((currentData) => {
-// Si no existe → somos los primeros
-if (currentData === null) {
-return {
-estado: 'completada',
-hunter_ganador: hunterId,
-timestamp: firebase.database.ServerValue.TIMESTAMP
-};
-}
-// Si ya está completada → no modificar
-if (currentData.estado === 'completada') {
-return; // Devuelve undefined = no cambios
-}
-// Caso imprevisto → mantener estado actual
-return currentData;
-});
-// Verificar si fuimos los ganadores
-if (transactionResult.committed &&
-transactionResult.snapshot.val()?.hunter_ganador === hunterId) {
-return true; // Éxito - somos los primeros
-}
-return false; // Alguien más llegó primero o hubo error
-} catch (err) {
-console.error("Error en transacción atómica:", err);
-// En caso de error, asumir que falló (seguro para el jugador)
-return false;
-}
-}
-
-// Función para ocultar todas las fases
-function hideAllPhases() {
-document.getElementById('phase1-consigna').style.display = 'none';
-document.getElementById('phase2-mapa').style.display = 'none';
-document.getElementById('phase3-pista').style.display = 'none';
-document.getElementById('phase4-completed').style.display = 'none';
-document.getElementById('teamSection').style.display = 'none';
-}
-// ========== CONFIGURACIÓN DEL JUGADOR ==========
-let jugador;
-let firebaseUser = null;
-function setupJugador() {
-const urlParams = new URLSearchParams(window.location.search);
-let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId');
-// Iniciar sesión anónima
-auth.signInAnonymously().catch((error) => {
-console.error("Error al iniciar sesión anónima:", error);
-});
-auth.onAuthStateChanged((user) => {
-if (user) {
-firebaseUser = user;
-localStorage.setItem('firebaseUid', user.uid);
-// Usar el ID del registro (no generar uno nuevo basado en UID)
-_continueSetupJugador(hunterId);
-} else {
-_continueSetupJugador(hunterId);
-}
-});
-}
-function _continueSetupJugador(hunterId) {
-if (!hunterId) {
-// Generar nuevo ID secuencial con prefijo LH
-const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
-hunterId = `LH-${String(nextId).padStart(4, '0')}`;
-localStorage.setItem('lastHunterId', nextId);
-const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
-jugador = {
-id: hunterId,
-nombre: 'Jugador de Prueba',
-telefono: '+5491112345678',
-zona: ciudadFromURL,
-modo: 'individual'
-};
-localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
-localStorage.setItem('currentHunterId', hunterId);
-} else {
-// Manejo seguro de localStorage
-let storedJugador;
-try {
-storedJugador = JSON.parse(localStorage.getItem(`jugador_${hunterId}`));
-} catch (e) {
-console.warn("Datos corruptos en localStorage. Reiniciando jugador.");
-storedJugador = null;
-}
-jugador = storedJugador || {
-id: hunterId,
-zona: 'CABA',
-modo: 'individual'
-};
-const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || '').replace(/\+/g, ' ')).trim();
-if (ciudadFromURL) {
-const zonaNormalizada = ciudadFromURL.normalize('NFC');
-if (getMisionesByZona(zonaNormalizada, 'solitario').length > 0) {
-jugador.zona = zonaNormalizada;
-}
-}
-localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugador));
-localStorage.setItem('currentHunterId', hunterId);
-}
-document.getElementById('hunterIdDisplay').textContent =
-jugador.modo === 'equipo' ? `👥 ${jugador.equipo || hunterId}` : `ID: ${hunterId}`;
-// Resetear estado de redención
-redemptionOffered = false;
-// Mostrar la misión correspondiente
-if (jugador.modo === 'equipo') {
-showTeamMission();
-} else {
-showPhase1();
-}
-}
-// ========== UTILIDADES DE MISIÓN ==========
-function getMisionesByZona(zona, tipo = 'solitario') {
-const lista = tipo === 'equipo' ? misionesEquipo : misionesSolitario;
-const zonaNormalizada = (zona || '').trim().toLowerCase();
-const barriosCABA = [
-'san telmo', 'la boca', 'recoleta', 'microcentro', 'palermo',
-'congreso', 'almagro', 'retiro', 'balvanera', 'villa crespo',
-'belgrano', 'barracas', 'flores', 'villa urquiza', 'puerto madero',
-'san cristóbal'
-];
-return lista.filter(m => {
-const misionZona = (m.zona || '').trim().toLowerCase();
-if (misionZona === zonaNormalizada) {
-return true;
-}
-if (zonaNormalizada === 'caba' && barriosCABA.includes(misionZona)) {
-return true;
-}
-if (barriosCABA.includes(zonaNormalizada) && barriosCABA.includes(misionZona)) {
-return true;
-}
-return false;
-});
-}
-function selectRandomMission(zona, tipo = 'solitario') {
-const misiones = getMisionesByZona(zona, tipo);
-if (misiones.length === 0) {
-return getMisionesByZona('CABA', tipo)[0] || misionesSolitario[0];
-}
-return misiones[Math.floor(Math.random() * misiones.length)];
-}
-// ========== FLUJO INDIVIDUAL ==========
-async function showPhase1() {
-currentMission = selectRandomMission(jugador.zona, 'solitario');
-// Registrar evento de Analytics
-analytics.logEvent('mision_aceptada', {
-zona: jugador.zona,
-tipo: 'solitario',
-hunter_id: jugador.id
-});
-// Verificar disponibilidad en tiempo real
-const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
-if (!disponible) {
-// Mostrar consuelo narrativo
-playConsolationNarration('already_completed');
-// Mostrar sugerencia y opción de redención
-document.querySelector('#phase1-consigna .mission-card').innerHTML = `
-<div class="mission-title">
-<span class="icon">⚠️</span>
-Misión ya completada
-</div>
-<div class="tension-bar" style="margin: 1rem 0; background: rgba(255, 170, 51, 0.15);">
-⏳ Alguien fue más rápido
-</div>
-<p class="pista">
-${getSuggestionBasedOnContext('already_completed')}
-<br><br>
-Pero no te preocupes. En Let's Hunt, cada fracaso es una lección.
-</p>
-<button class="btn btn-primary" id="new-mission-btn">🎯 Nueva misión</button>
-<button class="btn btn-outline" id="redemption-btn" style="margin-top: 10px;">🕊️ Misión de redención</button>
-`;
-document.getElementById('phase1-consigna').style.display = 'block';
-document.getElementById('new-mission-btn').addEventListener('click', showPhase1);
-document.getElementById('redemption-btn').addEventListener('click', showRedemptionMission);
-return;
-}
-document.querySelector('#phase1-consigna .mission-card').innerHTML = `
-<div class="mission-title">
-<span class="icon">🦁</span>
-${currentMission.titulo}
-</div>
-<div class="tension-bar" style="margin: 1rem 0; background: rgba(255,69,58,0.15);">
-⏳ Listo para cazar
-</div>
-<p class="pista">${currentMission.descripcion_narrativa || currentMission.pista_al_llegar}</p>
-<button class="btn btn-primary" id="start-mission-btn">✅ Aceptar y comenzar</button>
-`;
-document.getElementById('phase1-consigna').style.display = 'block';
-document.getElementById('start-mission-btn').addEventListener('click', () => {
-missionStartTime = Date.now();
-startTimer();
-guardarProgreso(currentMission.id);
-showPhase2();
-});
-}
-function showPhase2() {
-document.getElementById('phase1-consigna').style.display = 'none';
-document.querySelector('#phase2-mapa .mission-card').innerHTML = `
-<h3>📍 Acércate al objetivo</h3>
-<p style="margin: 1rem 0; color:#cbd5e1; line-height: 1.4;">${currentMission.ubicacion_mapa}</p>
-<div id="mapApprox" style="height: 300px; border-radius:12px; margin:1rem 0;"></div>
-<p id="proximity-instructions" style="font-size:0.9rem; color:#94a3b8;">Esperando tu ubicación...</p>
-<!-- Botón de acción grande para móviles -->
-<button class="btn btn-primary" id="back-to-phase1-btn" style="margin-top: 15px; width: 100%; padding: 12px;">
-🔙 Volver a misión
-</button>
-`;
-document.getElementById('phase2-mapa').style.display = 'block';
-loadApproxMap(currentMission.coordenadas.lat, currentMission.coordenadas.lng);
-startProximityCheck(currentMission.coordenadas.lat, currentMission.coordenadas.lng);
-// Evento para botón de retroceso
-document.getElementById('back-to-phase1-btn').onclick = () => {
-document.getElementById('phase2-mapa').style.display = 'none';
-document.getElementById('phase1-consigna').style.display = 'block';
-};
-}
-function showPhase3() {
-document.getElementById('phase2-mapa').style.display = 'none';
-const recoveryCode = generarRecoveryCode();
-localStorage.setItem(`recovery_${jugador.id}`, recoveryCode);
-document.querySelector('#phase3-pista .mission-card').innerHTML = `
-<h3>🔍 Pista final</h3>
-<p class="pista">${currentMission.pista_al_llegar}</p>
-<div class="actions">
-<button class="btn btn-primary" id="scan-btn">🔍 Escanear QR</button>
-</div>
-<div style="margin-top:1.2rem; font-size:0.9rem;">
-🔑 Código de recuperación: <code>${recoveryCode}</code>
-</div>
-`;
-document.getElementById('phase3-pista').style.display = 'block';
-document.getElementById('scan-btn').addEventListener('click', openQRScanner);
-playNarration(`Cazador ${jugador.id.replace('LH-', '')}. Estás en la zona. La pista final ha sido revelada.`);
-}
-// ========== FLUJO EQUIPO ==========
 let currentTeamMission = null;
-async function showTeamMission() {
-document.body.classList.add('modo-equipo');
-currentTeamMission = selectRandomMission(jugador.zona, 'equipo');
-const recoveryCode = generarRecoveryCode();
-localStorage.setItem(`recovery_${jugador.id}`, recoveryCode);
-document.querySelector('#teamSection .mission-card').innerHTML = `
-<div class="mission-title">
-<span class="icon">👁️</span>
-${currentTeamMission.titulo}
-<span class="status active nivel-N2">ACTIVA • N2</span>
-</div>
-<p class="pista">${currentTeamMission.descripcion_narrativa}</p>
-<div class="actions">
-<button class="btn btn-primary" id="accept-mission-btn">✅ Aceptar misión</button>
-<button class="btn btn-outline" id="scan-btn-team">🔍 Escanear QR</button>
-</div>
-<div style="margin-top:1.2rem; font-size:0.9rem;">
-🔑 Código de recuperación: <code>${recoveryCode}</code>
-</div>
-`;
-document.getElementById('teamSection').style.display = 'block';
-document.getElementById('accept-mission-btn').addEventListener('click', () => {
-missionStartTime = Date.now();
-startTimer();
-guardarProgreso(currentTeamMission.id);
-showToast("📍 Misión registrada · Tu alias ya está activo");
-startTeamProximityCheck();
-});
-document.getElementById('scan-btn-team').addEventListener('click', openQRScanner);
-}
-function startTeamProximityCheck() {
-const coordsA = currentTeamMission.qr_cercanos[0].coordenadas;
-loadApproxMap(coordsA.lat, coordsA.lng);
-document.getElementById('team-proximity-status').textContent = "📍 Esperando ubicación...";
-if (navigator.geolocation) {
-const watchId = navigator.geolocation.watchPosition(
-(pos) => {
-const userLat = pos.coords.latitude;
-const userLng = pos.coords.longitude;
-const distA = calculateDistance(userLat, userLng, coordsA.lat, coordsA.lng);
-const coordsB = currentTeamMission.qr_cercanos[1]?.coordenadas;
-let statusText = `Estás a ${distA.toFixed(0)} m del QR A`;
-if (coordsB) {
-const distB = calculateDistance(userLat, userLng, coordsB.lat, coordsB.lng);
-statusText += ` | ${distB.toFixed(0)} m del QR B`;
-}
-document.getElementById('team-proximity-status').textContent = statusText;
-},
-(err) => {
-document.getElementById('team-proximity-status').textContent = "⚠️ Ubicación desactivada";
-},
-{ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
-);
-}
-}
-// ========== VALIDACIÓN DE PROXIMIDAD REAL ==========
-let proximityWatchId = null;
-function startProximityCheck(targetLat, targetLng) {
-if (navigator.geolocation) {
-document.getElementById('proximity-instructions').textContent = "Verificando tu ubicación...";
-proximityWatchId = navigator.geolocation.watchPosition(
-(pos) => {
-const userLat = pos.coords.latitude;
-const userLng = pos.coords.longitude;
-const distance = calculateDistance(userLat, userLng, targetLat, targetLng);
-const statusEl = document.getElementById('proximity-status');
-if (distance <= 50) {
-statusEl.innerHTML = "✅ ¡Estás en la zona! Puedes acceder a la pista final.";
-statusEl.style.color = "#4ade80";
-if (!document.getElementById('unlock-phase3-btn')) {
-const btn = document.createElement('button');
-btn.id = 'unlock-phase3-btn';
-btn.className = 'btn btn-primary';
-btn.textContent = '🔓 Acceder a la pista final';
-btn.onclick = showPhase3;
-document.querySelector('#phase2-mapa .mission-card').appendChild(btn);
-}
-} else {
-statusEl.innerHTML = `📍 A ${Math.round(distance)} metros del objetivo. Acércate más.`;
-statusEl.style.color = "#64b5f7";
-const unlockBtn = document.getElementById('unlock-phase3-btn');
-if (unlockBtn) unlockBtn.remove();
-}
-},
-(err) => {
-document.getElementById('proximity-status').textContent = "⚠️ No se pudo obtener tu ubicación. Activa GPS.";
-},
-{ enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
-);
-} else {
-document.getElementById('proximity-status').textContent = "⚠️ Tu navegador no soporta geolocalización.";
-}
-}
-function calculateDistance(lat1, lon1, lat2, lon2) {
-const R = 6371e3;
-const φ1 = lat1 * Math.PI/180;
-const φ2 = lat2 * Math.PI/180;
-const Δφ = (lat2-lat1) * Math.PI/180;
-const Δλ = (lon2-lon1) * Math.PI/180;
-const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-Math.cos(φ1) * Math.cos(φ2) *
-Math.sin(Δλ/2) * Math.sin(Δλ/2);
-const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-return R * c;
-}
-// ========== MAPA ==========
-function loadApproxMap(lat, lng) {
-if (!window.L) {
-const link = document.createElement('link');
-link.rel = 'stylesheet';
-link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-document.head.appendChild(link);
-const script = document.createElement('script');
-script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-script.onload = () => initApproxMap(lat, lng);
-document.head.appendChild(script);
-} else {
-initApproxMap(lat, lng);
-}
-}
-function initApproxMap(lat, lng) {
-const map = L.map('mapApprox').setView([lat, lng], 18.5);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-attribution: '&copy; OpenStreetMap'
-}).addTo(map);
-L.circle([lat, lng], {
-color: '#ff6b6b',
-fillColor: '#ff6b6b',
-fillOpacity: 0.15,
-radius: 50
-}).addTo(map);
-L.marker([lat, lng]).addTo(map).bindPopup(`<strong>Objetivo</strong><br>Zona de 50m`);
-}
-// ========== TEMPORIZADOR ==========
-function startTimer() {
-document.getElementById('timer').textContent = "90:00";
-let timeLeft = 90 * 60;
-const timerEl = document.getElementById('timer');
-const interval = setInterval(() => {
-if (timeLeft <= 0) {
-timerEl.textContent = "⏰ Caducada";
-clearInterval(interval);
-// Mostrar consuelo por timeout
-playConsolationNarration('timeout');
-// Mostrar misión de redención
-setTimeout(() => {
-document.querySelector('#phase1-consigna .mission-card').innerHTML = `
-<div class="mission-title">
-<span class="icon">⏰</span>
-Tiempo agotado
-</div>
-<div class="tension-bar" style="margin: 1rem 0; background: rgba(255, 170, 51, 0.15);">
-⏳ La misión ha caducado
-</div>
-<p class="pista">
-${getSuggestionBasedOnContext('timeout')}
-<br><br>
-Pero el espíritu de caza nunca muere. ¿Aceptas una segunda oportunidad?
-</p>
-<button class="btn btn-primary" id="redemption-timeout-btn">🕊️ Misión de redención</button>
-<button class="btn btn-outline" id="new-mission-timeout-btn" style="margin-top: 10px;">🎯 Nueva misión</button>
-`;
-document.getElementById('phase1-consigna').style.display = 'block';
-document.getElementById('phase2-mapa').style.display = 'none';
-document.getElementById('redemption-timeout-btn').addEventListener('click', showRedemptionMission);
-document.getElementById('new-mission-timeout-btn').addEventListener('click', () => {
-window.location.href = 'registro.html';
-});
-}, 2000);
-return;
-}
-const mins = Math.floor(timeLeft / 60);
-const secs = timeLeft % 60;
-timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-timeLeft--;
-}, 1000);
-}
-// ========== ESCÁNER QR ==========
+let missionStartTime = null;
+let jugador = null;
+let firebaseUser = null;
+let deferredPrompt = null;
 let scannerActive = false;
 let stream = null;
+let proximityWatchId = null;
+let gpsWatchId = null;
+let mapInstance = null;
+let missionTimer = null;
+let globalTimer = null;
+let nearbyPlayers = [];
+let teamCoordinationTimer = null;
 
+// ✅ PROGRESIÓN DEL JUGADOR
+let playerProgress = {
+  level: 1,
+  missionsCompleted: 0,
+  streak: 0,
+  lastPlayed: null,
+  unlockedZones: ['CABA'],
+  badges: []
+};
+
+// ========== ANTI-CHEAT: CONFIGURACIÓN GPS ==========
+const GPS_ACCURACY_THRESHOLD = 40;
+
+// ========== FUNCIONES DE CLEANUP ==========
+function stopGPS() {
+  if (gpsWatchId !== null) {
+    navigator.geolocation.clearWatch(gpsWatchId);
+    gpsWatchId = null;
+  }
+}
+function cleanupMap() {
+  if (mapInstance) {
+    mapInstance.remove();
+    mapInstance = null;
+  }
+}
+function stopTimer() {
+  if (missionTimer !== null) {
+    clearInterval(missionTimer);
+    missionTimer = null;
+  }
+  if (globalTimer !== null) {
+    clearInterval(globalTimer);
+    globalTimer = null;
+  }
+}
+function cleanupAll() {
+  stopGPS();
+  cleanupMap();
+  stopTimer();
+  if (teamCoordinationTimer) {
+    clearInterval(teamCoordinationTimer);
+    teamCoordinationTimer = null;
+  }
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+  }
+}
+
+// ========== ANTI-CHEAT: VALIDAR PRECISIÓN GPS ==========
+function validateGPSAccuracy(position) {
+  if (!position || !position.coords) return { valid: false, reason: 'Sin coordenadas' };
+  const accuracy = position.coords.accuracy;
+  if (accuracy > GPS_ACCURACY_THRESHOLD) {
+    return { valid: false, reason: 'Precisión insuficiente', accuracy };
+  }
+  const { latitude, longitude } = position.coords;
+  if (Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+    return { valid: false, reason: 'Coordenadas inválidas' };
+  }
+  if (position.coords.speed !== null && position.coords.speed > 100) {
+    return { valid: false, reason: 'Velocidad sospechosa' };
+  }
+  return { valid: true, accuracy, latitude, longitude };
+}
+
+// ========== ACCESIBILIDAD ==========
+function applyAccessibilityMode() {
+  const body = document.body;
+  body.classList.remove('accessibility-high-contrast', 'accessibility-large-text');
+  ['accessibility-high-contrast-styles', 'accessibility-large-text-styles'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+  if (accessibilityMode === 'high-contrast') {
+    body.classList.add('accessibility-high-contrast');
+    const style = document.createElement('style');
+    style.id = 'accessibility-high-contrast-styles';
+    style.textContent = '.accessibility-high-contrast{background:black!important;color:yellow!important}.accessibility-high-contrast .mission-card,.accessibility-high-contrast .modal-content{background:#111!important;border:2px solid yellow!important;color:yellow!important}.accessibility-high-contrast button,.accessibility-high-contrast .btn{background:yellow!important;color:black!important;border:2px solid yellow!important;font-weight:bold!important}';
+    document.head.appendChild(style);
+  } else if (accessibilityMode === 'large-text') {
+    body.classList.add('accessibility-large-text');
+    const style = document.createElement('style');
+    style.id = 'accessibility-large-text-styles';
+    style.textContent = '.accessibility-large-text{font-size:110%!important}.accessibility-large-text h1{font-size:180%!important}.accessibility-large-text h2{font-size:160%!important}.accessibility-large-text h3{font-size:140%!important}.accessibility-large-text p{font-size:120%!important}.accessibility-large-text button{padding:12px 20px!important;font-size:110%!important;min-height:50px!important}';
+    document.head.appendChild(style);
+  }
+  updateAccessibilityButton();
+}
+function updateAccessibilityButton() {
+  const btn = document.getElementById('accessibility-toggle');
+  if (!btn) return;
+  const modes = { 'normal': '👁️', 'high-contrast': '☀️', 'large-text': '🅰️' };
+  btn.textContent = modes[accessibilityMode] || '👁️';
+}
+function toggleAccessibilityMode() {
+  const modes = ['normal', 'high-contrast', 'large-text'];
+  const idx = modes.indexOf(accessibilityMode);
+  accessibilityMode = modes[(idx + 1) % modes.length];
+  localStorage.setItem('lh_accessibility_mode', accessibilityMode);
+  applyAccessibilityMode();
+  showToast('✅ ' + accessibilityMode);
+}
+
+// ========== POSICIONAMIENTO DE BOTONES ==========
+function updateFloatingControlsPosition() {
+  const controls = document.getElementById('floating-controls');
+  if (!controls) return;
+  const nav = document.querySelector('.mobile-nav');
+  const navVisible = nav && window.getComputedStyle(nav).display !== 'none';
+  controls.style.bottom = navVisible ? ((nav.offsetHeight || 60) + 20) + 'px' : '20px';
+}
+
+// ========== TOAST ==========
+function showToast(msg, duration = 3500) {
+  const t = document.getElementById('toast');
+  if (t) {
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+}
+
+// ========== CARGAR MISIONES ==========
+async function loadMisiones() {
+  try {
+    const [res1, res2] = await Promise.all([
+      fetch('misiones-solitario.json'),
+      fetch('misiones-equipo-local.json')
+    ]);
+    if (!res1.ok || !res2.ok) throw new Error('Error JSON');
+    misionesSolitario = await res1.json();
+    misionesEquipo = await res2.json();
+  } catch (err) {
+    console.error('⚠️ Error cargando misiones:', err);
+    showToast('⚠️ Usando misiones de prueba');
+    misionesSolitario = [{id:1,zona:'CABA',titulo:'Misión de prueba',ubicacion_mapa:'Plaza de Mayo',pista_al_llegar:'Busca la pista final.',coordenadas:{lat:-34.6037,lng:-58.3816}}];
+  }
+}
+
+// ========== UTILIDADES DE MISIÓN ==========
+function getMisionesByZona(zona, tipo) {
+  tipo = tipo || 'solitario';
+  const lista = tipo === 'equipo' ? misionesEquipo : misionesSolitario;
+  const z = (zona || '').trim().toLowerCase();
+  const barrios = ['san telmo','la boca','recoleta','microcentro','palermo','congreso','almagro','retiro','balvanera','villa crespo','belgrano','barracas','flores','villa urquiza','puerto madero','san cristóbal'];
+  return lista.filter(m => {
+    const mz = (m.zona || '').trim().toLowerCase();
+    return mz === z || (z === 'caba' && barrios.includes(mz)) || (barrios.includes(z) && barrios.includes(mz));
+  });
+}
+function selectRandomMission(zona, tipo) {
+  tipo = tipo || 'solitario';
+  const misiones = getMisionesByZona(zona, tipo);
+  return misiones.length > 0 ? misiones[Math.floor(Math.random() * misiones.length)] : (misionesSolitario[0] || null);
+}
+
+// ========== OCULTAR FASES ==========
+function hideAllPhases() {
+  cleanupAll();
+  ['phase0-intro','phase1-consigna','phase2-mapa','phase3-pista','phase4-completed','teamSection','radar-section'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+// ========== FIREBASE: VERIFICAR MISIÓN ==========
+async function isMisionDisponible(misionId, zona) {
+  try {
+    const ref = db.ref('misiones/' + misionId + '-' + zona);
+    const snap = await ref.once('value');
+    if (!snap.exists()) return true;
+    return snap.val().estado !== 'completada';
+  } catch (err) {
+    console.error('Error Firebase:', err);
+    return true;
+  }
+}
+
+// ========== FIREBASE: SYNC PROGRESO ==========
+async function syncProgresoToFirebase(firebaseUid, data) {
+  if (!firebaseUid) return;
+  try {
+    // ✅ REGLA DE SEGURIDAD: Solo el usuario puede escribir en su propio nodo
+    await db.ref('jugadores/' + firebaseUid).update({
+      hunterId: data.hunterId || null,
+      zona: data.zona || null,
+      modo: data.modo || null,
+      progreso: data.progreso || null,
+      misiones_aceptadas: data.misiones_aceptadas || [],
+      desafios_completados: data.desafios_completados || [],
+      recoveryCode: data.recoveryCode || null,
+      misionActual: data.misionActual || null,
+      playerProgress: playerProgress, // ✅ Progresión del jugador
+      lastSync: firebase.database.ServerValue.TIMESTAMP
+    });
+  } catch (err) {
+    console.warn('⚠️ Sync offline:', err);
+  }
+}
+
+async function restoreProgresoFromFirebase(firebaseUid) {
+  if (!firebaseUid) return null;
+  try {
+    const snap = await db.ref('jugadores/' + firebaseUid).once('value');
+    if (snap.exists()) {
+      const data = snap.val();
+      if (data.playerProgress) playerProgress = { ...playerProgress, ...data.playerProgress };
+      return data;
+    }
+  } catch (err) { console.warn('⚠️ Restore offline:', err); }
+  return null;
+}
+
+// ========== CONFIGURACIÓN DEL JUGADOR ==========
+function setupJugador() {
+  const params = new URLSearchParams(window.location.search);
+  let hunterId = params.get('id') || localStorage.getItem('currentHunterId');
+  
+  auth.signInAnonymously().catch(err => console.error('Auth error:', err));
+  
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      firebaseUser = user;
+      localStorage.setItem('firebaseUid', user.uid);
+      _continueSetupJugador(hunterId, user.uid);
+    } else {
+      _continueSetupJugador(hunterId, null);
+    }
+  });
+}
+
+async function _continueSetupJugador(hunterId, firebaseUid) {
+  let restored = null;
+  if (firebaseUid) restored = await restoreProgresoFromFirebase(firebaseUid);
+  
+  if (!hunterId) {
+    const next = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
+    hunterId = 'LH-' + String(next).padStart(4, '0');
+    localStorage.setItem('lastHunterId', next);
+    const zona = decodeURIComponent((params.get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
+    jugador = { id: hunterId, nombre: 'Cazador', telefono: '+5491112345678', zona, modo: 'individual' };
+    localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
+    localStorage.setItem('currentHunterId', hunterId);
+    if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId, zona, modo: 'individual', playerProgress });
+  } else {
+    let stored = null;
+    if (restored && restored.hunterId === hunterId) {
+      stored = { id: restored.hunterId, zona: restored.zona, modo: restored.modo };
+    } else {
+      try { stored = JSON.parse(localStorage.getItem('jugador_' + hunterId)); } catch(e) { stored = null; }
+    }
+    jugador = stored || { id: hunterId, zona: 'CABA', modo: 'individual' };
+    const zonaUrl = decodeURIComponent((params.get('zona') || '').replace(/\+/g, ' ')).trim();
+    if (zonaUrl && getMisionesByZona(zonaUrl, 'solitario').length > 0) jugador.zona = zonaUrl;
+    localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
+    localStorage.setItem('currentHunterId', hunterId);
+    if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId: jugador.id, zona: jugador.zona, modo: jugador.modo, playerProgress });
+  }
+  
+  document.getElementById('hunterIdDisplay').textContent = jugador.modo === 'equipo' ? ('👥 ' + (jugador.equipo || hunterId)) : ('ID: ' + hunterId);
+  updateProgressDisplay();
+  
+  // ✅ MOSTRAR PANTALLA DE ACTIVACIÓN
+  showActivationScreen();
+}
+
+// ✅ PANTALLA DE ACTIVACIÓN (NUEVO)
+function showActivationScreen() {
+  const screen = document.getElementById('activation-screen');
+  const zoneEl = document.getElementById('activation-zone');
+  const textEl = document.getElementById('activation-text');
+  const btn = document.getElementById('enter-system-btn');
+  
+  if (zoneEl) zoneEl.innerHTML = `Tu señal ha sido detectada en <strong>${jugador.zona}</strong>`;
+  
+  // Secuencia narrativa
+  const steps = [
+    { text: 'Sincronizando misiones activas...', delay: 800 },
+    { text: 'Verificando tu zona de juego...', delay: 800 },
+    { text: 'Preparando tu primera cacería...', delay: 800 },
+    { text: '✅ Listo para empezar', delay: 400 }
+  ];
+  
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < steps.length && textEl) {
+      textEl.textContent = steps[i].text;
+      i++;
+    }
+  }, 800);
+  
+  // Mostrar botón después del delay
+  setTimeout(() => {
+    clearInterval(interval);
+    if (btn) {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+      btn.addEventListener('click', () => {
+        screen.style.display = 'none';
+        if (jugador.modo === 'equipo') showTeamMission();
+        else showPhase0();
+      }, { once: true });
+    }
+  }, 2000);
+  
+  screen.style.display = 'flex';
+}
+
+// ✅ ACTUALIZAR PROGRESO VISUAL
+function updateProgressDisplay() {
+  document.getElementById('missions-count').textContent = playerProgress.missionsCompleted;
+  document.getElementById('streak-count').textContent = playerProgress.streak;
+  document.getElementById('current-level').textContent = 'N' + playerProgress.level;
+  const levelEl = document.getElementById('level-display');
+  if (levelEl) levelEl.textContent = 'N' + playerProgress.level;
+}
+
+// ✅ ACTUALIZAR NIVEL (con desbloqueos)
+function checkLevelUp() {
+  const thresholds = [0, 3, 7, 12, 20]; // misiones para cada nivel
+  const newLevel = thresholds.findIndex((t, i, arr) => playerProgress.missionsCompleted < (arr[i+1] || Infinity)) + 1;
+  if (newLevel > playerProgress.level) {
+    playerProgress.level = newLevel;
+    showToast('🎉 ¡Nivel ' + newLevel + ' desbloqueado!');
+    // Desbloquear zonas según nivel
+    if (newLevel >= 2 && !playerProgress.unlockedZones.includes('Avellaneda')) {
+      playerProgress.unlockedZones.push('Avellaneda');
+      showToast('🗺️ Nueva zona: Avellaneda');
+    }
+    if (newLevel >= 3 && !playerProgress.unlockedZones.includes('Lanús')) {
+      playerProgress.unlockedZones.push('Lanús');
+      showToast('🗺️ Nueva zona: Lanús');
+    }
+    updateProgressDisplay();
+    if (firebaseUser) syncProgresoToFirebase(firebaseUser.uid, { playerProgress });
+  }
+}
+
+// ========== MISIÓN DE REDENCIÓN ==========
+async function showRedemptionMission() {
+  if (redemptionOffered) return;
+  cleanupAll();
+  const allZones = ['CABA','Avellaneda','Lanús','Lomas de Zamora'].filter(z => playerProgress.unlockedZones.includes(z));
+  const otherZones = allZones.filter(z => z !== jugador.zona);
+  const randomZone = otherZones[Math.floor(Math.random() * otherZones.length)] || jugador.zona;
+  const redemption = selectRandomMission(randomZone, 'solitario');
+  
+  document.querySelector('#phase1-consigna .mission-card').innerHTML = `
+    <div class="mission-title"><span class="icon">🕊️</span><span class="title-text">Misión de Redención</span></div>
+    <div class="tension-bar" style="margin:1rem 0;background:rgba(106,170,255,0.15)">🌟 Segunda oportunidad</div>
+    <p class="pista">No todos los cazadores triunfan a la primera. Pero tú... tienes el instinto necesario.<br><br><strong>${redemption.titulo}</strong><br>${redemption.descripcion_narrativa || redemption.pista_al_llegar}</p>
+    <button class="btn btn-primary" id="accept-redemption-btn">✅ Aceptar misión de redención</button>
+    <button class="btn btn-outline" id="retry-original-btn" style="margin-top:10px">🔄 Intentar original</button>
+  `;
+  redemptionOffered = true;
+  
+  document.getElementById('accept-redemption-btn').onclick = () => {
+    currentMission = redemption;
+    jugador.zona = randomZone;
+    localStorage.setItem('jugador_' + jugador.id, JSON.stringify(jugador));
+    missionStartTime = Date.now();
+    startTimer();
+    guardarProgreso(currentMission.id);
+    showPhase2();
+  };
+  document.getElementById('retry-original-btn').onclick = showPhase0;
+}
+
+// ========== CONSUELO NARRATIVO ==========
+function playConsolationNarration(reason) {
+  const msgs = {
+    timeout: 'El tiempo se agotó, pero tu instinto de caza permanece.',
+    already_completed: 'Alguien fue más rápido, pero eso no define tu habilidad.',
+    wrong_code: 'El código no era correcto, pero cada error te acerca más a la verdad.',
+    general: 'No todos los cazadores triunfan a la primera. Pero los verdaderos nunca se rinden.'
+  };
+  playNarration(msgs[reason] || msgs.general);
+}
+
+// ========== FASE 0: INTRO NARRATIVA MÍNIMA ==========
+async function showPhase0() {
+  cleanupAll();
+  currentMission = selectRandomMission(jugador.zona, 'solitario');
+  if (!currentMission) { showToast('⚠️ No hay misiones'); return; }
+  
+  analytics.logEvent('mision_aceptada', { zona: jugador.zona, tipo: 'solitario', hunter_id: jugador.id });
+  
+  const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
+  if (!disponible) {
+    playConsolationNarration('already_completed');
+    document.querySelector('#phase1-consigna .mission-card').innerHTML = `
+      <div class="mission-title"><span class="icon">⚠️</span><span class="title-text">Misión ya completada</span></div>
+      <div class="tension-bar" style="margin:1rem 0;background:rgba(255,170,51,0.15)">⏳ Alguien fue más rápido</div>
+      <p class="pista">💡 Consejo: Activa notificaciones para nuevas misiones.<br><br>En Let's Hunt, cada fracaso es una lección.</p>
+      <button class="btn btn-primary" id="new-mission-btn">🎯 Nueva misión</button>
+      <button class="btn btn-outline" id="redemption-btn" style="margin-top:10px">🕊️ Misión de redención</button>
+    `;
+    document.getElementById('phase1-consigna').style.display = 'block';
+    document.getElementById('new-mission-btn').onclick = showPhase0;
+    document.getElementById('redemption-btn').onclick = showRedemptionMission;
+    return;
+  }
+  
+  // ✅ INTRO MÍNIMA: solo título + CTA
+  document.getElementById('intro-mission-title').textContent = currentMission.titulo;
+  document.getElementById('intro-mission-desc').textContent = (currentMission.descripcion_narrativa || currentMission.pista_al_llegar).substring(0, 120) + '...';
+  document.getElementById('phase0-intro').style.display = 'block';
+  
+  document.getElementById('accept-intro-btn').onclick = () => {
+    document.getElementById('phase0-intro').style.display = 'none';
+    missionStartTime = Date.now();
+    startTimer();
+    startGlobalTimer(); // ✅ Timer global para tensión
+    guardarProgreso(currentMission.id);
+    showPhase2(); // Saltar fase 1 larga, ir directo al mapa
+  };
+}
+
+// ========== FASE 1 ==========
+async function showPhase1() {
+  cleanupAll();
+  currentMission = selectRandomMission(jugador.zona, 'solitario');
+  if (!currentMission) { showToast('⚠️ No hay misiones'); return; }
+  
+  analytics.logEvent('mision_aceptada', { zona: jugador.zona, tipo: 'solitario', hunter_id: jugador.id });
+  
+  const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
+  if (!disponible) {
+    playConsolationNarration('already_completed');
+    document.querySelector('#phase1-consigna .mission-card').innerHTML = `
+      <div class="mission-title"><span class="icon">⚠️</span><span class="title-text">Misión ya completada</span></div>
+      <div class="tension-bar" style="margin:1rem 0;background:rgba(255,170,51,0.15)">⏳ Alguien fue más rápido</div>
+      <p class="pista">💡 Consejo: Activa notificaciones para nuevas misiones.<br><br>En Let's Hunt, cada fracaso es una lección.</p>
+      <button class="btn btn-primary" id="new-mission-btn">🎯 Nueva misión</button>
+      <button class="btn btn-outline" id="redemption-btn" style="margin-top:10px">🕊️ Misión de redención</button>
+    `;
+    document.getElementById('phase1-consigna').style.display = 'block';
+    document.getElementById('new-mission-btn').onclick = showPhase1;
+    document.getElementById('redemption-btn').onclick = showRedemptionMission;
+    return;
+  }
+  
+  document.querySelector('#phase1-consigna .mission-card').innerHTML = `
+    <div class="mission-title"><span class="icon">🦁</span><span class="title-text">${currentMission.titulo}</span></div>
+    <div class="tension-bar" style="margin:1rem 0;background:rgba(255,69,58,0.15)">⏳ Listo para cazar</div>
+    <p class="pista">${currentMission.descripcion_narrativa || currentMission.pista_al_llegar}</p>
+    <button class="btn btn-primary" id="start-mission-btn">✅ Aceptar y comenzar</button>
+  `;
+  document.getElementById('phase1-consigna').style.display = 'block';
+  document.getElementById('start-mission-btn').onclick = () => {
+    missionStartTime = Date.now();
+    startTimer();
+    startGlobalTimer();
+    guardarProgreso(currentMission.id);
+    showPhase2();
+  };
+}
+
+// ========== FASE 2 ==========
+function showPhase2() {
+  cleanupAll();
+  document.getElementById('phase0-intro').style.display = 'none';
+  document.getElementById('phase1-consigna').style.display = 'none';
+  
+  document.querySelector('#phase2-mapa .mission-card').innerHTML = `
+    <h3>📍 Acércate al objetivo</h3>
+    <p style="margin:1rem 0;color:#cbd5e1;line-height:1.4">${currentMission.ubicacion_mapa}</p>
+    <div id="mapApprox" style="height:300px;border-radius:12px;margin:1rem 0"></div>
+    <p id="proximity-instructions" style="font-size:0.9rem;color:#94a3b8">Esperando ubicación...</p>
+    <button class="btn btn-outline" id="back-to-phase1-btn" style="margin-top:15px;width:100%;padding:12px">🔙 Volver</button>
+  `;
+  document.getElementById('phase2-mapa').style.display = 'block';
+  
+  loadApproxMap(currentMission.coordenadas.lat, currentMission.coordenadas.lng);
+  startProximityCheck(currentMission.coordenadas.lat, currentMission.coordenadas.lng);
+  startRadarScan(); // ✅ Escanear jugadores cercanos
+  
+  document.getElementById('back-to-phase1-btn').onclick = () => {
+    cleanupAll();
+    document.getElementById('phase2-mapa').style.display = 'none';
+    showPhase0();
+  };
+  
+  // ✅ Botón código manual
+  document.getElementById('manual-code-btn').onclick = openManualCodeModal;
+}
+
+// ✅ RADAR DE JUGADORES (NUEVO)
+function startRadarScan() {
+  document.getElementById('radar-section').style.display = 'block';
+  const nearbyEl = document.getElementById('nearby-players');
+  const urgencyEl = document.getElementById('radar-urgency');
+  
+  // Simular jugadores cercanos (en producción: Firebase Realtime)
+  const mockPlayers = [
+    { id: 'LH-2847', distance: 120, lastSeen: 'ahora' },
+    { id: 'LH-1923', distance: 340, lastSeen: '2min' }
+  ];
+  
+  nearbyEl.innerHTML = mockPlayers.map(p => `
+    <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px dashed rgba(255,255,255,0.1);">
+      <span style="color:var(--primary);font-weight:600;">${p.id}</span>
+      <span style="color:var(--text-muted);font-size:0.85rem;">${p.distance}m • ${p.lastSeen}</span>
+    </div>
+  `).join('');
+  
+  // Mostrar urgencia si hay jugadores muy cerca
+  const veryNear = mockPlayers.filter(p => p.distance < 200);
+  if (veryNear.length > 0 && urgencyEl) {
+    document.getElementById('urgency-text').textContent = `${veryNear.length} cazador${veryNear.length>1?'es':''} en tu zona`;
+    urgencyEl.style.display = 'block';
+  }
+  
+  // Actualizar cada 30s
+  setInterval(() => {
+    // En producción: consultar Firebase
+    const fluctuation = Math.floor(Math.random() * 3) - 1;
+    const count = Math.max(0, mockPlayers.length + fluctuation);
+    if (urgencyEl && count > 0) {
+      document.getElementById('urgency-text').textContent = `${count} cazador${count>1?'es':''} en tu zona`;
+    }
+  }, 30000);
+}
+
+// ========== FASE 3 ==========
+function showPhase3() {
+  cleanupAll();
+  document.getElementById('phase2-mapa').style.display = 'none';
+  
+  const recoveryCode = generarRecoveryCode();
+  localStorage.setItem('recovery_' + jugador.id, recoveryCode);
+  
+  document.querySelector('#phase3-pista .mission-card').innerHTML = `
+    <h3>🔍 Pista final</h3>
+    <p class="pista">${currentMission.pista_al_llegar}</p>
+    <div class="actions">
+      <button class="btn btn-primary" id="scan-btn">🔍 Escanear QR</button>
+      <button class="btn btn-outline" id="manual-scan-btn" style="margin-left:0.5rem;">⌨️ Código manual</button>
+    </div>
+    <div style="margin-top:1.2rem;font-size:0.9rem">🔑 Recuperación: <code>${recoveryCode}</code></div>
+  `;
+  document.getElementById('phase3-pista').style.display = 'block';
+  
+  document.getElementById('scan-btn').onclick = openQRScanner;
+  document.getElementById('manual-scan-btn').onclick = openManualCodeModal;
+  
+  playNarration('Cazador ' + jugador.id.replace('LH-','') + '. Estás en la zona. La pista final ha sido revelada.');
+}
+
+// ========== FASE 4: COMPLETADA (sin redirección) ==========
+function showMissionCompleted() {
+  cleanupAll();
+  hideAllPhases();
+  
+  const elapsed = Math.floor((Date.now() - missionStartTime) / 60000);
+  const recoveryCode = localStorage.getItem('recovery_' + jugador.id) || '—';
+  const title = jugador.modo === 'equipo' ? currentTeamMission?.titulo : currentMission?.titulo;
+  
+  // ✅ Actualizar progresión
+  playerProgress.missionsCompleted++;
+  checkLevelUp(); // Verificar nivel up
+  
+  // ✅ Actualizar racha
+  const today = new Date().toDateString();
+  if (playerProgress.lastPlayed !== today) {
+    playerProgress.streak = playerProgress.lastPlayed ? playerProgress.streak + 1 : 1;
+    playerProgress.lastPlayed = today;
+  }
+  updateProgressDisplay();
+  if (firebaseUser) syncProgresoToFirebase(firebaseUser.uid, { playerProgress });
+  
+  document.querySelector('#phase4-completed .mission-card').innerHTML = `
+    <h2 style="color:#ffd700;margin-bottom:1rem">✅ Operación Completada</h2>
+    <p><strong>${title}</strong></p>
+    <p style="font-size:0.95rem;color:#cbd5e1;margin:1rem 0">Tu posición ha sido registrada.</p>
+    <div style="margin:1.5rem 0;font-size:0.9rem;color:#64b5f7">⏱️ Completado en: <strong>${elapsed} min</strong></div>
+    <div style="font-size:0.85rem;color:#94a3b8;margin-bottom:1.5rem">🔑 Código: <code>${recoveryCode}</code></div>
+    <div style="margin:1.2rem 0;padding:0.8rem;border-radius:10px;background:rgba(255,215,0,0.08);color:#ffd700;font-size:0.9rem">
+      🎖️ <strong>Desafío completado</strong><br>
+      Has ganado el badge <strong>"Primer Cazador"</strong><br>
+      📡 Tu alias permanece visible en el radar
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="new-mission-btn">🔁 Nueva misión</button>
+      <button class="btn btn-outline" id="view-progress-btn">📊 Ver progreso</button>
+    </div>
+  `;
+  document.getElementById('phase4-completed').style.display = 'block';
+  
+  document.getElementById('new-mission-btn').onclick = () => {
+    // ✅ LOOP CORRECTO: quedarse en app, nueva misión
+    showPhase0();
+  };
+  document.getElementById('view-progress-btn').onclick = () => {
+    window.location.href = 'progreso.html';
+  };
+}
+
+// ========== FLUJO EQUIPO (con coordinación real) ==========
+async function showTeamMission() {
+  cleanupAll();
+  document.body.classList.add('modo-equipo');
+  
+  currentTeamMission = selectRandomMission(jugador.zona, 'equipo');
+  const recoveryCode = generarRecoveryCode();
+  localStorage.setItem('recovery_' + jugador.id, recoveryCode);
+  
+  // ✅ Coordinación real: QR A + QR B en 2 min
+  const coordText = currentTeamMission.qr_cercanos?.length >= 2 
+    ? `Tu equipo debe escanear ambos QR en menos de 2 minutos.<br><strong>QR A:</strong> ${currentTeamMission.qr_cercanos[0].descripcion}<br><strong>QR B:</strong> ${currentTeamMission.qr_cercanos[1].descripcion}`
+    : 'Coordina con tu equipo para completar la misión.';
+  
+  document.querySelector('#teamSection .mission-card').innerHTML = `
+    <div class="mission-title"><span class="icon">👁️</span><span class="title-text">${currentTeamMission.titulo}</span><span class="status active nivel-N2">ACTIVA • N2</span></div>
+    <p class="pista">${currentTeamMission.descripcion_narrativa}</p>
+    <div class="actions">
+      <button class="btn btn-primary" id="accept-mission-btn">✅ Aceptar misión</button>
+      <button class="btn btn-outline" id="scan-btn-team">🔍 Escanear QR</button>
+    </div>
+    <div style="margin-top:1.2rem;font-size:0.9rem">🔑 Recuperación: <code>${recoveryCode}</code></div>
+  `;
+  document.getElementById('teamSection').style.display = 'block';
+  
+  document.getElementById('accept-mission-btn').onclick = () => {
+    missionStartTime = Date.now();
+    startTimer();
+    startGlobalTimer();
+    guardarProgreso(currentTeamMission.id);
+    showToast('📍 Misión registrada · Tu alias ya está activo');
+    startTeamProximityCheck();
+    
+    // ✅ Mostrar coordinación si hay múltiples QR
+    if (currentTeamMission.qr_cercanos?.length >= 2) {
+      document.getElementById('team-coordination').style.display = 'block';
+      document.getElementById('team-task').innerHTML = coordText;
+      startTeamCoordinationTimer(120); // 2 minutos
+    }
+  };
+  
+  document.getElementById('scan-btn-team').onclick = openQRScanner;
+}
+
+// ✅ TIMER DE COORDINACIÓN DE EQUIPO
+function startTeamCoordinationTimer(seconds) {
+  let timeLeft = seconds;
+  const timerEl = document.getElementById('team-timer');
+  
+  teamCoordinationTimer = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(teamCoordinationTimer);
+      timerEl.textContent = '⏰ Tiempo agotado';
+      timerEl.style.color = '#ff453a';
+      showToast('⚠️ Tiempo de coordinación agotado');
+      return;
+    }
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    timerEl.textContent = `⏱️ Coordinación: ${m}:${s < 10 ? '0' : ''}${s}`;
+    timeLeft--;
+  }, 1000);
+}
+
+function startTeamProximityCheck() {
+  const coordsA = currentTeamMission.qr_cercanos?.[0]?.coordenadas;
+  if (!coordsA) return;
+  
+  loadApproxMap(coordsA.lat, coordsA.lng);
+  document.getElementById('team-proximity-status').textContent = '📍 Esperando ubicación...';
+  
+  if (navigator.geolocation) {
+    gpsWatchId = navigator.geolocation.watchPosition(
+      pos => {
+        const validation = validateGPSAccuracy(pos);
+        if (!validation.valid) {
+          document.getElementById('team-proximity-status').textContent = '⚠️ Señal GPS imprecisa';
+          document.getElementById('team-proximity-status').style.color = '#ff9500';
+          return;
+        }
+        document.getElementById('team-proximity-status').style.color = '#64b5f7';
+        const { latitude, longitude } = validation;
+        const distA = calculateDistance(latitude, longitude, coordsA.lat, coordsA.lng);
+        const coordsB = currentTeamMission.qr_cercanos?.[1]?.coordenadas;
+        let text = `Estás a ${distA.toFixed(0)}m del QR A (±${validation.accuracy.toFixed(0)}m)`;
+        if (coordsB) {
+          const distB = calculateDistance(latitude, longitude, coordsB.lat, coordsB.lng);
+          text += ` | ${distB.toFixed(0)}m del QR B`;
+        }
+        document.getElementById('team-proximity-status').textContent = text;
+      },
+      err => { document.getElementById('team-proximity-status').textContent = '⚠️ Ubicación desactivada'; },
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
+    );
+  }
+}
+
+// ========== VALIDACIÓN DE PROXIMIDAD (CON ANTI-CHEAT) ==========
+function startProximityCheck(targetLat, targetLng) {
+  if (!navigator.geolocation) {
+    document.getElementById('proximity-instructions').textContent = '⚠️ GPS no soportado';
+    return;
+  }
+  
+  gpsWatchId = navigator.geolocation.watchPosition(
+    pos => {
+      const validation = validateGPSAccuracy(pos);
+      if (!validation.valid) {
+        const statusEl = document.getElementById('proximity-status');
+        statusEl.innerHTML = `⚠️ Señal GPS imprecisa (±${validation.accuracy.toFixed(0)}m). Busca cielo despejado.`;
+        statusEl.style.color = '#ff9500';
+        return;
+      }
+      const statusEl = document.getElementById('proximity-status');
+      statusEl.style.color = '#94a3b8';
+      const { latitude, longitude } = validation;
+      const distance = calculateDistance(latitude, longitude, targetLat, targetLng);
+      
+      if (distance <= 50) {
+        statusEl.innerHTML = `✅ ¡Estás en la zona! <button class="btn btn-primary" id="unlock-phase3-btn" style="margin-top:10px">🔓 Acceder</button>`;
+        statusEl.style.color = '#4ade80';
+        const btn = document.getElementById('unlock-phase3-btn');
+        if (btn) btn.onclick = showPhase3;
+      } else {
+        statusEl.innerHTML = `📍 A ${Math.round(distance)}m del objetivo (±${validation.accuracy.toFixed(0)}m). Acércate más.`;
+        statusEl.style.color = '#64b5f7';
+      }
+    },
+    err => { document.getElementById('proximity-instructions').textContent = '⚠️ Error GPS'; },
+    { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
+  );
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
+  const Δφ = (lat2-lat1) * Math.PI/180, Δλ = (lon2-lon1) * Math.PI/180;
+  const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// ========== MAPA ==========
+function loadApproxMap(lat, lng) {
+  cleanupMap();
+  if (!window.L) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = () => initApproxMap(lat, lng);
+    document.head.appendChild(script);
+  } else {
+    initApproxMap(lat, lng);
+  }
+}
+
+function initApproxMap(lat, lng) {
+  mapInstance = L.map('mapApprox').setView([lat, lng], 18.5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapInstance);
+  L.circle([lat, lng], { color: '#ff6b6b', fillColor: '#ff6b6b', fillOpacity: 0.15, radius: 50 }).addTo(mapInstance);
+  L.marker([lat, lng]).addTo(mapInstance).bindPopup('<strong>Objetivo</strong><br>Zona de 50m');
+  setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 100);
+}
+
+// ========== TEMPORIZADORES ==========
+function startTimer() {
+  stopTimer();
+  let timeLeft = 90 * 60;
+  const timerEl = document.getElementById('timer');
+  timerEl.textContent = '90:00';
+  
+  missionTimer = setInterval(() => {
+    if (timeLeft <= 0) {
+      timerEl.textContent = '⏰ Caducada';
+      stopTimer();
+      playConsolationNarration('timeout');
+      setTimeout(() => {
+        document.querySelector('#phase1-consigna .mission-card').innerHTML = `
+          <div class="mission-title"><span class="icon">⏰</span><span class="title-text">Tiempo agotado</span></div>
+          <div class="tension-bar" style="margin:1rem 0;background:rgba(255,170,51,0.15)">⏳ La misión ha caducado</div>
+          <p class="pista">💡 Consejo: Prueba en horario de menor tráfico.<br><br>¿Aceptas una segunda oportunidad?</p>
+          <button class="btn btn-primary" id="redemption-timeout-btn">🕊️ Misión de redención</button>
+          <button class="btn btn-outline" id="new-mission-timeout-btn" style="margin-top:10px">🎯 Nueva misión</button>
+        `;
+        document.getElementById('phase1-consigna').style.display = 'block';
+        document.getElementById('phase2-mapa').style.display = 'none';
+        document.getElementById('redemption-timeout-btn').onclick = showRedemptionMission;
+        document.getElementById('new-mission-timeout-btn').onclick = () => showPhase0();
+      }, 2000);
+      return;
+    }
+    const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+    timerEl.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    timeLeft--;
+  }, 1000);
+}
+
+// ✅ TIMER GLOBAL PARA TENSIÓN (NUEVO)
+function startGlobalTimer() {
+  stopTimer(); // Detener timer anterior si existe
+  let timeLeft = 12 * 60; // 12 minutos globales
+  const el = document.getElementById('global-timer');
+  const timeEl = document.getElementById('global-time');
+  
+  if (el && timeEl) {
+    el.style.display = 'block';
+    timeEl.textContent = '12:00';
+    
+    globalTimer = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(globalTimer);
+        timeEl.textContent = '00:00';
+        el.style.color = '#ff453a';
+        showToast('⚠️ La misión global ha expirado');
+        return;
+      }
+      const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+      timeEl.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+      // Color de urgencia cuando queda poco tiempo
+      if (timeLeft < 120) el.style.color = '#ff6b6b';
+      else if (timeLeft < 300) el.style.color = '#ff9500';
+      timeLeft--;
+    }, 1000);
+  }
+}
+
+// ========== EVENTOS ALEATORIOS (NUEVO) ==========
+function startRandomEvents() {
+  // Evento aleatorio cada 3-5 minutos
+  const interval = setInterval(() => {
+    if (Math.random() < 0.3) { // 30% de probabilidad
+      const events = [
+        { title: '🚨 Interferencia detectada', desc: 'Nueva pista desbloqueada en tu zona', color: '#ff6b6b' },
+        { title: '📡 Señal reforzada', desc: '+30 segundos adicionales', color: '#4ade80' },
+        { title: '🎯 Objetivo marcado', desc: 'La ubicación ha sido precisada', color: '#ffd60a' }
+      ];
+      const evt = events[Math.floor(Math.random() * events.length)];
+      showToast(`${evt.title}: ${evt.desc}`, 5000);
+      // Efecto visual en timer
+      const bar = document.getElementById('tension-bar');
+      if (bar) {
+        bar.style.background = evt.color + '33';
+        setTimeout(() => { if (bar) bar.style.background = ''; }, 3000);
+      }
+    }
+  }, 180000 + Math.random() * 120000); // 3-5 min
+  
+  // Limpiar al salir
+  window.addEventListener('beforeunload', () => clearInterval(interval));
+}
+
+// ========== ESCÁNER QR (CON VALIDACIÓN DE MISIÓN) ==========
 async function openQRScanner() {
   const overlay = document.getElementById('scannerOverlay');
   const video = document.getElementById('scannerVideo');
   const canvas = document.getElementById('scannerCanvas');
   
+  if (!overlay || !video || !canvas) {
+    showToast('⚠️ Error: Elementos del escáner no encontrados');
+    return;
+  }
+  if (typeof jsQR === 'undefined') {
+    showToast('⚠️ Error: Librería QR no cargada');
+    return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia) {
+    showToast('⚠️ Tu navegador no soporta acceso a cámara');
+    return;
+  }
+  
   try {
-    const constraints = { 
-      video: { facingMode: { ideal: "environment" } }
-    };
-    
+    const constraints = { video: { facingMode: { ideal: 'environment' } } };
     stream = await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject = stream;
+    video.setAttribute('playsinline', true);
+    video.play();
     video.onloadedmetadata = () => {
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
@@ -840,312 +1135,291 @@ async function openQRScanner() {
     
     overlay.style.display = 'block';
     scannerActive = true;
+    showToast('🔍 Escaneando... Apuntá al QR');
     
-    const scanInterval = setInterval(async () => {
+    const scanInterval = setInterval(() => {
       if (!scannerActive || !video.videoWidth) return;
-      
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: "dontInvert" });
+      const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: 'dontInvert' });
       
-      if (code && code.data) {
+      if (code?.data) {
         clearInterval(scanInterval);
         stopScanner();
-        
         const scannedData = code.data.trim();
         
-        // Verificar si es una URL válida
         try {
           const url = new URL(scannedData);
-          // Si es una URL de qr-zona.html, redirigir
           if (url.hostname === 'codigoebel.com' && url.pathname.includes('qr-zona.html')) {
-            window.location.href = scannedData;
-            return;
+            const params = new URLSearchParams(url.search);
+            const scannedId = params.get('m');
+            const currentId = jugador.modo === 'equipo' ? currentTeamMission?.id : currentMission?.id;
+            
+            if (scannedId && String(scannedId) === String(currentId)) {
+              window.location.href = scannedData;
+              return;
+            } else if (scannedId && String(scannedId) !== String(currentId)) {
+              showToast('❌ Este QR es de otra misión');
+              return;
+            }
           }
         } catch (e) {
-          // No es una URL válida → ignorar
+          console.log('No es URL válida:', e);
         }
-        
-        // Si llega aquí, no es una URL válida
-        showToast("❌ Código no reconocido. Escanea el QR del Vigilante Oscuro.");
+        showToast('❌ Código no reconocido');
       }
     }, 300);
     
   } catch (err) {
     stopScanner();
-    console.error("Error de cámara:", err);
-    
-    if (err.name === 'NotAllowedError') {
-      showToast("⚠️ Necesitas permitir el acceso a la cámara para escanear QR.");
-    } else if (err.name === 'NotFoundError') {
-      showToast("⚠️ No se encontró ninguna cámara en tu dispositivo.");
-    } else {
-      showToast("⚠️ Error de cámara: " + (err.message || "dispositivo no compatible"));
-    }
+    console.error('❌ Error de cámara:', err.name, err.message);
+    if (err.name === 'NotAllowedError') showToast('⚠️ Permiso de cámara denegado. Activá en configuración.');
+    else if (err.name === 'NotFoundError') showToast('⚠️ No se encontró cámara en tu dispositivo.');
+    else if (err.name === 'NotReadableError') showToast('⚠️ La cámara está siendo usada por otra app.');
+    else showToast('⚠️ Error de cámara: ' + err.message);
   }
 }
 
-function completeMission() {
-const misionId = jugador.modo === 'equipo' ? currentTeamMission.id : currentMission.id;
-guardarProgreso(null, `${misionId}_desafio_1`);
-// Registrar evento de Analytics
-analytics.logEvent('mision_completada', {
-zona: jugador.zona,
-tipo: jugador.modo,
-hunter_id: jugador.id,
-tiempo_min: Math.floor((Date.now() - missionStartTime) / 60000)
-});
-playNarration(`Confirmado. Has completado la misión. El ranking se actualiza ahora.`);
-showToast(`✅ ¡Código verificado!
-🔥 ¡Cazador ${jugador.id} ha completado la misión!`);
-showMissionCompleted();
-}
 function stopScanner() {
-scannerActive = false;
-if (stream) {
-stream.getTracks().forEach(track => track.stop());
-stream = null;
+  scannerActive = false;
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+  }
+  const overlay = document.getElementById('scannerOverlay');
+  if (overlay) overlay.style.display = 'none';
 }
-document.getElementById('scannerOverlay').style.display = 'none';
+
+// ✅ MODAL CÓDIGO MANUAL (FALLBACK)
+function openManualCodeModal() {
+  const modal = document.getElementById('manualCodeModal');
+  const input = document.getElementById('manual-code-input');
+  if (modal && input) {
+    modal.style.display = 'flex';
+    input.value = '';
+    input.focus();
+  }
 }
-// ========== UTILIDADES COMPARTIDAS ==========
+
+function closeManualCodeModal() {
+  const modal = document.getElementById('manualCodeModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// Validar código manual
+document.getElementById('submit-manual-code')?.addEventListener('click', () => {
+  const code = document.getElementById('manual-code-input').value.trim().toUpperCase();
+  if (code.length === 6 && /^[A-Z0-9]{6}$/.test(code)) {
+    // ✅ En producción: validar contra Firebase
+    showToast('✅ Código válido · Redirigiendo...');
+    closeManualCodeModal();
+    setTimeout(() => {
+      // Simular éxito - en producción validar con backend
+      showPhase3();
+    }, 1000);
+  } else {
+    showToast('⚠️ Código inválido. Debe tener 6 caracteres alfanuméricos.');
+  }
+});
+
+document.getElementById('cancel-manual-code')?.addEventListener('click', closeManualCodeModal);
+document.getElementById('manualCodeModal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'manualCodeModal') closeManualCodeModal();
+});
+
+// ========== UTILIDADES ==========
 function generarRecoveryCode() {
-const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-let code = 'LH';
-for (let i = 0; i < 8; i++) {
-code += chars.charAt(Math.floor(Math.random() * chars.length));
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'LH';
+  for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+  return code;
 }
-return code;
+
+function guardarProgreso(misionId, desafioId) {
+  const key = 'progreso_' + jugador.id;
+  let data = JSON.parse(localStorage.getItem(key) || '{}');
+  
+  if (!data.misiones) data.misiones = 0;
+  if (!data.desafios) data.desafios = 0;
+  if (!data.zona) data.zona = jugador.zona;
+  
+  if (misionId) {
+    const mKey = 'misiones_aceptadas_' + jugador.id;
+    let misiones = JSON.parse(localStorage.getItem(mKey) || '[]');
+    if (!misiones.includes(misionId)) {
+      misiones.push(misionId);
+      localStorage.setItem(mKey, JSON.stringify(misiones));
+      data.misiones = misiones.length;
+    }
+  }
+  
+  if (desafioId) {
+    const dKey = 'desafios_completados_' + jugador.id;
+    let desafios = JSON.parse(localStorage.getItem(dKey) || '[]');
+    if (!desafios.includes(desafioId)) {
+      desafios.push(desafioId);
+      localStorage.setItem(dKey, JSON.stringify(desafios));
+      data.desafios = desafios.length;
+    }
+  }
+  
+  data.zona = jugador.zona;
+  data.lastUpdate = Date.now();
+  localStorage.setItem(key, JSON.stringify(data));
+  
+  const firebaseUid = localStorage.getItem('firebaseUid');
+  if (firebaseUid) {
+    syncProgresoToFirebase(firebaseUid, {
+      hunterId: jugador.id,
+      zona: jugador.zona,
+      modo: jugador.modo,
+      progreso: data,
+      misiones_aceptadas: JSON.parse(localStorage.getItem('misiones_aceptadas_' + jugador.id) || '[]'),
+      desafios_completados: JSON.parse(localStorage.getItem('desafios_completados_' + jugador.id) || '[]'),
+      recoveryCode: localStorage.getItem('recovery_' + jugador.id),
+      misionActual: currentMission ? { id: currentMission.id, zona: jugador.zona, fase: 2 } : null,
+      playerProgress
+    });
+  }
 }
-function guardarProgreso(misionId = null, desafioId = null) {
-const key = `progreso_${jugador.id}`;
-let data = JSON.parse(localStorage.getItem(key) || '{}');
-if (!data.misiones) data.misiones = 0;
-if (!data.desafios) data.desafios = 0;
-if (!data.zona) data.zona = jugador.zona;
-if (misionId) {
-const misionesKey = `misiones_aceptadas_${jugador.id}`;
-let misiones = JSON.parse(localStorage.getItem(misionesKey) || '[]');
-if (!misiones.includes(misionId)) {
-misiones.push(misionId);
-localStorage.setItem(misionesKey, JSON.stringify(misiones));
-data.misiones = misiones.length;
-}
-}
-if (desafioId) {
-const desafiosKey = `desafios_completados_${jugador.id}`;
-let desafios = JSON.parse(localStorage.getItem(desafiosKey) || '[]');
-if (!desafios.includes(desafioId)) {
-desafios.push(desafioId);
-localStorage.setItem(desafiosKey, JSON.stringify(desafios));
-data.desafios = desafios.length;
-}
-}
-data.zona = jugador.zona;
-data.lastUpdate = Date.now();
-localStorage.setItem(key, JSON.stringify(data));
-}
+
 function playNarration(text) {
-if (localStorage.getItem('lh_narration_off') === '1') return;
-const u = new SpeechSynthesisUtterance(text);
-u.rate = 0.62;
-u.pitch = 0.4;
-u.volume = 0.95;
-const loadVoice = () => {
-const voices = speechSynthesis.getVoices();
-const voice = voices.find(v =>
-v.lang.includes('es') &&
-(v.name.includes('Male') || v.name === 'Diego' || v.name === 'Juan')
-) || voices.find(v => v.lang.includes('es')) || null;
-if (voice) u.voice = voice;
-};
-loadVoice();
-speechSynthesis.addEventListener('voiceschanged', loadVoice, { once: true });
-u.onstart = () => {
-if (window.AudioContext) {
-try {
-const ctx = new (window.AudioContext || window.webkitAudioContext)();
-const delay = ctx.createDelay(1.5);
-delay.delayTime.value = 0.7;
-const feedback = ctx.createGain();
-feedback.gain.value = 0.25;
-delay.connect(feedback);
-feedback.connect(delay);
-setTimeout(() => ctx.close(), 4000);
-} catch (e) {}
+  if (localStorage.getItem('lh_narration_off') === '1') return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.62;
+  u.pitch = 0.4;
+  u.volume = 0.95;
+  
+  const loadVoice = () => {
+    const voices = speechSynthesis.getVoices();
+    const voice = voices.find(v => v.lang.includes('es') && (v.name.includes('Male') || v.name === 'Diego' || v.name === 'Juan')) 
+      || voices.find(v => v.lang.includes('es')) || null;
+    if (voice) u.voice = voice;
+  };
+  
+  loadVoice();
+  speechSynthesis.addEventListener('voiceschanged', loadVoice, { once: true });
+  speechSynthesis.speak(u);
 }
-};
-speechSynthesis.speak(u);
-}
-function showMissionCompleted() {
-document.getElementById('phase1-consigna').style.display = 'none';
-document.getElementById('phase2-mapa').style.display = 'none';
-document.getElementById('phase3-pista').style.display = 'none';
-document.getElementById('teamSection').style.display = 'none';
-const elapsedMinutes = Math.floor((Date.now() - missionStartTime) / 60000);
-const recoveryCode = localStorage.getItem(`recovery_${jugador.id}`) || '—';
-const missionTitle = jugador.modo === 'equipo' ? currentTeamMission.titulo : currentMission.titulo;
-document.querySelector('#phase4-completed .mission-card').innerHTML = `
-<h2 style="color:#ffd700; margin-bottom:1rem;">✅ Operación Completada</h2>
-<p><strong>${missionTitle}</strong></p>
-<p style="font-size:0.95rem; color:#cbd5e1; margin:1rem 0;">
-Tu posición ha sido registrada en el sistema central.
-</p>
-<div style="margin:1.5rem 0; font-size:0.9rem; color:#64b5f7;">
-⏱️ Completado en: <strong>${elapsedMinutes} min</strong>
-</div>
-<div style="font-size:0.85rem; color:#94a3b8; margin-bottom:1.5rem;">
-🔑 Código: <code>${recoveryCode}</code>
-</div>
-<div style="
-margin:1.2rem 0;
-padding:0.8rem;
-border-radius:10px;
-background:rgba(255,215,0,0.08);
-color:#ffd700;
-font-size:0.9rem;
-">
-🎖️ <strong>Desafío completado</strong><br>
-Has ganado el badge <strong>“Primer Cazador”</strong><br>
-📡 Tu alias permanece visible en el radar
-</div>
-<div class="actions">
-<button class="btn btn-primary" id="new-mission-btn">🔁 Nueva operación</button>
-<button class="btn btn-outline" id="view-progress-btn">📊 Ver progreso</button>
-</div>
-`;
-document.getElementById('phase4-completed').style.display = 'block';
-document.getElementById('new-mission-btn').addEventListener('click', () => {
-window.location.href = 'registro.html';
-});
-document.getElementById('view-progress-btn').addEventListener('click', () => {
-window.location.href = 'progreso.html';
-});
-}
-// Event listeners globales
+
+// ========== EVENT LISTENERS ==========
 document.getElementById('narration-toggle')?.addEventListener('click', function() {
-const isOff = localStorage.getItem('lh_narration_off') === '1';
-localStorage.setItem('lh_narration_off', isOff ? '0' : '1');
-this.textContent = isOff ? '🔊' : '🔇';
-showToast(isOff ? '✅ Narración activada' : '🔇 Narración desactivada');
+  const isOff = localStorage.getItem('lh_narration_off') === '1';
+  localStorage.setItem('lh_narration_off', isOff ? '0' : '1');
+  this.textContent = isOff ? '🔊' : '🔇';
+  showToast(isOff ? '✅ Narración activada' : '🔇 Narración desactivada');
 });
+
 document.getElementById('closeScannerBtn')?.addEventListener('click', stopScanner);
 document.getElementById('manualInputBtn')?.addEventListener('click', () => {
-stopScanner();
-showToast("⚠️ Usa el escáner QR para leer el código del Vigilante Oscuro.");
+  stopScanner();
+  openManualCodeModal();
 });
-document.addEventListener('keydown', (e) => {
-if (e.key === 'Escape' && scannerActive) stopScanner();
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && scannerActive) stopScanner();
+  if (e.key === 'Escape' && document.getElementById('manualCodeModal')?.style.display === 'flex') closeManualCodeModal();
 });
-// Evento para botón de accesibilidad
+
 document.getElementById('accessibility-toggle')?.addEventListener('click', toggleAccessibilityMode);
-function showToast(msg) {
-const t = document.getElementById('toast');
-t.textContent = msg;
-t.classList.add('show');
-setTimeout(() => t.classList.remove('show'), 3500);
-}
-// ========== BANNER DE INSTALACIÓN PWA ==========
-window.addEventListener('beforeinstallprompt', (e) => {
-e.preventDefault();
-deferredPrompt = e;
+
+// Navegación móvil
+document.getElementById('nav-radar')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById('radar-section').style.display = 'block';
+  document.getElementById('radar-section').scrollIntoView({ behavior: 'smooth' });
 });
+
+document.getElementById('nav-missions')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  showPhase0();
+});
+
+document.getElementById('nav-scan')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  openQRScanner();
+});
+
+document.getElementById('nav-progress')?.addEventListener('click', (e) => {
+  // Dejar que navegue a progreso.html
+});
+
+// ========== PWA ==========
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
 function showInstallBanner() {
-const banner = document.getElementById('pwa-install-banner');
-if (!banner) return;
-const bannerDismissed = localStorage.getItem('pwaBannerDismissed');
-const now = Date.now();
-if (bannerDismissed && (now - parseInt(bannerDismissed)) < 24 * 60 * 60 * 1000) {
-return;
+  const banner = document.getElementById('pwa-install-banner');
+  if (!banner) return;
+  const dismissed = localStorage.getItem('pwaBannerDismissed');
+  const now = Date.now();
+  if (dismissed && (now - parseInt(dismissed)) < 24 * 60 * 60 * 1000) return;
+  
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isStandalone) {
+    banner.innerHTML = '<button class="close-btn" id="close-install-banner">×</button><p style="margin:0 0 8px">🎯 Codigo Ebel está instalado.</p><p style="font-size:0.85rem;margin:0;color:#94a3b8">¿Ves esto? Cierra el banner.</p>';
+    banner.style.display = 'block';
+    document.getElementById('close-install-banner')?.addEventListener('click', () => {
+      banner.style.display = 'none';
+      localStorage.setItem('pwaBannerDismissed', now.toString());
+    });
+    return;
+  }
+  
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  setTimeout(() => {
+    banner.style.display = 'block';
+    if (isIOS) {
+      banner.innerHTML = '<button class="close-btn" id="close-install-banner">×</button><p style="margin:0 0 8px">👆 Toca <strong>Compartir</strong> → <strong>"Añadir a pantalla de inicio"</strong></p>';
+    } else {
+      banner.innerHTML = '<button class="close-btn" id="close-install-banner">×</button><p style="margin:0 0 8px">📥 ¿Agregar Codigo Ebel a tu pantalla de inicio?</p><button id="install-btn" style="background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:6px;font-weight:bold;font-size:0.9rem;margin-top:4px">Instalar</button>';
+      document.getElementById('install-btn')?.addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => {
+            banner.style.display = 'none';
+            deferredPrompt = null;
+          });
+        } else {
+          banner.innerHTML = '<button class="close-btn" id="close-install-banner">×</button><p style="margin:0 0 8px">Abre el menú (⋯ o ≡) y busca <strong>"Instalar app"</strong>.</p>';
+        }
+      });
+    }
+    document.getElementById('close-install-banner')?.addEventListener('click', () => {
+      banner.style.display = 'none';
+      localStorage.setItem('pwaBannerDismissed', now.toString());
+    });
+  }, 3000);
 }
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-|| window.navigator.standalone === true;
-if (isStandalone) {
-banner.innerHTML = `
-<button class="close-btn" id="close-install-banner">×</button>
-<p style="margin:0 0 8px;">
-🎯 Let's Hunt está instalado.
-</p>
-<p style="font-size:0.85rem; margin:0; color:#94a3b8;">
-¿Ves esto? Cierra el banner.
-</p>
-`;
-banner.style.display = 'block';
-document.getElementById('close-install-banner').onclick = () => {
-banner.style.display = 'none';
-localStorage.setItem('pwaBannerDismissed', now.toString());
-};
-return;
-}
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-setTimeout(() => {
-banner.style.display = 'block';
-if (isIOS) {
-banner.innerHTML = `
-<button class="close-btn" id="close-install-banner">×</button>
-<p style="margin:0 0 8px;">
-👆 Toca <strong>Compartir</strong> → <strong>“Añadir a pantalla de inicio”</strong>
-</p>
-`;
-document.getElementById('close-install-banner').onclick = () => {
-banner.style.display = 'none';
-localStorage.setItem('pwaBannerDismissed', now.toString());
-};
-} else {
-banner.innerHTML = `
-<button class="close-btn" id="close-install-banner">×</button>
-<p style="margin:0 0 8px;">
-📥 ¿Agregar Codigo Ebel a tu pantalla de inicio?
-</p>
-<button id="install-btn" style="
-background:var(--primary); color:white; border:none;
-padding:6px 12px; border-radius:6px; font-weight:bold;
-font-size:0.9rem; margin-top:4px;
-">Instalar</button>
-`;
-document.getElementById('close-install-banner').onclick = () => {
-banner.style.display = 'none';
-localStorage.setItem('pwaBannerDismissed', now.toString());
-};
-document.getElementById('install-btn').onclick = () => {
-if (deferredPrompt) {
-deferredPrompt.prompt();
-deferredPrompt.userChoice.then((choiceResult) => {
-banner.style.display = 'none';
-deferredPrompt = null;
-});
-} else {
-banner.innerHTML = `
-<button class="close-btn" id="close-install-banner">×</button>
-<p style="margin:0 0 8px;">
-Abre el menú del navegador (⋯ o ≡) y busca <strong>“Instalar app”</strong>.
-</p>
-`;
-document.getElementById('close-install-banner').onclick = () => {
-banner.style.display = 'none';
-localStorage.setItem('pwaBannerDismissed', now.toString());
-};
-}
-};
-}
-}, 3000);
-}
-// Registrar Service Worker
+
+// ========== SERVICE WORKER ==========
 if ('serviceWorker' in navigator) {
-window.addEventListener('load', () => {
-navigator.serviceWorker.register('/sw.js')
-.then(() => console.log('✅ SW registrado'))
-.catch(err => console.error('❌ Error SW:', err));
-});
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('✅ SW registrado'))
+      .catch(err => console.error('❌ Error SW:', err));
+  });
 }
-// Mostrar banner de instalación
+
+// ========== INICIALIZAR ==========
 showInstallBanner();
-// Inicializar posicionamiento de botones
 updateFloatingControlsPosition();
 window.addEventListener('resize', updateFloatingControlsPosition);
-// Inicializar app
-window.addEventListener('load', initApp);
+window.addEventListener('beforeunload', cleanupAll);
+
+window.addEventListener('load', () => {
+  loadMisiones().then(() => {
+    applyAccessibilityMode();
+    setupJugador();
+    startRandomEvents(); // ✅ Eventos aleatorios para tensión
+    console.log('✅ Codigo Ebel App inicializada');
+    console.log('🛡️ Anti-cheat GPS activado (threshold: ' + GPS_ACCURACY_THRESHOLD + 'm)');
+    console.log('🔐 Firebase: Recuerda configurar reglas de seguridad en la consola');
+  });
+});
 </script>
 </body>
 </html>
