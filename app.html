@@ -14,7 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
   <!-- Librerías externas -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1156,13 +1156,48 @@ async function openQRScanner() {
             const scannedId = params.get('m');
             const currentId = jugador.modo === 'equipo' ? currentTeamMission?.id : currentMission?.id;
             
-            if (scannedId && String(scannedId) === String(currentId)) {
-              window.location.href = scannedData;
-              return;
-            } else if (scannedId && String(scannedId) !== String(currentId)) {
-              showToast('❌ Este QR es de otra misión');
-              return;
-            }
+            // ✅ VALIDACIÓN SEGURA CON CLOUD FUNCTIONS:
+if (scannedId && String(scannedId) === String(currentId)) {
+  showToast('🔄 Validando misión...');
+  
+  // Obtener coordenadas para validación GPS en backend
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      // Llamar a Cloud Function validarMision
+      const validarMision = firebase.functions().httpsCallable('validarMision');
+      const result = await validarMision({
+        misionId: scannedId,
+        qrCode: scannedId,
+        coordenadas: {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy
+        },
+        zona: jugador.zona
+      });
+      
+      if (result.data.success) {
+        showToast('✅ ' + result.data.message);
+        showMissionCompleted();
+      }
+    } catch (error) {
+      console.error('Error en Cloud Function:', error);
+      const errorMsg = error.details || error.message || 'Error al validar la misión';
+      showToast('❌ ' + errorMsg);
+    }
+  }, (err) => {
+    showToast('⚠️ Error obteniendo ubicación');
+  }, {
+    enableHighAccuracy: true,
+    maximumAge: 10000,
+    timeout: 10000
+  });
+  
+  return;
+} else if (scannedId && String(scannedId) !== String(currentId)) {
+  showToast('❌ Este QR es de otra misión');
+  return;
+}
           }
         } catch (e) {
           console.log('No es URL válida:', e);
