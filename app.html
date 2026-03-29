@@ -1,216 +1,191 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Codigo Ebel · App</title>
-  <meta name="description" content="Tu cacería urbana en el Gran Buenos Aires" />
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  
-  <!-- Firebase SDK (legacy v8.10.1) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Codigo Ebel · App</title>
+<meta name="description" content="Tu cacería urbana en el Gran Buenos Aires" />
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- Firebase SDK (legacy v8.10.1) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
-  <!-- Librerías externas -->
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="manifest" href="/site.webmanifest">
-  <meta name="theme-color" content="#000000">
+<!-- Librerías externas -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<meta name="theme-color" content="#000000">
 </head>
 <body>
-
-<!-- 🔐 PANTALLA DE ACTIVACIÓN (NUEVO) -->
+<!-- 🔐 PANTALLA DE ACTIVACIÓN -->
 <div id="activation-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a0a12,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:2rem;text-align:center;">
-  <div class="logo-container centered" style="margin-bottom:2rem;">
-    <img src="code_ebel3.webp" alt="Codigo Ebel" style="max-width:200px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.6));">
-  </div>
-  <h2 style="color:var(--primary);font-size:1.5rem;margin-bottom:1rem;">🕶️ Bienvenido, cazador</h2>
-  <p id="activation-zone" style="color:var(--text-muted);margin-bottom:1.5rem;font-size:1.1rem;">Tu señal ha sido detectada en <strong>CABA</strong></p>
-  <div class="activation-status" style="margin-bottom:2rem;">
-    <span class="pulse-dot" style="display:inline-block;margin-right:0.5rem;"></span>
-    <span id="activation-text">Sincronizando misiones activas...</span>
-  </div>
-  <button id="enter-system-btn" class="btn-hero" style="opacity:0;pointer-events:none;transition:opacity 0.3s;">
-    🎯 Entrar al sistema
-  </button>
+<div class="logo-container centered" style="margin-bottom:2rem;">
+<img src="code_ebel3.webp" alt="Codigo Ebel" style="max-width:200px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.6));">
 </div>
-
+<h2 style="color:var(--primary);font-size:1.5rem;margin-bottom:1rem;">🕶️ Bienvenido, cazador</h2>
+<p id="activation-zone" style="color:var(--text-muted);margin-bottom:1.5rem;font-size:1.1rem;">Tu señal ha sido detectada en <strong>CABA</strong></p>
+<div class="activation-status" style="margin-bottom:2rem;">
+<span class="pulse-dot" style="display:inline-block;margin-right:0.5rem;"></span>
+<span id="activation-text">Sincronizando misiones activas...</span>
+</div>
+<button id="enter-system-btn" class="btn-hero" style="opacity:0;pointer-events:none;transition:opacity 0.3s;">
+🎯 Entrar al sistema
+</button>
+</div>
 <!-- HEADER -->
 <header>
-  <div class="header-left">
-    <div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
-    <!-- ✅ Timer global para tensión -->
-    <div id="global-timer" class="global-timer" style="display:none;font-size:0.75rem;color:#ff6b6b;margin-top:0.3rem;">⏰ Expira en: <span id="global-time">12:00</span></div>
-  </div>
-  <div class="header-center">
-    <div class="logo-container centered">
-      <img src="code_ebel3.webp" alt="Codigo Ebel" class="app-logo">
-    </div>
-  </div>
-  <div class="header-right">
-    <!-- ✅ Progresión visible -->
-    <div class="hunter-id" id="hunterIdDisplay">ID: LH-0000</div>
-    <div id="level-display" class="level-badge" style="font-size:0.7rem;margin-top:0.3rem;color:var(--primary);">N1</div>
-  </div>
+<div class="header-left">
+<div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
+<div id="global-timer" class="global-timer" style="display:none;font-size:0.75rem;color:#ff6b6b;margin-top:0.3rem;">⏰ Expira en: <span id="global-time">12:00</span></div>
+</div>
+<div class="header-center">
+<div class="logo-container centered">
+<img src="code_ebel3.webp" alt="Codigo Ebel" class="app-logo">
+</div>
+</div>
+<div class="header-right">
+<div class="hunter-id" id="hunterIdDisplay">ID: LH-0000</div>
+<div id="level-display" class="level-badge" style="font-size:0.7rem;margin-top:0.3rem;color:var(--primary);">N1</div>
+</div>
 </header>
-
 <!-- MAIN CONTENT -->
 <main>
-  <div class="container">
-    
-    <!-- ✅ RADAR DE JUGADORES (NUEVO) -->
-    <div id="radar-section" class="mission-phase" style="display:none;">
-      <div class="mission-card">
-        <h3 style="margin-bottom:1rem;">📡 Cazadores cercanos</h3>
-        <div id="nearby-players" style="min-height:60px;">
-          <p style="color:var(--text-muted);font-size:0.9rem;">Busando señales...</p>
-        </div>
-        <div id="radar-urgency" style="margin-top:1rem;font-size:0.85rem;color:#ff6b6b;display:none;">
-          ⚠️ <span id="urgency-text">2 cazadores en tu zona</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- FASE 0: Consigna inicial con narrativa mínima -->
-    <div id="phase0-intro" class="mission-phase" style="display:none;">
-      <div class="mission-card">
-        <div class="mission-title"><span class="icon">🦁</span><span class="title-text" id="intro-mission-title">Cargando...</span></div>
-        <p class="pista" id="intro-mission-desc" style="margin:1rem 0;font-size:0.95rem;line-height:1.4;"></p>
-        <div class="actions">
-          <button class="btn btn-primary" id="accept-intro-btn">✅ Aceptar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- FASE 1: Consigna -->
-    <div id="phase1-consigna" class="mission-phase" style="display:none;">
-      <div class="mission-card"></div>
-    </div>
-
-    <!-- FASE 2: Mapa de aproximación -->
-    <div id="phase2-mapa" class="mission-phase" style="display:none;">
-      <div class="mission-card"></div>
-      <div id="proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
-      <!-- ✅ Fallback manual siempre visible -->
-      <button id="manual-code-btn" class="btn btn-outline" style="margin-top:1rem;width:100%;">⌨️ Ingresar código manual</button>
-    </div>
-
-    <!-- FASE 3: Pista final + QR -->
-    <div id="phase3-pista" class="mission-phase" style="display:none;">
-      <div class="mission-card"></div>
-    </div>
-
-    <!-- FASE 4: Misión completada (sin redirección) -->
-    <div id="phase4-completed" class="mission-phase" style="display:none;">
-      <div class="mission-card"></div>
-    </div>
-
-    <!-- SECCIÓN PARA EQUIPOS (con coordinación real) -->
-    <div id="teamSection" class="mission-phase" style="display:none;">
-      <div class="mission-card"></div>
-      <div id="team-coordination" style="margin-top:1rem;padding:1rem;background:rgba(168,85,247,0.1);border-radius:12px;display:none;">
-        <p style="font-size:0.9rem;margin-bottom:0.5rem;"><strong>👥 Coordinación de equipo:</strong></p>
-        <p id="team-task" style="font-size:0.85rem;color:var(--text-muted);"></p>
-        <div id="team-timer" style="margin-top:0.5rem;font-size:0.9rem;color:#ff6b6b;font-weight:600;"></div>
-      </div>
-      <div id="team-proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
-    </div>
-
-    <!-- ✅ PROGRESO VISUAL (siempre visible) -->
-    <div id="progress-summary" style="margin-top:2rem;text-align:center;">
-      <div style="display:inline-flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
-        <span style="background:rgba(0,170,255,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
-          🎯 Misiones: <strong id="missions-count">0</strong>
-        </span>
-        <span style="background:rgba(168,85,247,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
-          🔥 Racha: <strong id="streak-count">0</strong> días
-        </span>
-        <span style="background:rgba(255,215,0,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
-          🏆 Nivel: <strong id="current-level">N1</strong>
-        </span>
-      </div>
-    </div>
-
-  </div>
-</main>
-
-<!-- Modal de invitación (equipo) -->
-<div id="inviteModal" class="modal-overlay">
-  <div class="modal-content">
-    <h3>👥 Invitar a tu equipo</h3>
-    <p>Compartí este código para que otros se unan:</p>
-    <div id="codigoInvitacion">CARGANDO...</div>
-    <div class="modal-actions">
-      <button id="copyCodeBtn" class="btn btn-outline">📋 Copiar código</button>
-      <button id="shareWaBtn" class="btn btn-primary">💬 WhatsApp</button>
-    </div>
-    <button id="closeModalBtn" class="modal-close">Cerrar</button>
-  </div>
+<div class="container">
+<!-- RADAR DE JUGADORES -->
+<div id="radar-section" class="mission-phase" style="display:none;">
+<div class="mission-card">
+<h3 style="margin-bottom:1rem;">📡 Cazadores cercanos</h3>
+<div id="nearby-players" style="min-height:60px;">
+<p style="color:var(--text-muted);font-size:0.9rem;">Buscando señales...</p>
 </div>
-
+<div id="radar-urgency" style="margin-top:1rem;font-size:0.85rem;color:#ff6b6b;display:none;">
+⚠️ <span id="urgency-text">2 cazadores en tu zona</span>
+</div>
+</div>
+</div>
+<!-- FASE 0: Intro -->
+<div id="phase0-intro" class="mission-phase" style="display:none;">
+<div class="mission-card">
+<div class="mission-title"><span class="icon">🦁</span><span class="title-text" id="intro-mission-title">Cargando...</span></div>
+<p class="pista" id="intro-mission-desc" style="margin:1rem 0;font-size:0.95rem;line-height:1.4;"></p>
+<div class="actions">
+<button class="btn btn-primary" id="accept-intro-btn">✅ Aceptar</button>
+</div>
+</div>
+</div>
+<!-- FASE 1: Consigna -->
+<div id="phase1-consigna" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+</div>
+<!-- FASE 2: Mapa -->
+<div id="phase2-mapa" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+<div id="proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
+<button id="manual-code-btn" class="btn btn-outline" style="margin-top:1rem;width:100%;">⌨️ Ingresar código manual</button>
+</div>
+<!-- FASE 3: Pista + QR -->
+<div id="phase3-pista" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+</div>
+<!-- FASE 4: Completada -->
+<div id="phase4-completed" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+</div>
+<!-- EQUIPOS -->
+<div id="teamSection" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+<div id="team-coordination" style="margin-top:1rem;padding:1rem;background:rgba(168,85,247,0.1);border-radius:12px;display:none;">
+<p style="font-size:0.9rem;margin-bottom:0.5rem;"><strong>👥 Coordinación de equipo:</strong></p>
+<p id="team-task" style="font-size:0.85rem;color:var(--text-muted);"></p>
+<div id="team-timer" style="margin-top:0.5rem;font-size:0.9rem;color:#ff6b6b;font-weight:600;"></div>
+</div>
+<div id="team-proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
+</div>
+<!-- PROGRESO VISUAL -->
+<div id="progress-summary" style="margin-top:2rem;text-align:center;">
+<div style="display:inline-flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+<span style="background:rgba(0,170,255,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+🎯 Misiones: <strong id="missions-count">0</strong>
+</span>
+<span style="background:rgba(168,85,247,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+🔥 Racha: <strong id="streak-count">0</strong> días
+</span>
+<span style="background:rgba(255,215,0,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+🏆 Nivel: <strong id="current-level">N1</strong>
+</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal invitación -->
+<div id="inviteModal" class="modal-overlay">
+<div class="modal-content">
+<h3>👥 Invitar a tu equipo</h3>
+<p>Compartí este código para que otros se unan:</p>
+<div id="codigoInvitacion">CARGANDO...</div>
+<div class="modal-actions">
+<button id="copyCodeBtn" class="btn btn-outline">📋 Copiar código</button>
+<button id="shareWaBtn" class="btn btn-primary">💬 WhatsApp</button>
+</div>
+<button id="closeModalBtn" class="modal-close">Cerrar</button>
+</div>
+</div>
 <!-- Escáner QR -->
 <div id="scannerOverlay" class="modal-overlay">
-  <div class="scanner-container">
-    <h3>🔍 Escanea el Código QR</h3>
-    <video id="scannerVideo" autoplay playsinline></video>
-    <canvas id="scannerCanvas" style="display:none;"></canvas>
-    <div class="scanner-frame">
-      <div class="scanner-corner tl"></div>
-      <div class="scanner-corner tr"></div>
-      <div class="scanner-corner bl"></div>
-      <div class="scanner-corner br"></div>
-    </div>
-    <div class="scanner-actions">
-      <button id="closeScannerBtn" class="btn btn-outline">❌ Cancelar</button>
-      <button id="manualInputBtn" class="btn btn-primary">⌨️ Ingresar manualmente</button>
-    </div>
-  </div>
+<div class="scanner-container">
+<h3>🔍 Escanea el Código QR</h3>
+<video id="scannerVideo" autoplay playsinline></video>
+<canvas id="scannerCanvas" style="display:none;"></canvas>
+<div class="scanner-frame">
+<div class="scanner-corner tl"></div>
+<div class="scanner-corner tr"></div>
+<div class="scanner-corner bl"></div>
+<div class="scanner-corner br"></div>
 </div>
-
-<!-- Modal de código manual -->
+<div class="scanner-actions">
+<button id="closeScannerBtn" class="btn btn-outline">❌ Cancelar</button>
+<button id="manualInputBtn" class="btn btn-primary">⌨️ Ingresar manualmente</button>
+</div>
+</div>
+</div>
+<!-- Modal código manual -->
 <div id="manualCodeModal" class="modal-overlay">
-  <div class="modal-content">
-    <h3>⌨️ Ingresar código manualmente</h3>
-    <p style="margin-bottom:1rem;font-size:0.9rem;color:var(--text-muted);">Si el QR no funciona, ingresá el código de 6 caracteres:</p>
-    <input type="text" id="manual-code-input" maxlength="6" placeholder="Ej: AB12CD" style="width:100%;padding:0.8rem;margin-bottom:1rem;border-radius:8px;border:1px solid var(--surface-border);background:var(--surface);color:var(--text);font-size:1.1rem;text-align:center;letter-spacing:2px;text-transform:uppercase;">
-    <div class="modal-actions">
-      <button id="submit-manual-code" class="btn btn-primary">✅ Validar</button>
-      <button id="cancel-manual-code" class="btn btn-outline">Cancelar</button>
-    </div>
-  </div>
+<div class="modal-content">
+<h3>⌨️ Ingresar código manualmente</h3>
+<p style="margin-bottom:1rem;font-size:0.9rem;color:var(--text-muted);">Si el QR no funciona, ingresá el código de 6 caracteres:</p>
+<input type="text" id="manual-code-input" maxlength="6" placeholder="Ej: AB12CD" style="width:100%;padding:0.8rem;margin-bottom:1rem;border-radius:8px;border:1px solid var(--surface-border);background:var(--surface);color:var(--text);font-size:1.1rem;text-align:center;letter-spacing:2px;text-transform:uppercase;">
+<div class="modal-actions">
+<button id="submit-manual-code" class="btn btn-primary">✅ Validar</button>
+<button id="cancel-manual-code" class="btn btn-outline">Cancelar</button>
 </div>
-
+</div>
+</div>
 <!-- NAVEGACIÓN MÓVIL -->
 <nav class="mobile-nav">
-  <a href="#radar" id="nav-radar"><i>📡</i>Radar</a>
-  <a href="#misiones" id="nav-missions"><i>🎯</i>Misiones</a>
-  <a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
-  <a href="progreso.html" id="nav-progress"><i>📊</i>Progreso</a>
+<a href="#radar" id="nav-radar"><i>📡</i>Radar</a>
+<a href="#misiones" id="nav-missions"><i>🎯</i>Misiones</a>
+<a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
+<a href="progreso.html" id="nav-progress"><i>📊</i>Progreso</a>
 </nav>
-
 <!-- BOTONES FLOTANTES -->
 <div id="floating-controls" style="position:fixed;right:20px;bottom:20px;z-index:999;display:flex;flex-direction:column;gap:10px;">
-  <button id="narration-toggle" title="Activar/Desactivar narración" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🔊</button>
-  <button id="accessibility-toggle" title="Modo normal" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">👁️</button>
+<button id="narration-toggle" title="Activar/Desactivar narración" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🔊</button>
+<button id="accessibility-toggle" title="Modo normal" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">👁️</button>
 </div>
-
 <!-- Banner PWA -->
 <div id="pwa-install-banner"></div>
-
-<!-- Toast Notification -->
+<!-- Toast -->
 <div id="toast"></div>
-
 <!-- LÓGICA PRINCIPAL -->
 <script>
 // ========== FIREBASE ==========
@@ -230,6 +205,7 @@ const auth = firebase.auth();
 const analytics = firebase.analytics();
 
 // ========== VARIABLES GLOBALES ==========
+const urlParams = new URLSearchParams(window.location.search);
 let accessibilityMode = localStorage.getItem('lh_accessibility_mode') || 'normal';
 let redemptionOffered = false;
 let misionesSolitario = [];
@@ -247,10 +223,11 @@ let gpsWatchId = null;
 let mapInstance = null;
 let missionTimer = null;
 let globalTimer = null;
+let radarInterval = null;
 let nearbyPlayers = [];
 let teamCoordinationTimer = null;
 
-// ✅ PROGRESIÓN DEL JUGADOR
+// ✅ PROGRESIÓN (solo UI, NO fuente de verdad)
 let playerProgress = {
   level: 1,
   missionsCompleted: 0,
@@ -260,14 +237,18 @@ let playerProgress = {
   badges: []
 };
 
-// ========== ANTI-CHEAT: CONFIGURACIÓN GPS ==========
+// ========== ANTI-CHEAT GPS ==========
 const GPS_ACCURACY_THRESHOLD = 40;
 
-// ========== FUNCIONES DE CLEANUP ==========
+// ========== CLEANUP ==========
 function stopGPS() {
   if (gpsWatchId !== null) {
     navigator.geolocation.clearWatch(gpsWatchId);
     gpsWatchId = null;
+  }
+  if (proximityWatchId !== null) {
+    navigator.geolocation.clearWatch(proximityWatchId);
+    proximityWatchId = null;
   }
 }
 function cleanupMap() {
@@ -290,6 +271,10 @@ function cleanupAll() {
   stopGPS();
   cleanupMap();
   stopTimer();
+  if (radarInterval !== null) {
+    clearInterval(radarInterval);
+    radarInterval = null;
+  }
   if (teamCoordinationTimer) {
     clearInterval(teamCoordinationTimer);
     teamCoordinationTimer = null;
@@ -300,10 +285,17 @@ function cleanupAll() {
   }
 }
 
-// ========== ANTI-CHEAT: VALIDAR PRECISIÓN GPS ==========
+// ========== VALIDAR GPS ==========
 function validateGPSAccuracy(position) {
   if (!position || !position.coords) return { valid: false, reason: 'Sin coordenadas' };
   const accuracy = position.coords.accuracy;
+  const timestamp = position.timestamp || Date.now();
+  const now = Date.now();
+  
+  if (now - timestamp > 60000) {
+    return { valid: false, reason: 'Timestamp muy viejo', accuracy };
+  }
+  
   if (accuracy > GPS_ACCURACY_THRESHOLD) {
     return { valid: false, reason: 'Precisión insuficiente', accuracy };
   }
@@ -314,7 +306,7 @@ function validateGPSAccuracy(position) {
   if (position.coords.speed !== null && position.coords.speed > 100) {
     return { valid: false, reason: 'Velocidad sospechosa' };
   }
-  return { valid: true, accuracy, latitude, longitude };
+  return { valid: true, accuracy, latitude, longitude, timestamp };
 }
 
 // ========== ACCESIBILIDAD ==========
@@ -355,7 +347,7 @@ function toggleAccessibilityMode() {
   showToast('✅ ' + accessibilityMode);
 }
 
-// ========== POSICIONAMIENTO DE BOTONES ==========
+// ========== POSICIONAMIENTO ==========
 function updateFloatingControlsPosition() {
   const controls = document.getElementById('floating-controls');
   if (!controls) return;
@@ -391,7 +383,7 @@ async function loadMisiones() {
   }
 }
 
-// ========== UTILIDADES DE MISIÓN ==========
+// ========== UTILIDADES MISIÓN ==========
 function getMisionesByZona(zona, tipo) {
   tipo = tipo || 'solitario';
   const lista = tipo === 'equipo' ? misionesEquipo : misionesSolitario;
@@ -420,13 +412,14 @@ function hideAllPhases() {
 // ========== FIREBASE: VERIFICAR MISIÓN ==========
 async function isMisionDisponible(misionId, zona) {
   try {
-    const ref = db.ref('misiones/' + misionId + '-' + zona);
+    // ✅ CORREGIDO: Leer de misiones_publicas (no misiones)
+    const ref = db.ref('misiones_publicas/' + misionId + '-' + zona);
     const snap = await ref.once('value');
-    if (!snap.exists()) return true;
+    if (!snap.exists()) return false;
     return snap.val().estado !== 'completada';
   } catch (err) {
     console.error('Error Firebase:', err);
-    return true;
+    return false;
   }
 }
 
@@ -434,18 +427,12 @@ async function isMisionDisponible(misionId, zona) {
 async function syncProgresoToFirebase(firebaseUid, data) {
   if (!firebaseUid) return;
   try {
-    // ✅ REGLA DE SEGURIDAD: Solo el usuario puede escribir en su propio nodo
+    // ✅ CORREGIDO: Solo campos permitidos por las Rules (hunterId, zona, modo)
     await db.ref('jugadores/' + firebaseUid).update({
       hunterId: data.hunterId || null,
       zona: data.zona || null,
-      modo: data.modo || null,
-      progreso: data.progreso || null,
-      misiones_aceptadas: data.misiones_aceptadas || [],
-      desafios_completados: data.desafios_completados || [],
-      recoveryCode: data.recoveryCode || null,
-      misionActual: data.misionActual || null,
-      playerProgress: playerProgress, // ✅ Progresión del jugador
-      lastSync: firebase.database.ServerValue.TIMESTAMP
+      modo: data.modo || null
+      // ❌ ELIMINADO: progreso, misiones_aceptadas, desafios_completados, recoveryCode, misionActual, playerProgress, lastSync
     });
   } catch (err) {
     console.warn('⚠️ Sync offline:', err);
@@ -457,21 +444,20 @@ async function restoreProgresoFromFirebase(firebaseUid) {
   try {
     const snap = await db.ref('jugadores/' + firebaseUid).once('value');
     if (snap.exists()) {
-      const data = snap.val();
-      if (data.playerProgress) playerProgress = { ...playerProgress, ...data.playerProgress };
-      return data;
+      return snap.val();
     }
   } catch (err) { console.warn('⚠️ Restore offline:', err); }
   return null;
 }
 
-// ========== CONFIGURACIÓN DEL JUGADOR ==========
+// ✅ ESCRIBIR DESAFÍO COMPLETADO (SOLO CLOUD FUNCTIONS - NO DESDE FRONTEND)
+// Esta función NO debe llamarse desde el frontend porque .write: false
+// Solo Cloud Functions debe escribir en desafios_completados
+
+// ========== CONFIGURACIÓN JUGADOR ==========
 function setupJugador() {
-  const params = new URLSearchParams(window.location.search);
-  let hunterId = params.get('id') || localStorage.getItem('currentHunterId');
-  
+  let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId');
   auth.signInAnonymously().catch(err => console.error('Auth error:', err));
-  
   auth.onAuthStateChanged(user => {
     if (user) {
       firebaseUser = user;
@@ -486,16 +472,15 @@ function setupJugador() {
 async function _continueSetupJugador(hunterId, firebaseUid) {
   let restored = null;
   if (firebaseUid) restored = await restoreProgresoFromFirebase(firebaseUid);
-  
   if (!hunterId) {
     const next = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
     hunterId = 'LH-' + String(next).padStart(4, '0');
     localStorage.setItem('lastHunterId', next);
-    const zona = decodeURIComponent((params.get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
+    const zona = decodeURIComponent((urlParams.get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
     jugador = { id: hunterId, nombre: 'Cazador', telefono: '+5491112345678', zona, modo: 'individual' };
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
-    if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId, zona, modo: 'individual', playerProgress });
+    if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId, zona, modo: 'individual' });
   } else {
     let stored = null;
     if (restored && restored.hunterId === hunterId) {
@@ -504,37 +489,30 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
       try { stored = JSON.parse(localStorage.getItem('jugador_' + hunterId)); } catch(e) { stored = null; }
     }
     jugador = stored || { id: hunterId, zona: 'CABA', modo: 'individual' };
-    const zonaUrl = decodeURIComponent((params.get('zona') || '').replace(/\+/g, ' ')).trim();
+    const zonaUrl = decodeURIComponent((urlParams.get('zona') || '').replace(/\+/g, ' ')).trim();
     if (zonaUrl && getMisionesByZona(zonaUrl, 'solitario').length > 0) jugador.zona = zonaUrl;
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
-    if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId: jugador.id, zona: jugador.zona, modo: jugador.modo, playerProgress });
+    if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId: jugador.id, zona: jugador.zona, modo: jugador.modo });
   }
-  
   document.getElementById('hunterIdDisplay').textContent = jugador.modo === 'equipo' ? ('👥 ' + (jugador.equipo || hunterId)) : ('ID: ' + hunterId);
   updateProgressDisplay();
-  
-  // ✅ MOSTRAR PANTALLA DE ACTIVACIÓN
   showActivationScreen();
 }
 
-// ✅ PANTALLA DE ACTIVACIÓN (NUEVO)
+// ========== PANTALLA ACTIVACIÓN ==========
 function showActivationScreen() {
   const screen = document.getElementById('activation-screen');
   const zoneEl = document.getElementById('activation-zone');
   const textEl = document.getElementById('activation-text');
   const btn = document.getElementById('enter-system-btn');
-  
   if (zoneEl) zoneEl.innerHTML = `Tu señal ha sido detectada en <strong>${jugador.zona}</strong>`;
-  
-  // Secuencia narrativa
   const steps = [
     { text: 'Sincronizando misiones activas...', delay: 800 },
     { text: 'Verificando tu zona de juego...', delay: 800 },
     { text: 'Preparando tu primera cacería...', delay: 800 },
     { text: '✅ Listo para empezar', delay: 400 }
   ];
-  
   let i = 0;
   const interval = setInterval(() => {
     if (i < steps.length && textEl) {
@@ -542,8 +520,6 @@ function showActivationScreen() {
       i++;
     }
   }, 800);
-  
-  // Mostrar botón después del delay
   setTimeout(() => {
     clearInterval(interval);
     if (btn) {
@@ -556,41 +532,95 @@ function showActivationScreen() {
       }, { once: true });
     }
   }, 2000);
-  
   screen.style.display = 'flex';
 }
 
-// ✅ ACTUALIZAR PROGRESO VISUAL
-function updateProgressDisplay() {
+// ✅ ACTUALIZAR PROGRESO DESDE BACKEND (FUENTE DE VERDAD)
+async function updateProgressDisplay() {
+  const firebaseUid = localStorage.getItem('firebaseUid');
+  
+  if (firebaseUid) {
+    try {
+      // ✅ LLAMAR A CLOUD FUNCTION PARA OBTENER PROGRESO REAL
+      const obtenerProgreso = firebase.functions().httpsCallable('obtenerProgreso');
+      const result = await obtenerProgreso({});
+      
+      if (result.data.success) {
+        const progreso = result.data.progreso;
+        
+        // Actualizar UI con datos reales del backend
+        document.getElementById('missions-count').textContent = progreso.misiones_completadas;
+        document.getElementById('streak-count').textContent = progreso.streak;
+        document.getElementById('current-level').textContent = 'N' + progreso.nivel;
+        
+        const levelEl = document.getElementById('level-display');
+        if (levelEl) levelEl.textContent = 'N' + progreso.nivel;
+        
+        // Actualizar variable local para UI
+        playerProgress = {
+          ...playerProgress,
+          missionsCompleted: progreso.misiones_completadas,
+          level: progreso.nivel,
+          streak: progreso.streak
+        };
+        return;
+      }
+    } catch (err) {
+      console.warn('⚠️ Error obteniendo progreso:', err);
+      // Fallback a localStorage si falla la llamada
+    }
+  }
+  
+  // Fallback offline (solo para desarrollo/testing)
   document.getElementById('missions-count').textContent = playerProgress.missionsCompleted;
   document.getElementById('streak-count').textContent = playerProgress.streak;
   document.getElementById('current-level').textContent = 'N' + playerProgress.level;
+  
   const levelEl = document.getElementById('level-display');
   if (levelEl) levelEl.textContent = 'N' + playerProgress.level;
 }
 
-// ✅ ACTUALIZAR NIVEL (con desbloqueos)
-function checkLevelUp() {
-  const thresholds = [0, 3, 7, 12, 20]; // misiones para cada nivel
+// ✅ CALCULAR NIVEL DESDE FIREBASE
+async function checkLevelUp() {
+  const firebaseUid = localStorage.getItem('firebaseUid');
+  if (firebaseUid) {
+    try {
+      const snap = await db.ref(`jugadores/${firebaseUid}`).once('value');
+      if (snap.exists()) {
+        const data = snap.val();
+        const misionesCompletadas = Array.isArray(data.desafios_completados) ? data.desafios_completados.length : 0;
+        const thresholds = [0, 3, 7, 12, 20];
+        const newLevel = thresholds.findIndex((t, i, arr) => misionesCompletadas < (arr[i+1] || Infinity)) + 1;
+        if (newLevel > playerProgress.level) {
+          playerProgress.level = newLevel;
+          showToast('🎉 ¡Nivel ' + newLevel + ' desbloqueado!');
+          if (newLevel >= 2 && !playerProgress.unlockedZones.includes('Avellaneda')) {
+            playerProgress.unlockedZones.push('Avellaneda');
+            showToast('🗺️ Nueva zona: Avellaneda');
+          }
+          if (newLevel >= 3 && !playerProgress.unlockedZones.includes('Lanús')) {
+            playerProgress.unlockedZones.push('Lanús');
+            showToast('🗺️ Nueva zona: Lanús');
+          }
+          updateProgressDisplay();
+        }
+        return;
+      }
+    } catch (err) {
+      console.warn('⚠️ Error verificando nivel:', err);
+    }
+  }
+  // Fallback local
+  const thresholds = [0, 3, 7, 12, 20];
   const newLevel = thresholds.findIndex((t, i, arr) => playerProgress.missionsCompleted < (arr[i+1] || Infinity)) + 1;
   if (newLevel > playerProgress.level) {
     playerProgress.level = newLevel;
     showToast('🎉 ¡Nivel ' + newLevel + ' desbloqueado!');
-    // Desbloquear zonas según nivel
-    if (newLevel >= 2 && !playerProgress.unlockedZones.includes('Avellaneda')) {
-      playerProgress.unlockedZones.push('Avellaneda');
-      showToast('🗺️ Nueva zona: Avellaneda');
-    }
-    if (newLevel >= 3 && !playerProgress.unlockedZones.includes('Lanús')) {
-      playerProgress.unlockedZones.push('Lanús');
-      showToast('🗺️ Nueva zona: Lanús');
-    }
     updateProgressDisplay();
-    if (firebaseUser) syncProgresoToFirebase(firebaseUser.uid, { playerProgress });
   }
 }
 
-// ========== MISIÓN DE REDENCIÓN ==========
+// ========== MISIÓN REDENCIÓN ==========
 async function showRedemptionMission() {
   if (redemptionOffered) return;
   cleanupAll();
@@ -598,7 +628,6 @@ async function showRedemptionMission() {
   const otherZones = allZones.filter(z => z !== jugador.zona);
   const randomZone = otherZones[Math.floor(Math.random() * otherZones.length)] || jugador.zona;
   const redemption = selectRandomMission(randomZone, 'solitario');
-  
   document.querySelector('#phase1-consigna .mission-card').innerHTML = `
     <div class="mission-title"><span class="icon">🕊️</span><span class="title-text">Misión de Redención</span></div>
     <div class="tension-bar" style="margin:1rem 0;background:rgba(106,170,255,0.15)">🌟 Segunda oportunidad</div>
@@ -607,7 +636,6 @@ async function showRedemptionMission() {
     <button class="btn btn-outline" id="retry-original-btn" style="margin-top:10px">🔄 Intentar original</button>
   `;
   redemptionOffered = true;
-  
   document.getElementById('accept-redemption-btn').onclick = () => {
     currentMission = redemption;
     jugador.zona = randomZone;
@@ -620,7 +648,7 @@ async function showRedemptionMission() {
   document.getElementById('retry-original-btn').onclick = showPhase0;
 }
 
-// ========== CONSUELO NARRATIVO ==========
+// ========== CONSUELO ==========
 function playConsolationNarration(reason) {
   const msgs = {
     timeout: 'El tiempo se agotó, pero tu instinto de caza permanece.',
@@ -631,14 +659,12 @@ function playConsolationNarration(reason) {
   playNarration(msgs[reason] || msgs.general);
 }
 
-// ========== FASE 0: INTRO NARRATIVA MÍNIMA ==========
+// ========== FASE 0 ==========
 async function showPhase0() {
   cleanupAll();
   currentMission = selectRandomMission(jugador.zona, 'solitario');
   if (!currentMission) { showToast('⚠️ No hay misiones'); return; }
-  
   analytics.logEvent('mision_aceptada', { zona: jugador.zona, tipo: 'solitario', hunter_id: jugador.id });
-  
   const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
   if (!disponible) {
     playConsolationNarration('already_completed');
@@ -654,30 +680,42 @@ async function showPhase0() {
     document.getElementById('redemption-btn').onclick = showRedemptionMission;
     return;
   }
-  
-  // ✅ INTRO MÍNIMA: solo título + CTA
   document.getElementById('intro-mission-title').textContent = currentMission.titulo;
   document.getElementById('intro-mission-desc').textContent = (currentMission.descripcion_narrativa || currentMission.pista_al_llegar).substring(0, 120) + '...';
   document.getElementById('phase0-intro').style.display = 'block';
+  // ✅ En showPhase0(), cuando se acepta una misión:
+document.getElementById('accept-intro-btn').onclick = async () => {
+  document.getElementById('phase0-intro').style.display = 'none';
   
-  document.getElementById('accept-intro-btn').onclick = () => {
-    document.getElementById('phase0-intro').style.display = 'none';
-    missionStartTime = Date.now();
-    startTimer();
-    startGlobalTimer(); // ✅ Timer global para tensión
-    guardarProgreso(currentMission.id);
-    showPhase2(); // Saltar fase 1 larga, ir directo al mapa
-  };
-}
+  const firebaseUid = localStorage.getItem('firebaseUid');
+  if (firebaseUid && currentMission) {
+    try {
+      // ✅ ASIGNAR MISIÓN VÍA CLOUD FUNCTION (NO directo)
+      const asignarMision = firebase.functions().httpsCallable('asignarMision');
+      await asignarMision({
+        misionId: currentMission.id,
+        zona: jugador.zona
+      });
+    } catch (err) {
+      console.warn('⚠️ Error asignando misión:', err);
+      showToast('⚠️ Error: ' + err.message);
+      return; // No continuar si falla la asignación
+    }
+  }
+  
+  missionStartTime = Date.now();
+  startTimer();
+  startGlobalTimer();
+  guardarProgreso(currentMission.id); // Solo localStorage
+  showPhase2();
+};
 
 // ========== FASE 1 ==========
 async function showPhase1() {
   cleanupAll();
   currentMission = selectRandomMission(jugador.zona, 'solitario');
   if (!currentMission) { showToast('⚠️ No hay misiones'); return; }
-  
   analytics.logEvent('mision_aceptada', { zona: jugador.zona, tipo: 'solitario', hunter_id: jugador.id });
-  
   const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
   if (!disponible) {
     playConsolationNarration('already_completed');
@@ -693,7 +731,6 @@ async function showPhase1() {
     document.getElementById('redemption-btn').onclick = showRedemptionMission;
     return;
   }
-  
   document.querySelector('#phase1-consigna .mission-card').innerHTML = `
     <div class="mission-title"><span class="icon">🦁</span><span class="title-text">${currentMission.titulo}</span></div>
     <div class="tension-bar" style="margin:1rem 0;background:rgba(255,69,58,0.15)">⏳ Listo para cazar</div>
@@ -715,7 +752,6 @@ function showPhase2() {
   cleanupAll();
   document.getElementById('phase0-intro').style.display = 'none';
   document.getElementById('phase1-consigna').style.display = 'none';
-  
   document.querySelector('#phase2-mapa .mission-card').innerHTML = `
     <h3>📍 Acércate al objetivo</h3>
     <p style="margin:1rem 0;color:#cbd5e1;line-height:1.4">${currentMission.ubicacion_mapa}</p>
@@ -724,50 +760,43 @@ function showPhase2() {
     <button class="btn btn-outline" id="back-to-phase1-btn" style="margin-top:15px;width:100%;padding:12px">🔙 Volver</button>
   `;
   document.getElementById('phase2-mapa').style.display = 'block';
-  
   loadApproxMap(currentMission.coordenadas.lat, currentMission.coordenadas.lng);
   startProximityCheck(currentMission.coordenadas.lat, currentMission.coordenadas.lng);
-  startRadarScan(); // ✅ Escanear jugadores cercanos
-  
+  startRadarScan();
   document.getElementById('back-to-phase1-btn').onclick = () => {
     cleanupAll();
     document.getElementById('phase2-mapa').style.display = 'none';
     showPhase0();
   };
-  
-  // ✅ Botón código manual
   document.getElementById('manual-code-btn').onclick = openManualCodeModal;
 }
 
-// ✅ RADAR DE JUGADORES (NUEVO)
+// ========== RADAR ==========
 function startRadarScan() {
+  if (radarInterval) {
+    clearInterval(radarInterval);
+    radarInterval = null;
+  }
+  
   document.getElementById('radar-section').style.display = 'block';
   const nearbyEl = document.getElementById('nearby-players');
   const urgencyEl = document.getElementById('radar-urgency');
-  
-  // Simular jugadores cercanos (en producción: Firebase Realtime)
   const mockPlayers = [
     { id: 'LH-2847', distance: 120, lastSeen: 'ahora' },
     { id: 'LH-1923', distance: 340, lastSeen: '2min' }
   ];
-  
   nearbyEl.innerHTML = mockPlayers.map(p => `
     <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px dashed rgba(255,255,255,0.1);">
       <span style="color:var(--primary);font-weight:600;">${p.id}</span>
       <span style="color:var(--text-muted);font-size:0.85rem;">${p.distance}m • ${p.lastSeen}</span>
     </div>
   `).join('');
-  
-  // Mostrar urgencia si hay jugadores muy cerca
   const veryNear = mockPlayers.filter(p => p.distance < 200);
   if (veryNear.length > 0 && urgencyEl) {
     document.getElementById('urgency-text').textContent = `${veryNear.length} cazador${veryNear.length>1?'es':''} en tu zona`;
     urgencyEl.style.display = 'block';
   }
-  
-  // Actualizar cada 30s
-  setInterval(() => {
-    // En producción: consultar Firebase
+  radarInterval = setInterval(() => {
     const fluctuation = Math.floor(Math.random() * 3) - 1;
     const count = Math.max(0, mockPlayers.length + fluctuation);
     if (urgencyEl && count > 0) {
@@ -780,10 +809,8 @@ function startRadarScan() {
 function showPhase3() {
   cleanupAll();
   document.getElementById('phase2-mapa').style.display = 'none';
-  
   const recoveryCode = generarRecoveryCode();
   localStorage.setItem('recovery_' + jugador.id, recoveryCode);
-  
   document.querySelector('#phase3-pista .mission-card').innerHTML = `
     <h3>🔍 Pista final</h3>
     <p class="pista">${currentMission.pista_al_llegar}</p>
@@ -794,25 +821,34 @@ function showPhase3() {
     <div style="margin-top:1.2rem;font-size:0.9rem">🔑 Recuperación: <code>${recoveryCode}</code></div>
   `;
   document.getElementById('phase3-pista').style.display = 'block';
-  
   document.getElementById('scan-btn').onclick = openQRScanner;
   document.getElementById('manual-scan-btn').onclick = openManualCodeModal;
-  
   playNarration('Cazador ' + jugador.id.replace('LH-','') + '. Estás en la zona. La pista final ha sido revelada.');
 }
 
-// ========== FASE 4: COMPLETADA (sin redirección) ==========
-function showMissionCompleted() {
+// ✅ FASE 4: COMPLETADA (CON VALIDACIÓN FIREBASE)
+async function showMissionCompleted() {
+  const firebaseUid = localStorage.getItem('firebaseUid');
+  
+  // ✅ Verificar en Firebase que la misión está validada
+  if (firebaseUid && currentMission) {
+    try {
+      const snap = await db.ref(`verificaciones/${firebaseUid}/${currentMission.id}`).once('value');
+      if (!snap.exists() || !snap.val().validado) {
+        console.warn('⚠️ Intento de completar misión sin validación');
+        showToast('⚠️ Validación pendiente');
+        return;
+      }
+    } catch (err) {
+      console.warn('⚠️ Error verificando validación:', err);
+    }
+  }
+  
   cleanupAll();
   hideAllPhases();
-  
   const elapsed = Math.floor((Date.now() - missionStartTime) / 60000);
   const recoveryCode = localStorage.getItem('recovery_' + jugador.id) || '—';
   const title = jugador.modo === 'equipo' ? currentTeamMission?.titulo : currentMission?.titulo;
-  
-  // ✅ Actualizar progresión
-  playerProgress.missionsCompleted++;
-  checkLevelUp(); // Verificar nivel up
   
   // ✅ Actualizar racha
   const today = new Date().toDateString();
@@ -820,8 +856,10 @@ function showMissionCompleted() {
     playerProgress.streak = playerProgress.lastPlayed ? playerProgress.streak + 1 : 1;
     playerProgress.lastPlayed = today;
   }
-  updateProgressDisplay();
-  if (firebaseUser) syncProgresoToFirebase(firebaseUser.uid, { playerProgress });
+  
+  // ✅ Recalcular progreso desde Firebase
+  await updateProgressDisplay();
+  await checkLevelUp();
   
   document.querySelector('#phase4-completed .mission-card').innerHTML = `
     <h2 style="color:#ffd700;margin-bottom:1rem">✅ Operación Completada</h2>
@@ -840,9 +878,7 @@ function showMissionCompleted() {
     </div>
   `;
   document.getElementById('phase4-completed').style.display = 'block';
-  
   document.getElementById('new-mission-btn').onclick = () => {
-    // ✅ LOOP CORRECTO: quedarse en app, nueva misión
     showPhase0();
   };
   document.getElementById('view-progress-btn').onclick = () => {
@@ -850,20 +886,16 @@ function showMissionCompleted() {
   };
 }
 
-// ========== FLUJO EQUIPO (con coordinación real) ==========
+// ========== EQUIPO ==========
 async function showTeamMission() {
   cleanupAll();
   document.body.classList.add('modo-equipo');
-  
   currentTeamMission = selectRandomMission(jugador.zona, 'equipo');
   const recoveryCode = generarRecoveryCode();
   localStorage.setItem('recovery_' + jugador.id, recoveryCode);
-  
-  // ✅ Coordinación real: QR A + QR B en 2 min
-  const coordText = currentTeamMission.qr_cercanos?.length >= 2 
+  const coordText = currentTeamMission.qr_cercanos?.length >= 2
     ? `Tu equipo debe escanear ambos QR en menos de 2 minutos.<br><strong>QR A:</strong> ${currentTeamMission.qr_cercanos[0].descripcion}<br><strong>QR B:</strong> ${currentTeamMission.qr_cercanos[1].descripcion}`
     : 'Coordina con tu equipo para completar la misión.';
-  
   document.querySelector('#teamSection .mission-card').innerHTML = `
     <div class="mission-title"><span class="icon">👁️</span><span class="title-text">${currentTeamMission.titulo}</span><span class="status active nivel-N2">ACTIVA • N2</span></div>
     <p class="pista">${currentTeamMission.descripcion_narrativa}</p>
@@ -874,7 +906,6 @@ async function showTeamMission() {
     <div style="margin-top:1.2rem;font-size:0.9rem">🔑 Recuperación: <code>${recoveryCode}</code></div>
   `;
   document.getElementById('teamSection').style.display = 'block';
-  
   document.getElementById('accept-mission-btn').onclick = () => {
     missionStartTime = Date.now();
     startTimer();
@@ -882,23 +913,19 @@ async function showTeamMission() {
     guardarProgreso(currentTeamMission.id);
     showToast('📍 Misión registrada · Tu alias ya está activo');
     startTeamProximityCheck();
-    
-    // ✅ Mostrar coordinación si hay múltiples QR
     if (currentTeamMission.qr_cercanos?.length >= 2) {
       document.getElementById('team-coordination').style.display = 'block';
       document.getElementById('team-task').innerHTML = coordText;
-      startTeamCoordinationTimer(120); // 2 minutos
+      startTeamCoordinationTimer(120);
     }
   };
-  
   document.getElementById('scan-btn-team').onclick = openQRScanner;
 }
 
-// ✅ TIMER DE COORDINACIÓN DE EQUIPO
+// ========== TIMER EQUIPO ==========
 function startTeamCoordinationTimer(seconds) {
   let timeLeft = seconds;
   const timerEl = document.getElementById('team-timer');
-  
   teamCoordinationTimer = setInterval(() => {
     if (timeLeft <= 0) {
       clearInterval(teamCoordinationTimer);
@@ -913,14 +940,11 @@ function startTeamCoordinationTimer(seconds) {
     timeLeft--;
   }, 1000);
 }
-
 function startTeamProximityCheck() {
   const coordsA = currentTeamMission.qr_cercanos?.[0]?.coordenadas;
   if (!coordsA) return;
-  
   loadApproxMap(coordsA.lat, coordsA.lng);
   document.getElementById('team-proximity-status').textContent = '📍 Esperando ubicación...';
-  
   if (navigator.geolocation) {
     gpsWatchId = navigator.geolocation.watchPosition(
       pos => {
@@ -947,13 +971,12 @@ function startTeamProximityCheck() {
   }
 }
 
-// ========== VALIDACIÓN DE PROXIMIDAD (CON ANTI-CHEAT) ==========
+// ========== PROXIMIDAD ==========
 function startProximityCheck(targetLat, targetLng) {
   if (!navigator.geolocation) {
     document.getElementById('proximity-instructions').textContent = '⚠️ GPS no soportado';
     return;
   }
-  
   gpsWatchId = navigator.geolocation.watchPosition(
     pos => {
       const validation = validateGPSAccuracy(pos);
@@ -967,7 +990,6 @@ function startProximityCheck(targetLat, targetLng) {
       statusEl.style.color = '#94a3b8';
       const { latitude, longitude } = validation;
       const distance = calculateDistance(latitude, longitude, targetLat, targetLng);
-      
       if (distance <= 50) {
         statusEl.innerHTML = `✅ ¡Estás en la zona! <button class="btn btn-primary" id="unlock-phase3-btn" style="margin-top:10px">🔓 Acceder</button>`;
         statusEl.style.color = '#4ade80';
@@ -982,7 +1004,6 @@ function startProximityCheck(targetLat, targetLng) {
     { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
   );
 }
-
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3;
   const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1007,7 +1028,6 @@ function loadApproxMap(lat, lng) {
     initApproxMap(lat, lng);
   }
 }
-
 function initApproxMap(lat, lng) {
   mapInstance = L.map('mapApprox').setView([lat, lng], 18.5);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapInstance);
@@ -1016,13 +1036,12 @@ function initApproxMap(lat, lng) {
   setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 100);
 }
 
-// ========== TEMPORIZADORES ==========
+// ========== TIMERS ==========
 function startTimer() {
   stopTimer();
   let timeLeft = 90 * 60;
   const timerEl = document.getElementById('timer');
   timerEl.textContent = '90:00';
-  
   missionTimer = setInterval(() => {
     if (timeLeft <= 0) {
       timerEl.textContent = '⏰ Caducada';
@@ -1049,17 +1068,15 @@ function startTimer() {
   }, 1000);
 }
 
-// ✅ TIMER GLOBAL PARA TENSIÓN (NUEVO)
+// ========== TIMER GLOBAL ==========
 function startGlobalTimer() {
-  stopTimer(); // Detener timer anterior si existe
-  let timeLeft = 12 * 60; // 12 minutos globales
+  stopTimer();
+  let timeLeft = 12 * 60;
   const el = document.getElementById('global-timer');
   const timeEl = document.getElementById('global-time');
-  
   if (el && timeEl) {
     el.style.display = 'block';
     timeEl.textContent = '12:00';
-    
     globalTimer = setInterval(() => {
       if (timeLeft <= 0) {
         clearInterval(globalTimer);
@@ -1070,7 +1087,6 @@ function startGlobalTimer() {
       }
       const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
       timeEl.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
-      // Color de urgencia cuando queda poco tiempo
       if (timeLeft < 120) el.style.color = '#ff6b6b';
       else if (timeLeft < 300) el.style.color = '#ff9500';
       timeLeft--;
@@ -1078,11 +1094,10 @@ function startGlobalTimer() {
   }
 }
 
-// ========== EVENTOS ALEATORIOS (NUEVO) ==========
+// ========== EVENTOS ALEATORIOS ==========
 function startRandomEvents() {
-  // Evento aleatorio cada 3-5 minutos
   const interval = setInterval(() => {
-    if (Math.random() < 0.3) { // 30% de probabilidad
+    if (Math.random() < 0.3) {
       const events = [
         { title: '🚨 Interferencia detectada', desc: 'Nueva pista desbloqueada en tu zona', color: '#ff6b6b' },
         { title: '📡 Señal reforzada', desc: '+30 segundos adicionales', color: '#4ade80' },
@@ -1090,25 +1105,21 @@ function startRandomEvents() {
       ];
       const evt = events[Math.floor(Math.random() * events.length)];
       showToast(`${evt.title}: ${evt.desc}`, 5000);
-      // Efecto visual en timer
       const bar = document.getElementById('tension-bar');
       if (bar) {
         bar.style.background = evt.color + '33';
         setTimeout(() => { if (bar) bar.style.background = ''; }, 3000);
       }
     }
-  }, 180000 + Math.random() * 120000); // 3-5 min
-  
-  // Limpiar al salir
+  }, 180000 + Math.random() * 120000);
   window.addEventListener('beforeunload', () => clearInterval(interval));
 }
 
-// ========== ESCÁNER QR (CON VALIDACIÓN DE MISIÓN) ==========
+// ✅ ESCÁNER QR (CON CLOUD FUNCTIONS)
 async function openQRScanner() {
   const overlay = document.getElementById('scannerOverlay');
   const video = document.getElementById('scannerVideo');
   const canvas = document.getElementById('scannerCanvas');
-  
   if (!overlay || !video || !canvas) {
     showToast('⚠️ Error: Elementos del escáner no encontrados');
     return;
@@ -1121,7 +1132,6 @@ async function openQRScanner() {
     showToast('⚠️ Tu navegador no soporta acceso a cámara');
     return;
   }
-  
   try {
     const constraints = { video: { facingMode: { ideal: 'environment' } } };
     stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -1132,42 +1142,36 @@ async function openQRScanner() {
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
     };
-    
     overlay.style.display = 'block';
     scannerActive = true;
     showToast('🔍 Escaneando... Apuntá al QR');
-    
     const scanInterval = setInterval(() => {
       if (!scannerActive || !video.videoWidth) return;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: 'dontInvert' });
-      
       if (code?.data) {
         clearInterval(scanInterval);
         stopScanner();
         const scannedData = code.data.trim();
-        
         try {
           const url = new URL(scannedData);
           if (url.hostname === 'codigoebel.com' && url.pathname.includes('qr-zona.html')) {
             const params = new URLSearchParams(url.search);
             const scannedId = params.get('m');
             const currentId = jugador.modo === 'equipo' ? currentTeamMission?.id : currentMission?.id;
-            
-            // ✅ VALIDACIÓN SEGURA CON CLOUD FUNCTIONS:
+            // ✅ En la sección de validación de QR:
 if (scannedId && String(scannedId) === String(currentId)) {
   showToast('🔄 Validando misión...');
   
-  // Obtener coordenadas para validación GPS en backend
   navigator.geolocation.getCurrentPosition(async (pos) => {
     try {
-      // Llamar a Cloud Function validarMision
-      const validarMision = firebase.functions().httpsCallable('validarMision');
-      const result = await validarMision({
+      // ✅ LLAMAR A CLOUD FUNCTION (NO escribir directo)
+      const validarQR = firebase.functions().httpsCallable('validarQR');
+      const result = await validarQR({
         misionId: scannedId,
-        qrCode: scannedId,
+        codigo_qr: scannedId,
         coordenadas: {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
@@ -1178,11 +1182,16 @@ if (scannedId && String(scannedId) === String(currentId)) {
       
       if (result.data.success) {
         showToast('✅ ' + result.data.message);
+        
+        // ✅ Llamar a completarMision SOLO después de validar QR
+        const completarMision = firebase.functions().httpsCallable('completarMision');
+        await completarMision({ misionId: scannedId });
+        
         showMissionCompleted();
       }
     } catch (error) {
       console.error('Error en Cloud Function:', error);
-      const errorMsg = error.details || error.message || 'Error al validar la misión';
+      const errorMsg = error.details || error.message || 'Error al validar';
       showToast('❌ ' + errorMsg);
     }
   }, (err) => {
@@ -1192,10 +1201,6 @@ if (scannedId && String(scannedId) === String(currentId)) {
     maximumAge: 10000,
     timeout: 10000
   });
-  
-  return;
-} else if (scannedId && String(scannedId) !== String(currentId)) {
-  showToast('❌ Este QR es de otra misión');
   return;
 }
           }
@@ -1205,17 +1210,15 @@ if (scannedId && String(scannedId) === String(currentId)) {
         showToast('❌ Código no reconocido');
       }
     }, 300);
-    
   } catch (err) {
     stopScanner();
     console.error('❌ Error de cámara:', err.name, err.message);
-    if (err.name === 'NotAllowedError') showToast('⚠️ Permiso de cámara denegado. Activá en configuración.');
-    else if (err.name === 'NotFoundError') showToast('⚠️ No se encontró cámara en tu dispositivo.');
-    else if (err.name === 'NotReadableError') showToast('⚠️ La cámara está siendo usada por otra app.');
+    if (err.name === 'NotAllowedError') showToast('⚠️ Permiso de cámara denegado.');
+    else if (err.name === 'NotFoundError') showToast('⚠️ No se encontró cámara.');
+    else if (err.name === 'NotReadableError') showToast('⚠️ La cámara está en uso.');
     else showToast('⚠️ Error de cámara: ' + err.message);
   }
 }
-
 function stopScanner() {
   scannerActive = false;
   if (stream) {
@@ -1226,7 +1229,7 @@ function stopScanner() {
   if (overlay) overlay.style.display = 'none';
 }
 
-// ✅ MODAL CÓDIGO MANUAL (FALLBACK)
+// ========== MODAL MANUAL ==========
 function openManualCodeModal() {
   const modal = document.getElementById('manualCodeModal');
   const input = document.getElementById('manual-code-input');
@@ -1236,28 +1239,20 @@ function openManualCodeModal() {
     input.focus();
   }
 }
-
 function closeManualCodeModal() {
   const modal = document.getElementById('manualCodeModal');
   if (modal) modal.style.display = 'none';
 }
-
-// Validar código manual
 document.getElementById('submit-manual-code')?.addEventListener('click', () => {
   const code = document.getElementById('manual-code-input').value.trim().toUpperCase();
   if (code.length === 6 && /^[A-Z0-9]{6}$/.test(code)) {
-    // ✅ En producción: validar contra Firebase
     showToast('✅ Código válido · Redirigiendo...');
     closeManualCodeModal();
-    setTimeout(() => {
-      // Simular éxito - en producción validar con backend
-      showPhase3();
-    }, 1000);
+    setTimeout(() => { showPhase3(); }, 1000);
   } else {
     showToast('⚠️ Código inválido. Debe tener 6 caracteres alfanuméricos.');
   }
 });
-
 document.getElementById('cancel-manual-code')?.addEventListener('click', closeManualCodeModal);
 document.getElementById('manualCodeModal')?.addEventListener('click', (e) => {
   if (e.target.id === 'manualCodeModal') closeManualCodeModal();
@@ -1270,14 +1265,11 @@ function generarRecoveryCode() {
   for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
   return code;
 }
-
-function guardarProgreso(misionId, desafioId) {
+// ✅ AHORA (SEGURO - solo Cloud Functions escribe):
+async function guardarProgreso(misionId) {
+  // ✅ SOLO guardar en localStorage para UI offline
   const key = 'progreso_' + jugador.id;
   let data = JSON.parse(localStorage.getItem(key) || '{}');
-  
-  if (!data.misiones) data.misiones = 0;
-  if (!data.desafios) data.desafios = 0;
-  if (!data.zona) data.zona = jugador.zona;
   
   if (misionId) {
     const mKey = 'misiones_aceptadas_' + jugador.id;
@@ -1289,6 +1281,13 @@ function guardarProgreso(misionId, desafioId) {
     }
   }
   
+  data.zona = jugador.zona;
+  data.lastUpdate = Date.now();
+  localStorage.setItem(key, JSON.stringify(data));
+  
+  // ✅ NO escribir en Firebase desde el cliente
+  // El progreso real lo manejan las Cloud Functions
+}
   if (desafioId) {
     const dKey = 'desafios_completados_' + jugador.id;
     let desafios = JSON.parse(localStorage.getItem(dKey) || '[]');
@@ -1298,41 +1297,31 @@ function guardarProgreso(misionId, desafioId) {
       data.desafios = desafios.length;
     }
   }
-  
   data.zona = jugador.zona;
   data.lastUpdate = Date.now();
   localStorage.setItem(key, JSON.stringify(data));
-  
   const firebaseUid = localStorage.getItem('firebaseUid');
   if (firebaseUid) {
+    // ✅ CORREGIDO: Solo campos permitidos por las Rules
     syncProgresoToFirebase(firebaseUid, {
       hunterId: jugador.id,
       zona: jugador.zona,
-      modo: jugador.modo,
-      progreso: data,
-      misiones_aceptadas: JSON.parse(localStorage.getItem('misiones_aceptadas_' + jugador.id) || '[]'),
-      desafios_completados: JSON.parse(localStorage.getItem('desafios_completados_' + jugador.id) || '[]'),
-      recoveryCode: localStorage.getItem('recovery_' + jugador.id),
-      misionActual: currentMission ? { id: currentMission.id, zona: jugador.zona, fase: 2 } : null,
-      playerProgress
+      modo: jugador.modo
     });
   }
 }
-
 function playNarration(text) {
   if (localStorage.getItem('lh_narration_off') === '1') return;
   const u = new SpeechSynthesisUtterance(text);
   u.rate = 0.62;
   u.pitch = 0.4;
   u.volume = 0.95;
-  
   const loadVoice = () => {
     const voices = speechSynthesis.getVoices();
-    const voice = voices.find(v => v.lang.includes('es') && (v.name.includes('Male') || v.name === 'Diego' || v.name === 'Juan')) 
+    const voice = voices.find(v => v.lang.includes('es') && (v.name.includes('Male') || v.name === 'Diego' || v.name === 'Juan'))
       || voices.find(v => v.lang.includes('es')) || null;
     if (voice) u.voice = voice;
   };
-  
   loadVoice();
   speechSynthesis.addEventListener('voiceschanged', loadVoice, { once: true });
   speechSynthesis.speak(u);
@@ -1345,37 +1334,29 @@ document.getElementById('narration-toggle')?.addEventListener('click', function(
   this.textContent = isOff ? '🔊' : '🔇';
   showToast(isOff ? '✅ Narración activada' : '🔇 Narración desactivada');
 });
-
 document.getElementById('closeScannerBtn')?.addEventListener('click', stopScanner);
 document.getElementById('manualInputBtn')?.addEventListener('click', () => {
   stopScanner();
   openManualCodeModal();
 });
-
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && scannerActive) stopScanner();
   if (e.key === 'Escape' && document.getElementById('manualCodeModal')?.style.display === 'flex') closeManualCodeModal();
 });
-
 document.getElementById('accessibility-toggle')?.addEventListener('click', toggleAccessibilityMode);
-
-// Navegación móvil
 document.getElementById('nav-radar')?.addEventListener('click', (e) => {
   e.preventDefault();
   document.getElementById('radar-section').style.display = 'block';
   document.getElementById('radar-section').scrollIntoView({ behavior: 'smooth' });
 });
-
 document.getElementById('nav-missions')?.addEventListener('click', (e) => {
   e.preventDefault();
   showPhase0();
 });
-
 document.getElementById('nav-scan')?.addEventListener('click', (e) => {
   e.preventDefault();
   openQRScanner();
 });
-
 document.getElementById('nav-progress')?.addEventListener('click', (e) => {
   // Dejar que navegue a progreso.html
 });
@@ -1385,14 +1366,12 @@ window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
 });
-
 function showInstallBanner() {
   const banner = document.getElementById('pwa-install-banner');
   if (!banner) return;
   const dismissed = localStorage.getItem('pwaBannerDismissed');
   const now = Date.now();
   if (dismissed && (now - parseInt(dismissed)) < 24 * 60 * 60 * 1000) return;
-  
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   if (isStandalone) {
     banner.innerHTML = '<button class="close-btn" id="close-install-banner">×</button><p style="margin:0 0 8px">🎯 Codigo Ebel está instalado.</p><p style="font-size:0.85rem;margin:0;color:#94a3b8">¿Ves esto? Cierra el banner.</p>';
@@ -1403,7 +1382,6 @@ function showInstallBanner() {
     });
     return;
   }
-  
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   setTimeout(() => {
     banner.style.display = 'block';
@@ -1444,15 +1422,14 @@ showInstallBanner();
 updateFloatingControlsPosition();
 window.addEventListener('resize', updateFloatingControlsPosition);
 window.addEventListener('beforeunload', cleanupAll);
-
 window.addEventListener('load', () => {
   loadMisiones().then(() => {
     applyAccessibilityMode();
     setupJugador();
-    startRandomEvents(); // ✅ Eventos aleatorios para tensión
+    startRandomEvents();
     console.log('✅ Codigo Ebel App inicializada');
     console.log('🛡️ Anti-cheat GPS activado (threshold: ' + GPS_ACCURACY_THRESHOLD + 'm)');
-    console.log('🔐 Firebase: Recuerda configurar reglas de seguridad en la consola');
+    console.log('🔐 Firebase: Progreso calculado desde desafios_completados');
   });
 });
 </script>

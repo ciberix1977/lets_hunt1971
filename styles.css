@@ -2563,3 +2563,53 @@ body header.hero .logo-container.centered .logo-wrapper img[src*="code_ebel"][wi
     line-height: 1.4 !important;
   }
 }
+/* ===== SOCIAL ICONS ===== */
+.social-list {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary, #00aaff);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.social-link svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.social-link:hover {
+  background: var(--primary, #00aaff);
+  color: #000;
+  transform: translateY(-2px);
+}
+
+.social-link:active {
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .social-link {
+    width: 36px;
+    height: 36px;
+  }
+  .social-link svg {
+    width: 18px;
+    height: 18px;
+  }
+}

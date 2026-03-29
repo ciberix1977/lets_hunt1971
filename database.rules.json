@@ -1,0 +1,120 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "jugadores": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && !data.exists()",
+        ".validate": "
+          newData.hasChildren(['hunterId','zona','modo']) &&
+          newData.child('hunterId').isString() &&
+          newData.child('hunterId').val().matches(/^LH-[0-9]{4}$/) &&
+          newData.child('zona').isString() &&
+          newData.child('zona').val().matches(/^(CABA|Avellaneda|Lanús|Lomas de Zamora)$/) &&
+          newData.child('modo').isString() &&
+          newData.child('modo').val().matches(/^(individual|equipo)$/)
+        "
+      }
+    },
+
+    "usuarios": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && !data.exists()",
+        ".validate": "
+          newData.hasChildren(['hunterId']) &&
+          newData.child('hunterId').isString() &&
+          newData.child('hunterId').val().matches(/^LH-[0-9]{4}$/)
+        "
+      }
+    },
+
+    "hunterIds": {
+      "$hunterId": {
+        ".read": "auth != null && data.val() === auth.uid",
+        ".write": "auth != null && !data.exists()",
+        ".validate": "
+          $hunterId.matches(/^LH-[0-9]{4}$/) &&
+          newData.val() === auth.uid
+        "
+      }
+    },
+
+    "misiones": {
+      ".read": false,
+      ".write": false
+    },
+
+    "misiones_publicas": {
+      ".read": "auth != null",
+      ".write": false
+    },
+
+    "misiones_asignadas": {
+      "$uid": {
+        "$misionId": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": false,
+          ".validate": "
+            newData.hasChildren(['misionId','estado','fecha_asignacion']) &&
+            newData.child('misionId').val() === $misionId &&
+            newData.child('estado').val().matches(/^(pendiente|en_progreso|completada)$/) &&
+            newData.child('fecha_asignacion').isNumber()
+          "
+        }
+      }
+    },
+
+    "verificaciones": {
+      "$uid": {
+        "$misionId": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": false,
+          ".validate": "
+            newData.hasChildren(['misionId','codigo_qr','timestamp','validado']) &&
+            newData.child('misionId').val() === $misionId &&
+            newData.child('codigo_qr').isString() &&
+            newData.child('timestamp').isNumber() &&
+            newData.child('validado').isBoolean()
+          "
+        }
+      }
+    },
+
+    "desafios_completados": {
+      "$uid": {
+        "$misionId": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": false,
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+
+    "ranking": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": false,
+        ".validate": "
+          newData.hasChildren(['puntos','misiones_completadas']) &&
+          newData.child('puntos').isNumber() &&
+          newData.child('misiones_completadas').isNumber()
+        "
+      }
+    },
+
+    "qr_validos": {
+      ".read": false,
+      ".write": false
+    },
+
+    "logs": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
+    }
+  }
+}
