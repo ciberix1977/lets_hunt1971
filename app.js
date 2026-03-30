@@ -3,23 +3,7 @@
    app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN CORREGIDA)
    ========================================================================== */
 
-// ========== FIREBASE CONFIGURATION ==========
-const firebaseConfig = {
-  apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
-  authDomain: "let-s-hunt.firebaseapp.com",
-  databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
-  projectId: "let-s-hunt",
-  storageBucket: "let-s-hunt.firebasestorage.app",
-  messagingSenderId: "787017812046",
-  appId: "1:787017812046:web:da098b2361df4dda995b1f",
-  measurementId: "G-07SR9WR8NV"
-};
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const auth = firebase.auth();
-const analytics = firebase.analytics();
 
 // ========== VARIABLES GLOBALES ==========
 let accessibilityMode = localStorage.getItem('lh_accessibility_mode') || 'normal';

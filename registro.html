@@ -53,7 +53,7 @@
   <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript><link rel="stylesheet" href="styles.css"></noscript>
   
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK (SOLO para auth y database, NO inicializar aquí) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -257,22 +257,9 @@
     // ========== AÑO DINÁMICO ==========
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // ========== FIREBASE CONFIG ==========
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
-      authDomain: "let-s-hunt.firebaseapp.com",
-      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
-      projectId: "let-s-hunt",
-      storageBucket: "let-s-hunt.firebasestorage.app",
-      messagingSenderId: "787017812046",
-      appId: "1:787017812046:web:da098b2361df4dda995b1f"
-    };
-    
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
-
     // ========== VARIABLES GLOBALES ==========
+    // ✅ NO inicializar Firebase aquí - app.js ya lo hace
+    // Usamos firebase.auth() y firebase.database() directamente
     let telefonoGuardado = '';
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');
@@ -427,7 +414,7 @@
       setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    // ========== SUBMIT FINAL CON FIREBASE ==========
+    // ========== SUBMIT FINAL CON FIREBASE (CORREGIDO) ==========
     document.getElementById('registroForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -457,8 +444,8 @@
       submitBtn.classList.add('loading');
 
       try {
-        // Login anónimo con Firebase
-        const userCredential = await auth.signInAnonymously();
+        // ✅ Login anónimo con Firebase (auth ya está inicializado en app.js)
+        const userCredential = await firebase.auth().signInAnonymously();
         const firebaseUid = userCredential.user.uid;
         
         // ✅ Hunter ID único basado en Firebase UID (no localStorage)
@@ -470,27 +457,45 @@
           equipo = codigoIngresado || generarCodigoEquipo();
         }
 
-        // Guardar en Firebase
-        const jugadorData = {
-          hunterId: hunterId,
-          telefono: `+549${telefonoGuardado}`,
-          zona: zona,
-          modo: modo,
-          equipo: equipo,
-          fecha_registro: Date.now(),
-          activo: true,
-          whatsapp_verified: true,
-          consents: {
-            game: gameConsent,
-            live: liveConsent // opcional
+        // ✅ CORREGIDO: Verificar si el nodo ya existe antes de escribir
+        const jugadorRef = firebase.database().ref(`jugadores/${firebaseUid}`);
+        const jugadorSnap = await jugadorRef.once('value');
+        
+        if (!jugadorSnap.exists()) {
+          // ✅ SOLO escribir campos permitidos por las Rules de Firebase:
+          // hunterId, zona, modo, lastSync (opcional)
+          const jugadorData = {
+            hunterId: hunterId,                    // ✅ Permitido
+            zona: zona,                            // ✅ Permitido
+            modo: modo,                            // ✅ Permitido
+            lastSync: firebase.database.ServerValue.TIMESTAMP  // ✅ Opcional permitido
+            // ❌ NO enviar: telefono, equipo, fecha_registro, activo, whatsapp_verified, consents
+            // Estos datos deben guardarse en nodos separados o manejarse por Cloud Functions
+          };
+          
+          await jugadorRef.set(jugadorData);
+          
+          // ✅ Guardar datos sensibles en nodos separados (si es necesario)
+          // Estos nodos tendrían sus propias reglas de seguridad
+          if (telefonoGuardado) {
+            await firebase.database().ref(`perfiles/${firebaseUid}/telefono`).set(`+549${telefonoGuardado}`);
           }
-        };
-
-        await db.ref(`jugadores/${firebaseUid}`).set(jugadorData);
+          if (equipo) {
+            await firebase.database().ref(`equipos/${firebaseUid}/codigo`).set(equipo);
+          }
+          await firebase.database().ref(`consents/${firebaseUid}`).set({
+            game: gameConsent,
+            live: liveConsent,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+          });
+        }
+        // Si ya existe, no hacer nada (el progreso real lo manejan Cloud Functions)
         
         // Guardar en localStorage para referencia rápida (solo este usuario)
         localStorage.setItem('currentFirebaseUid', firebaseUid);
-        localStorage.setItem(`jugador_${hunterId}`, JSON.stringify(jugadorData));
+        localStorage.setItem(`jugador_${hunterId}`, JSON.stringify({
+          hunterId, zona, modo, equipo, telefono: `+549${telefonoGuardado}`
+        }));
         localStorage.setItem('currentHunterId', hunterId);
         localStorage.removeItem('telefonoDraft'); // Limpiar draft
 
@@ -499,7 +504,19 @@
 
       } catch (error) {
         console.error("Error en registro:", error);
-        showToast('⚠️ Error al conectar. Intentá de nuevo.');
+        
+        // Manejar errores específicos de Firebase
+        if (error.code === 'permission-denied') {
+          showToast('⚠️ Error de permisos. Intentá de nuevo.');
+        } else if (error.code === 'already-exists') {
+          // Usuario ya registrado, redirigir igual
+          const hunterId = localStorage.getItem('currentHunterId') || 'LH-0001';
+          mostrarRegistroExitoso(hunterId, zona);
+          return;
+        } else {
+          showToast('⚠️ Error al conectar. Intentá de nuevo.');
+        }
+        
         submitBtn.disabled = false;
         submitBtn.textContent = '🎯 Entrar a la Cacería';
         submitBtn.classList.remove('loading');
