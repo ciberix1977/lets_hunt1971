@@ -44,6 +44,7 @@
   <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#0a0e17" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Codigo Ebel" />
   
@@ -53,7 +54,7 @@
   <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript><link rel="stylesheet" href="styles.css"></noscript>
   
-  <!-- Firebase SDK (SOLO para auth y database, NO inicializar aquí) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -257,47 +258,55 @@
     // ========== AÑO DINÁMICO ==========
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    // ========== FIREBASE CONFIG (INICIALIZACIÓN CORREGIDA) ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+      authDomain: "let-s-hunt.firebaseapp.com",
+      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+      projectId: "let-s-hunt",
+      storageBucket: "let-s-hunt.firebasestorage.app",
+      messagingSenderId: "787017812046",
+      appId: "1:787017812046:web:da098b2361df4dda995b1f"
+    };
+    
+    // ✅ Inicializar Firebase SOLO si no está ya inicializado
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.database();
+
     // ========== VARIABLES GLOBALES ==========
-    // ✅ NO inicializar Firebase aquí - app.js ya lo hace
-    // Usamos firebase.auth() y firebase.database() directamente
     let telefonoGuardado = '';
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');
 
     // ========== LIMPIAR TELÉFONO (acepta +54, 15, espacios, etc.) ==========
     function limpiarTelefono(input) {
-      // Remover todo lo que no sea número
       let num = input.replace(/\D/g, '');
-      
-      // Remover prefijos internacionales o de operador
-      if (num.startsWith('54')) num = num.slice(2);      // +54
-      if (num.startsWith('9')) num = num.slice(1);        // 9 de móvil
-      if (num.startsWith('15')) num = num.slice(2);       // 15 de Buenos Aires
-      
-      // Tomar últimos 10 dígitos (formato argentino estándar)
+      if (num.startsWith('54')) num = num.slice(2);
+      if (num.startsWith('9')) num = num.slice(1);
+      if (num.startsWith('15')) num = num.slice(2);
       return num.slice(-10);
     }
 
-    // ========== VALIDAR NÚMERO ARGENTINO (más flexible) ==========
+    // ========== VALIDAR NÚMERO ARGENTINO ==========
     function validarNumeroArgentino(phone) {
       const limpio = limpiarTelefono(phone);
       return /^[0-9]{10}$/.test(limpio);
     }
 
-    // ========== GENERAR HUNTER ID ÚNICO (sin localStorage conflictivo) ==========
+    // ========== GENERAR HUNTER ID ÚNICO ==========
     function generarHunterId(firebaseUid) {
-      // Usar primeros 6 caracteres del UID de Firebase + timestamp corto
-      // Esto garantiza unicidad sin depender de localStorage
       const prefix = firebaseUid ? firebaseUid.slice(0, 6).toUpperCase() : 'CE';
       const suffix = Date.now().toString(36).slice(-4).toUpperCase();
       return `${prefix}-${suffix}`;
     }
 
-    // ========== RECUPERAR TELÉFONO Y SALTAR PASO 1 SI YA EMPEZÓ ==========
+    // ========== RECUPERAR TELÉFONO Y SALTAR PASO 1 ==========
     document.addEventListener('DOMContentLoaded', function() {
       const savedPhone = localStorage.getItem('telefonoDraft');
       
-      // ✅ Si hay teléfono guardado, saltar directo al paso 2
       if (savedPhone && validarNumeroArgentino(savedPhone)) {
         telefonoGuardado = limpiarTelefono(savedPhone);
         document.getElementById('telefono').value = savedPhone;
@@ -306,15 +315,13 @@
         step2.classList.add('show');
       }
       
-      // Contador "live" visible
       updateLiveCounter();
       setInterval(updateLiveCounter, 30000);
       
-      // Hint de zona (texto "sugerida" para evitar desconfianza)
       const hint = document.getElementById('zoneHint');
       const detectedZone = document.getElementById('detectedZone');
       if (hint && detectedZone) {
-        detectedZone.textContent = 'CABA'; // En producción: usar geolocalización real
+        detectedZone.textContent = 'CABA';
         hint.style.display = 'block';
       }
     });
@@ -325,7 +332,6 @@
       const fluctuation = Math.floor(Math.random() * 8);
       const count = base + fluctuation;
       
-      // Actualizar en header y en ritual
       const headerEl = document.getElementById('liveCountHeader');
       const ritualEl = document.getElementById('liveCountRitual');
       if (headerEl) headerEl.textContent = count;
@@ -338,17 +344,14 @@
       
       const telefonoRaw = document.getElementById('telefono').value.trim();
       
-      // Validación flexible
       if (!validarNumeroArgentino(telefonoRaw)) {
         showToast('⚠️ Ingresá un número de WhatsApp argentino válido.');
         return;
       }
       
-      // Limpiar y guardar
       telefonoGuardado = limpiarTelefono(telefonoRaw);
-      localStorage.setItem('telefonoDraft', telefonoRaw); // Guardar formato original para UX
+      localStorage.setItem('telefonoDraft', telefonoRaw);
       
-      // Transición suave al paso 2
       const continueBtn = document.getElementById('continueBtn');
       continueBtn.textContent = '✓ Verificando...';
       continueBtn.disabled = true;
@@ -426,7 +429,6 @@
       const gameConsent = document.getElementById('gameConsent').checked;
       const liveConsent = document.getElementById('liveConsent').checked;
 
-      // Validaciones mínimas (enfoque volumen)
       if (!zona) {
         showToast('⚠️ Por favor, selecciona una zona de juego.');
         return;
@@ -438,17 +440,16 @@
 
       const submitBtn = document.getElementById('submitBtn');
       
-      // Micro-animación de carga + texto emocional
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span class="pulse-dot"></span> Conectando...';
       submitBtn.classList.add('loading');
 
       try {
-        // ✅ Login anónimo con Firebase (auth ya está inicializado en app.js)
-        const userCredential = await firebase.auth().signInAnonymously();
+        // ✅ Login anónimo con Firebase
+        const userCredential = await auth.signInAnonymously();
         const firebaseUid = userCredential.user.uid;
         
-        // ✅ Hunter ID único basado en Firebase UID (no localStorage)
+        // ✅ Hunter ID único
         const hunterId = generarHunterId(firebaseUid);
 
         // Generar código de equipo si es necesario
@@ -458,46 +459,41 @@
         }
 
         // ✅ CORREGIDO: Verificar si el nodo ya existe antes de escribir
-        const jugadorRef = firebase.database().ref(`jugadores/${firebaseUid}`);
+        const jugadorRef = db.ref(`jugadores/${firebaseUid}`);
         const jugadorSnap = await jugadorRef.once('value');
         
         if (!jugadorSnap.exists()) {
           // ✅ SOLO escribir campos permitidos por las Rules de Firebase:
-          // hunterId, zona, modo, lastSync (opcional)
           const jugadorData = {
-            hunterId: hunterId,                    // ✅ Permitido
-            zona: zona,                            // ✅ Permitido
-            modo: modo,                            // ✅ Permitido
-            lastSync: firebase.database.ServerValue.TIMESTAMP  // ✅ Opcional permitido
-            // ❌ NO enviar: telefono, equipo, fecha_registro, activo, whatsapp_verified, consents
-            // Estos datos deben guardarse en nodos separados o manejarse por Cloud Functions
+            hunterId: hunterId,
+            zona: zona,
+            modo: modo,
+            lastSync: firebase.database.ServerValue.TIMESTAMP
           };
           
           await jugadorRef.set(jugadorData);
           
-          // ✅ Guardar datos sensibles en nodos separados (si es necesario)
-          // Estos nodos tendrían sus propias reglas de seguridad
+          // ✅ Guardar datos sensibles en nodos separados (con sus propias reglas)
           if (telefonoGuardado) {
-            await firebase.database().ref(`perfiles/${firebaseUid}/telefono`).set(`+549${telefonoGuardado}`);
+            await db.ref(`perfiles/${firebaseUid}/telefono`).set(`+549${telefonoGuardado}`);
           }
           if (equipo) {
-            await firebase.database().ref(`equipos/${firebaseUid}/codigo`).set(equipo);
+            await db.ref(`equipos/${firebaseUid}/codigo`).set(equipo);
           }
-          await firebase.database().ref(`consents/${firebaseUid}`).set({
+          await db.ref(`consents/${firebaseUid}`).set({
             game: gameConsent,
             live: liveConsent,
             timestamp: firebase.database.ServerValue.TIMESTAMP
           });
         }
-        // Si ya existe, no hacer nada (el progreso real lo manejan Cloud Functions)
         
-        // Guardar en localStorage para referencia rápida (solo este usuario)
+        // Guardar en localStorage para referencia rápida
         localStorage.setItem('currentFirebaseUid', firebaseUid);
         localStorage.setItem(`jugador_${hunterId}`, JSON.stringify({
           hunterId, zona, modo, equipo, telefono: `+549${telefonoGuardado}`
         }));
         localStorage.setItem('currentHunterId', hunterId);
-        localStorage.removeItem('telefonoDraft'); // Limpiar draft
+        localStorage.removeItem('telefonoDraft');
 
         // ✅ Feedback inmersivo + animación dinámica
         mostrarRegistroExitoso(hunterId, zona);
@@ -505,11 +501,9 @@
       } catch (error) {
         console.error("Error en registro:", error);
         
-        // Manejar errores específicos de Firebase
         if (error.code === 'permission-denied') {
           showToast('⚠️ Error de permisos. Intentá de nuevo.');
         } else if (error.code === 'already-exists') {
-          // Usuario ya registrado, redirigir igual
           const hunterId = localStorage.getItem('currentHunterId') || 'LH-0001';
           mostrarRegistroExitoso(hunterId, zona);
           return;
@@ -535,26 +529,22 @@
       return codigo;
     }
 
-    // ========== FEEDBACK POST-REGISTRO CON ANIMACIÓN DINÁMICA ==========
+    // ========== FEEDBACK POST-REGISTRO ==========
     function mostrarRegistroExitoso(hunterId, zona) {
       const formCard = document.querySelector('.form-card');
       const successPanel = document.getElementById('registrationSuccess');
       const dynamicStatus = document.getElementById('dynamicStatus');
       
-      // Actualizar ID mostrado
       document.getElementById('displayHunterId').textContent = hunterId;
       
-      // Ocultar formularios
       if (formCard.querySelector('#step1')) formCard.querySelector('#step1').hidden = true;
       if (formCard.querySelector('#step2')) formCard.querySelector('#step2').hidden = true;
       if (formCard.querySelector('#phoneForm')) formCard.querySelector('#phoneForm').hidden = true;
       if (formCard.querySelector('#registroForm')) formCard.querySelector('#registroForm').hidden = true;
       
-      // Mostrar panel de éxito
       successPanel.hidden = false;
       successPanel.classList.add('show');
       
-      // ✅ Animación dinámica de estados (genera expectativa)
       const estados = [
         "Conectando con el sistema...",
         "Verificando tu zona...",
@@ -571,7 +561,6 @@
         }
       }, 800);
       
-      // ✅ Redirección con delay extendido (4.5s para procesar la experiencia)
       setTimeout(() => {
         clearInterval(interval);
         successPanel.style.opacity = '0.7';
