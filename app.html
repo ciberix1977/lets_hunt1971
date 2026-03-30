@@ -152,9 +152,10 @@
 <div class="scanner-corner bl"></div>
 <div class="scanner-corner br"></div>
 </div>
+<!-- En app.html, dentro de #scannerOverlay -->
 <div class="scanner-actions">
-<button id="closeScannerBtn" class="btn btn-outline">❌ Cancelar</button>
-<button id="manualInputBtn" class="btn btn-primary">⌨️ Ingresar manualmente</button>
+  <button id="closeScannerBtn" class="btn btn-outline" onclick="stopScanner()">❌ Cancelar</button>
+  <button id="manualInputBtn" class="btn btn-primary" onclick="openManualCodeModal()">⌨️ Ingresar manualmente</button>
 </div>
 </div>
 </div>
@@ -1432,6 +1433,125 @@ window.addEventListener('load', () => {
     console.log('🔐 Firebase: Progreso calculado desde desafios_completados');
   });
 });
+</script>
+<!-- ========== FUNCIONES GLOBALES PARA HTML (Scope Global) ========== -->
+<script>
+// ✅ stopScanner - Detener escáner QR (llamado desde HTML inline)
+function stopScanner() {
+  if (typeof window._stopScanner === 'function') {
+    window._stopScanner();
+  } else {
+    // Fallback si app.js no cargó aún
+    const overlay = document.getElementById('scannerOverlay');
+    if (overlay) overlay.style.display = 'none';
+    
+    const video = document.getElementById('scannerVideo');
+    if (video && video.srcObject) {
+      video.srcObject.getTracks().forEach(track => track.stop());
+      video.srcObject = null;
+    }
+    
+    if (typeof window.scannerActive !== 'undefined') {
+      window.scannerActive = false;
+    }
+  }
+}
+
+// ✅ openManualCodeModal - Abrir modal de código manual
+function openManualCodeModal() {
+  if (typeof window._openManualCodeModal === 'function') {
+    window._openManualCodeModal();
+  } else {
+    const modal = document.getElementById('manualCodeModal');
+    if (modal) modal.style.display = 'flex';
+  }
+}
+
+// ✅ closeManualCodeModal - Cerrar modal de código manual
+function closeManualCodeModal() {
+  const modal = document.getElementById('manualCodeModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// ✅ showToast - Mostrar notificación toast
+function showToast(msg, duration = 3500) {
+  if (typeof window._showToast === 'function') {
+    window._showToast(msg, duration);
+  } else {
+    // Fallback simple
+    const toast = document.getElementById('toast');
+    if (toast) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    } else {
+      alert(msg);
+    }
+  }
+}
+
+// ✅ Funciones de navegación de fases
+function showPhase0() { if (typeof window._showPhase0 === 'function') window._showPhase0(); }
+function showPhase1() { if (typeof window._showPhase1 === 'function') window._showPhase1(); }
+function showPhase2() { if (typeof window._showPhase2 === 'function') window._showPhase2(); }
+function showPhase3() { if (typeof window._showPhase3 === 'function') window._showPhase3(); }
+function showMissionCompleted() { if (typeof window._showMissionCompleted === 'function') window._showMissionCompleted(); }
+</script>
+<!-- ========== FUNCIONES GLOBALES PARA EL SCANNER ========== -->
+<script>
+// ✅ stopScanner - Detener escáner QR (llamado desde HTML)
+function stopScanner() {
+  if (typeof window._stopScanner === 'function') {
+    window._stopScanner();
+  } else {
+    // Fallback si app.js no cargó aún
+    const overlay = document.getElementById('scannerOverlay');
+    if (overlay) overlay.style.display = 'none';
+    
+    const video = document.getElementById('scannerVideo');
+    if (video && video.srcObject) {
+      video.srcObject.getTracks().forEach(track => track.stop());
+      video.srcObject = null;
+    }
+    
+    if (typeof window.scannerActive !== 'undefined') {
+      window.scannerActive = false;
+    }
+  }
+}
+
+// ✅ openManualCodeModal - Abrir modal de código manual
+function openManualCodeModal() {
+  if (typeof window._openManualCodeModal === 'function') {
+    window._openManualCodeModal();
+  } else {
+    const modal = document.getElementById('manualCodeModal');
+    if (modal) modal.style.display = 'flex';
+  }
+}
+
+// ✅ closeManualCodeModal - Cerrar modal de código manual
+function closeManualCodeModal() {
+  const modal = document.getElementById('manualCodeModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// ✅ showToast - Mostrar notificación toast
+function showToast(msg, duration = 3500) {
+  if (typeof window._showToast === 'function') {
+    window._showToast(msg, duration);
+  } else {
+    // Fallback simple
+    const toast = document.getElementById('toast');
+    if (toast) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    } else {
+      alert(msg);
+    }
+  }
+}
 </script>
 </body>
 </html>

@@ -1296,3 +1296,32 @@ async function initApp() {
   
   console.log('✅ Codigo Ebel App inicializada');
 }
+// ========== EXPOSICIÓN DE FUNCIONES AL SCOPE GLOBAL ==========
+// Para que puedan ser llamadas desde HTML inline en app.html
+
+if (typeof window !== 'undefined') {
+  window._stopScanner = stopScanner;
+  window._openManualCodeModal = openManualCodeModal;
+  window._closeManualCodeModal = closeManualCodeModal;
+  window._showToast = showToast;
+  window._showPhase0 = showPhase0;
+  window._showPhase1 = showPhase1;
+  window._showPhase2 = showPhase2;
+  window._showPhase3 = showPhase3;
+  window._showMissionCompleted = showMissionCompleted;
+  
+  // Variables de estado globales
+  window.scannerActive = false;
+  window.stream = null;
+}
+// ========== EXPOSICIÓN DE FUNCIONES AL SCOPE GLOBAL ==========
+// Para que puedan ser llamadas desde HTML inline en app.html
+
+if (typeof window !== 'undefined') {
+  window._stopScanner = stopScanner;
+  window._openManualCodeModal = openManualCodeModal;
+  window._closeManualCodeModal = closeManualCodeModal;
+  window._showToast = showToast;
+  window.scannerActive = false;
+  window.stream = null;
+}
