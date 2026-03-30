@@ -1,9 +1,7 @@
 /**
  * ==========================================================================
-   app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN CORREGIDA)
+   app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN FINAL)
    ========================================================================== */
-
-
 
 // ========== VARIABLES GLOBALES ==========
 let accessibilityMode = localStorage.getItem('lh_accessibility_mode') || 'normal';
@@ -289,14 +287,18 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
     const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
     hunterId = 'LH-' + String(nextId).padStart(4, '0');
     localStorage.setItem('lastHunterId', nextId);
+    
+    // ✅ CORREGIDO: Obtener zona del URL y respetarla SIEMPRE
     const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
+    
     jugador = {
       id: hunterId,
       nombre: 'Jugador de Prueba',
       telefono: '+5491112345678',
-      zona: ciudadFromURL,
+      zona: ciudadFromURL,  // ✅ Usar la zona del URL directamente
       modo: 'individual'
     };
+    
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
     
@@ -325,14 +327,14 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
       }
     }
     
-    jugador = storedJugador || { id: hunterId, zona: 'CABA', modo: 'individual' };
-    const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || '').replace(/\+/g, ' ')).trim();
-    if (ciudadFromURL) {
-      const zonaNormalizada = ciudadFromURL.normalize('NFC');
-      if (getMisionesByZona(zonaNormalizada, 'solitario').length > 0) {
-        jugador.zona = zonaNormalizada;
-      }
-    }
+   // ✅ En _continueSetupJugador(), línea ~185-195:
+jugador = storedJugador || { id: hunterId, zona: 'CABA', modo: 'individual' };
+
+// ✅ AGREGAR ESTO DESPUÉS:
+const zonaUrl = decodeURIComponent((urlParams.get('zona') || '').replace(/\+/g, ' ')).trim();
+if (zonaUrl) {
+  jugador.zona = zonaUrl;  // ✅ La zona del URL siempre tiene prioridad
+}
     
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
@@ -346,7 +348,10 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
     }
   }
   
+  // ✅ Actualizar UI con la zona correcta
   document.getElementById('hunterIdDisplay').textContent = jugador.modo === 'equipo' ? ('👥 ' + (jugador.equipo || hunterId)) : ('ID: ' + hunterId);
+  document.getElementById('activation-zone').innerHTML = `Tu señal ha sido detectada en <strong>${jugador.zona}</strong>`;
+  
   redemptionOffered = false;
   
   if (jugador.modo === 'equipo') {
@@ -562,7 +567,6 @@ async function showPhase0() {
   document.getElementById('phase0-intro').style.display = 'block';
   document.getElementById('accept-intro-btn').onclick = async () => {
     document.getElementById('phase0-intro').style.display = 'none';
-    
     const firebaseUid = localStorage.getItem('firebaseUid');
     if (firebaseUid && currentMission) {
       try {
@@ -577,7 +581,6 @@ async function showPhase0() {
         return;
       }
     }
-    
     missionStartTime = Date.now();
     startTimer();
     startGlobalTimer();
@@ -629,7 +632,6 @@ async function showPhase1() {
         return;
       }
     }
-    
     missionStartTime = Date.now();
     startTimer();
     startGlobalTimer();
@@ -720,7 +722,6 @@ function showPhase3() {
 // ========== SHOW PHASE 4 ==========
 async function showMissionCompleted() {
   const firebaseUid = localStorage.getItem('firebaseUid');
-  
   if (firebaseUid && currentMission) {
     try {
       const snap = await db.ref(`verificaciones/${firebaseUid}/${currentMission.id}`).once('value');
@@ -733,7 +734,6 @@ async function showMissionCompleted() {
       console.warn('⚠️ Error verificando validación:', err);
     }
   }
-  
   cleanupAll();
   hideAllPhases();
   const elapsed = Math.floor((Date.now() - missionStartTime) / 60000);
@@ -809,7 +809,6 @@ async function showTeamMission() {
         return;
       }
     }
-    
     missionStartTime = Date.now();
     startTimer();
     startGlobalTimer();
@@ -1081,11 +1080,9 @@ async function openQRScanner() {
                     },
                     zona: jugador.zona
                   });
-                  
                   if (result.data.success) {
                     const completarMision = firebase.functions().httpsCallable('completarMision');
                     await completarMision({ misionId: scannedId });
-                    
                     showToast('✅ ' + result.data.message);
                     showMissionCompleted();
                   }
@@ -1285,20 +1282,15 @@ window.addEventListener('load', function() {
 // ========== INICIALIZACIÓN PRINCIPAL ==========
 async function initApp() {
   console.log('🚀 Iniciando Codigo Ebel App...');
-  
   await loadMisiones();
-  
   if (typeof applyAccessibilityMode === 'function') {
     applyAccessibilityMode();
   }
-  
   setupJugador();
-  
   console.log('✅ Codigo Ebel App inicializada');
 }
-// ========== EXPOSICIÓN DE FUNCIONES AL SCOPE GLOBAL ==========
-// Para que puedan ser llamadas desde HTML inline en app.html
 
+// ========== EXPOSICIÓN DE FUNCIONES AL SCOPE GLOBAL ==========
 if (typeof window !== 'undefined') {
   window._stopScanner = stopScanner;
   window._openManualCodeModal = openManualCodeModal;
@@ -1309,19 +1301,6 @@ if (typeof window !== 'undefined') {
   window._showPhase2 = showPhase2;
   window._showPhase3 = showPhase3;
   window._showMissionCompleted = showMissionCompleted;
-  
-  // Variables de estado globales
-  window.scannerActive = false;
-  window.stream = null;
-}
-// ========== EXPOSICIÓN DE FUNCIONES AL SCOPE GLOBAL ==========
-// Para que puedan ser llamadas desde HTML inline en app.html
-
-if (typeof window !== 'undefined') {
-  window._stopScanner = stopScanner;
-  window._openManualCodeModal = openManualCodeModal;
-  window._closeManualCodeModal = closeManualCodeModal;
-  window._showToast = showToast;
   window.scannerActive = false;
   window.stream = null;
 }
