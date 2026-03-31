@@ -327,14 +327,10 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
       }
     }
     
-   // ✅ En _continueSetupJugador(), línea ~185-195:
-jugador = storedJugador || { id: hunterId, zona: 'CABA', modo: 'individual' };
-
-// ✅ AGREGAR ESTO DESPUÉS:
+// ✅ CORREGIDO: Siempre usar la zona del URL (sin verificar misiones)
+jugador = stored || { id: hunterId, zona: 'CABA', modo: 'individual' };
 const zonaUrl = decodeURIComponent((urlParams.get('zona') || '').replace(/\+/g, ' ')).trim();
-if (zonaUrl) {
-  jugador.zona = zonaUrl;  // ✅ La zona del URL siempre tiene prioridad
-}
+if (zonaUrl) jugador.zona = zonaUrl;  // ✅ Siempre asignar, sin verificar misiones
     
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
