@@ -452,43 +452,57 @@ _continueSetupJugador(hunterId, null);
 });
 }
 async function _continueSetupJugador(hunterId, firebaseUid) {
-let restored = null;
-if (firebaseUid) restored = await restoreProgresoFromFirebase(firebaseUid);
-if (!hunterId) {
-const next = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
-hunterId = 'LH-' + String(next).padStart(4, '0');
-localStorage.setItem('lastHunterId', next);
-// ✅ CORREGIDO: Obtener zona del URL y usarla SIEMPRE (sin verificar misiones)
-const zona = decodeURIComponent((urlParams.get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
-jugador = { id: hunterId, nombre: 'Cazador', telefono: '+5491112345678', zona, modo: 'individual' };
-localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
-localStorage.setItem('currentHunterId', hunterId);
-if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId, zona, modo: 'individual' });
-} else {
-let stored = null;
-if (restored && restored.hunterId === hunterId) {
-stored = { id: restored.hunterId, zona: restored.zona, modo: restored.modo };
-} else {
-try { stored = JSON.parse(localStorage.getItem('jugador_' + hunterId)); } catch(e) { stored = null; }
-}
-// ✅ CORREGIDO: Siempre usar la zona del URL (sin verificar misiones)
-jugador = stored || { id: hunterId, zona: 'CABA', modo: 'individual' };
-const zonaUrl = decodeURIComponent((urlParams.get('zona') || '').replace(/\+/g, ' ')).trim();
-if (zonaUrl) {
-  jugador.zona = zonaUrl;  // ✅ Siempre asignar, sin verificar misiones
-}
-localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
-localStorage.setItem('currentHunterId', hunterId);
-if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId: jugador.id, zona: jugador.zona, modo: jugador.modo });
-
-// ✅ ACTUALIZAR UI CON LA ZONA CORRECTA (agregar esto)
-const zoneEl = document.getElementById('activation-zone');
-if (zoneEl) {
-  zoneEl.innerHTML = `Tu señal ha sido detectada en <strong>${jugador.zona}</strong>`;
-}
-document.getElementById('hunterIdDisplay').textContent = jugador.modo === 'equipo' ? ('👥 ' + (jugador.equipo || hunterId)) : ('ID: ' + hunterId);
-updateProgressDisplay();
-showActivationScreen();
+  let restored = null;
+  if (firebaseUid) restored = await restoreProgresoFromFirebase(firebaseUid);
+  
+  if (!hunterId) {
+    // ========== JUGADOR NUEVO ==========
+    const next = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
+    hunterId = 'LH-' + String(next).padStart(4, '0');
+    localStorage.setItem('lastHunterId', next);
+    
+    // ✅ CORREGIDO: Obtener zona del URL y usarla SIEMPRE (sin verificar misiones)
+    const zona = decodeURIComponent((urlParams.get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
+    jugador = { id: hunterId, nombre: 'Cazador', telefono: '+5491112345678', zona, modo: 'individual' };
+    
+    localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
+    localStorage.setItem('currentHunterId', hunterId);
+    
+    if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId, zona, modo: 'individual' });
+    
+  } else {
+    // ========== JUGADOR EXISTENTE ==========
+    let storedJugador = null;
+    
+    if (restored && restored.hunterId === hunterId) {
+      storedJugador = { id: restored.hunterId, zona: restored.zona, modo: restored.modo };
+    } else {
+      try { storedJugador = JSON.parse(localStorage.getItem('jugador_' + hunterId)); } catch(e) { storedJugador = null; }
+    }
+    
+    // ✅ CORREGIDO: Usar storedJugador (no 'stored')
+    jugador = storedJugador || { id: hunterId, zona: 'CABA', modo: 'individual' };
+    
+    // ✅ CORREGIDO: Siempre usar la zona del URL (sin verificar misiones)
+    const zonaUrl = decodeURIComponent((urlParams.get('zona') || '').replace(/\+/g, ' ')).trim();
+    if (zonaUrl) {
+      jugador.zona = zonaUrl;  // ✅ Siempre asignar, sin verificar misiones
+    }
+    
+    localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
+    localStorage.setItem('currentHunterId', hunterId);
+    
+    if (firebaseUid) syncProgresoToFirebase(firebaseUid, { hunterId: jugador.id, zona: jugador.zona, modo: jugador.modo });
+  }
+  
+  // ✅ ACTUALIZAR UI CON LA ZONA CORRECTA (FUERA del if/else - se ejecuta SIEMPRE)
+  const zoneEl = document.getElementById('activation-zone');
+  if (zoneEl) {
+    zoneEl.innerHTML = `Tu señal ha sido detectada en <strong>${jugador.zona}</strong>`;
+  }
+  document.getElementById('hunterIdDisplay').textContent = jugador.modo === 'equipo' ? ('👥 ' + (jugador.equipo || hunterId)) : ('ID: ' + hunterId);
+  updateProgressDisplay();
+  showActivationScreen();
 }
 // ========== PANTALLA ACTIVACIÓN ==========
 function showActivationScreen() {

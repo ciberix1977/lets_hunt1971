@@ -33,7 +33,7 @@
   },
   {
     "id": "LH-005",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "El Potrero Fantasma",
     "ubicacion_mapa": "Esquina de Sánchez de Loria y José León Suárez",
     "pista_al_llegar": "Aquí el barro hizo leyenda. Busca el poste que aún lleva el número 87.",
@@ -41,7 +41,7 @@
   },
   {
     "id": "LH-006",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "La Placa del Fundador",
     "ubicacion_mapa": "Monumento central, Plaza Eva Perón",
     "pista_al_llegar": "La historia se borra… pero no del todo. Busca los números que el tiempo no pudo borrar.",
@@ -49,7 +49,7 @@
   },
   {
     "id": "LH-007",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "El Kiosco del Tiempo",
     "ubicacion_mapa": "Esquina de Av. Mitre y Sarmiento",
     "pista_al_llegar": "Desde 1968, guarda secretos. Mira donde el letrero se quiebra.",
@@ -57,7 +57,7 @@
   },
   {
     "id": "LH-008",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "El Pasaje del Ferroviario",
     "ubicacion_mapa": "Pasaje entre Sarmiento y Belgrano",
     "pista_al_llegar": "Los trenes dejaron sus huellas. Encuentra el T-47 en la pared del olvido.",
@@ -65,7 +65,7 @@
   },
   {
     "id": "LH-009",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "La Banca del Susurro",
     "ubicacion_mapa": "Plaza Güemes, banca de hierro bajo el árbol grande",
     "pista_al_llegar": "Siéntate donde otros juraron silencio. La verdad está bajo tus pies.",
@@ -73,7 +73,7 @@
   },
   {
     "id": "LH-010",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "El Mosaico del Sur",
     "ubicacion_mapa": "Frente al Correo Argentino, San Martín 1000",
     "pista_al_llegar": "La ciudad firma su nombre donde nadie mira. Busca las letras LZ en el piso.",
@@ -81,7 +81,7 @@
   },
   {
     "id": "LH-011",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "La Sombra del Mercado",
     "ubicacion_mapa": "Galería Güemes, entrada principal",
     "pista_al_llegar": "Entra al corazón del mercado. Donde el eco responde, tú debes escuchar.",
@@ -89,7 +89,7 @@
   },
   {
     "id": "LH-012",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "La Hora del Último Tren",
     "ubicacion_mapa": "Estación Lanús, andén principal",
     "pista_al_llegar": "Mira donde la luz del último tren nace. Solo los nocturnos ven la señal.",
@@ -97,7 +97,7 @@
   },
   {
     "id": "LH-013",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "El Puente de los Trenes Fantasma",
     "ubicacion_mapa": "Puente sobre las vías, Rivadavia al 3000",
     "pista_al_llegar": "Escucha el gong del fantasma. El tercer golpe es tu código.",
@@ -105,7 +105,7 @@
   },
   {
     "id": "LH-014",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "El Muro de los Nombres",
     "ubicacion_mapa": "Pared lateral de taller mecánico, Fiorito al 3100",
     "pista_al_llegar": "Tu nombre ya está escrito. Encuéntralo… o déjalo para otro hunter.",
@@ -113,7 +113,7 @@
   },
   {
     "id": "LH-015",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "La Torre que No Suena",
     "ubicacion_mapa": "Iglesia Santa Rosa, Rivadavia y San Martín",
     "pista_al_llegar": "La torre calla, pero la paloma cuenta. Observa su vuelo al mediodía.",
@@ -121,7 +121,7 @@
   },
   {
     "id": "LH-016",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "El Espejo Roto",
     "ubicacion_mapa": "Bar “El Recreo”, Alsina 1400",
     "pista_al_llegar": "La ciudad firma con sus heridas. Encuentra la V que no se borra.",
@@ -129,7 +129,7 @@
   },
   {
     "id": "LH-017",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "El Árbol de las Cintas",
     "ubicacion_mapa": "Plaza Manuel Belgrano",
     "pista_al_llegar": "Hoy, el árbol pide un color. Ata tu cinta y espera la señal.",
@@ -137,7 +137,7 @@
   },
   {
     "id": "LH-018",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "La Estatua sin Nombre",
     "ubicacion_mapa": "Plaza Güemes, estatua de bronce central",
     "pista_al_llegar": "No tiene nombre, pero guarda un código. Toca su mano izquierda y escucha.",
@@ -145,7 +145,7 @@
   },
   {
     "id": "LH-019",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "La Huella en el Barro",
     "ubicacion_mapa": "Camino de tierra cerca del potrero, Sánchez de Loria",
     "pista_al_llegar": "Solo después de la lluvia, el pasado camina. Sigue sus pasos hasta el final.",
@@ -153,7 +153,7 @@
   },
   {
     "id": "LH-020",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "El Mapa del Piso",
     "ubicacion_mapa": "Entrada del Correo Argentino",
     "pista_al_llegar": "Pisa el corazón del Sur. Tu sombra marcará el siguiente paso.",
@@ -161,7 +161,7 @@
   },
   {
     "id": "LH-021",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "La Pared de los Reflejos",
     "ubicacion_mapa": "Calle Belgrano 500, pared de azulejos rotos",
     "pista_al_llegar": "Sigue la luz rota. Donde se detiene, comienza tu camino.",
@@ -169,7 +169,7 @@
   },
   {
     "id": "LH-022",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "El Murmullo del Riachuelo",
     "ubicacion_mapa": "Acceso peatonal al Riachuelo, Av. Hipólito Yrigoyen",
     "pista_al_llegar": "Escucha cuando el río hable. Solo dice una palabra… ¿cuál?",
@@ -177,7 +177,7 @@
   },
   {
     "id": "LH-023",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "La Pared de los Códigos",
     "ubicacion_mapa": "Pasaje entre Alsina y Lavalle",
     "pista_al_llegar": "Las coordenadas mienten… pero la tercera línea dice la verdad.",
@@ -185,7 +185,7 @@
   },
   {
     "id": "LH-024",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "El Silbato del Viento",
     "ubicacion_mapa": "Entre casas en Fiorito al 3100",
     "pista_al_llegar": "El viento llama a los hunters. Graba su canción.",
@@ -193,7 +193,7 @@
   },
   {
     "id": "LH-025",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "La Librería del Tiempo Perdido",
     "ubicacion_mapa": "Local cerrado, Rivadavia 1200",
     "pista_al_llegar": "¿Desde cuándo se perdió el tiempo aquí? El letrero lo recuerda.",
@@ -201,7 +201,7 @@
   },
   {
     "id": "LH-026",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "El Banco de los Poetas",
     "ubicacion_mapa": "Plaza Güemes, banca de piedra este",
     "pista_al_llegar": "Si hay un papel hoy, léelo. Si no, escribe uno. La ciudad juzgará tu alma.",
@@ -209,7 +209,7 @@
   },
   {
     "id": "LH-027",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "El Poste del Mensaje Perdido",
     "ubicacion_mapa": "Frente a la estación Lanús, poste de luz",
     "pista_al_llegar": "Alguien intentó escribir tu nombre. Completa lo que falta.",
@@ -217,7 +217,7 @@
   },
   {
     "id": "LH-028",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "El Pozo de los Susurros",
     "ubicacion_mapa": "Calle Moreno al 1500, boca de tormenta",
     "pista_al_llegar": "Di ‘hunter’ frente al pozo. Si responde, eres uno de los nuestros.",
@@ -225,7 +225,7 @@
   },
   {
     "id": "LH-029",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "El Banco Roto",
     "ubicacion_mapa": "Esquina de Fiorito y Sánchez de Loria",
     "pista_al_llegar": "Siéntate donde otros se rompieron. Tu fuerza es tu código.",
@@ -233,7 +233,7 @@
   },
   {
     "id": "LH-030",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "El Archivo Oculto",
     "ubicacion_mapa": "Biblioteca Popular, San Martín 900",
     "pista_al_llegar": "Entra y busca el libro que no tiene título. Está en el estante del olvido.",
@@ -241,7 +241,7 @@
   },
   {
     "id": "LH-031",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "La Fábrica del Silencio",
     "ubicacion_mapa": "Edificio textil abandonado, Güemes y 9 de Julio",
     "pista_al_llegar": "El ojo ve lo que el río esconde. Toma su mirada y síguela.",
@@ -249,7 +249,7 @@
   },
   {
     "id": "LH-032",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "La Tapadera del Vigilante",
     "ubicacion_mapa": "Tapa de cloaca, esquina Yrigoyen y Sarmiento",
     "pista_al_llegar": "No es basura. Es un mensaje. Lee lo que el metal esconde.",
@@ -257,7 +257,7 @@
   },
   {
     "id": "LH-033",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "El Reloj de Arena Urbano",
     "ubicacion_mapa": "Parada de colectivo, Rivadavia y Alsina",
     "pista_al_llegar": "El tiempo cae en grano. Cuenta los agujeros en el asiento.",
@@ -265,7 +265,7 @@
   },
   {
     "id": "LH-034",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "La Pelota Perdida",
     "ubicacion_mapa": "Potrero abandonado, Soler al 3000",
     "pista_al_llegar": "Él mira al sur. ¿Qué ve? Ve lo que él ve y descifra su mensaje.",
@@ -273,7 +273,7 @@
   },
   {
     "id": "LH-035",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "El Faro de Hormigón",
     "ubicacion_mapa": "Torre de agua, calle 14 y San Martín",
     "pista_al_llegar": "No emite luz, pero guía. Mira su sombra al amanecer.",
@@ -281,7 +281,7 @@
   },
   {
     "id": "LH-036",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "El Eco del Riachuelo",
     "ubicacion_mapa": "Mirador del Riachuelo, Av. Bartolomé Mitre",
     "pista_al_llegar": "Grita tu nombre. Si el río lo repite, eres digno.",
@@ -289,7 +289,7 @@
   },
   {
     "id": "LH-037",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "La Puerta que No Abre",
     "ubicacion_mapa": "Casa con rejas verdes, Calle 14 y Soler",
     "pista_al_llegar": "La puerta está abierta… aunque no se mueva. Toca el timbre roto.",
@@ -297,7 +297,7 @@
   },
   {
     "id": "LH-038",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "El Muro del Tiempo",
     "ubicacion_mapa": "Pared lateral de escuela, Moreno al 1600",
     "pista_al_llegar": "Los años están escritos en ladrillo. Encuentra el que falta.",
@@ -305,7 +305,7 @@
   },
   {
     "id": "LH-039",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "El Camino del Barro",
     "ubicacion_mapa": "Sendero entre casas, Fiorito al 3200",
     "pista_al_llegar": "Donde el barro se endurece, el código nace. Busca la marca circular.",
@@ -313,7 +313,7 @@
   },
   {
     "id": "LH-040",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "El Reloj de Sol Urbano",
     "ubicacion_mapa": "Parque Saavedra, sector norte",
     "pista_al_llegar": "Cuando el sol toque la punta, el número aparecerá en la piedra.",
@@ -321,7 +321,7 @@
   },
   {
     "id": "LH-041",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "La Ventana Cerrada",
     "ubicacion_mapa": "Edificio histórico, Belgrano 400",
     "pista_al_llegar": "La ventana no se abre, pero mira. ¿Qué refleja a las 15:00?",
@@ -329,7 +329,7 @@
   },
   {
     "id": "LH-042",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "El Cartel del Olvido",
     "ubicacion_mapa": "Parada de tren, cartel deteriorado",
     "pista_al_llegar": "Las letras faltantes forman tu código. Reconstruye el nombre.",
@@ -337,7 +337,7 @@
   },
   {
     "id": "LH-043",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "La Sombra del Monumento",
     "ubicacion_mapa": "Plaza Güemes, monumento central",
     "pista_al_llegar": "A las 16:00, la sombra señala el lugar. Ve donde apunta.",
@@ -345,7 +345,7 @@
   },
   {
     "id": "LH-044",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "El Alambre que Canta",
     "ubicacion_mapa": "Alambrado del potrero, lado sur",
     "pista_al_llegar": "Con viento, canta. Graba su nota más alta.",
@@ -353,7 +353,7 @@
   },
   {
     "id": "LH-045",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "La Piedra del Juramento",
     "ubicacion_mapa": "Plaza Eva Perón, sector oeste",
     "pista_al_llegar": "Toca la piedra tres veces. Si vibra, tu misión comienza.",
@@ -361,7 +361,7 @@
   },
   {
     "id": "LH-046",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "El Piso que Habla",
     "ubicacion_mapa": "Entrada de la estación Avellaneda",
     "pista_al_llegar": "Cada baldosa tiene un número. Suma las tres más rotas.",
@@ -369,7 +369,7 @@
   },
   {
     "id": "LH-047",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "El Espejo del Andén",
     "ubicacion_mapa": "Estación Lanús, espejo de seguridad",
     "pista_al_llegar": "Mírate. Detrás de ti, hay un número. Envíalo.",
@@ -377,7 +377,7 @@
   },
   {
     "id": "LH-048",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "La Puerta del Tiempo",
     "ubicacion_mapa": "Casa antigua, Alsina 1300",
     "pista_al_llegar": "La puerta tiene 7 clavos. El tercero esconde tu clave.",
@@ -385,7 +385,7 @@
   },
   {
     "id": "LH-049",
-    "zona": "Fiorito",
+    "zona": "fiorito",
     "titulo": "El Muro del Sur",
     "ubicacion_mapa": "Pared final del barrio, Fiorito al 3300",
     "pista_al_llegar": "Aquí termina el mapa. Pero no tu misión. Busca la flecha pintada.",
@@ -393,7 +393,7 @@
   },
   {
     "id": "LH-050",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "El Último Mensaje",
     "ubicacion_mapa": "Banco de plaza, sector sur de Plaza Eva Perón",
     "pista_al_llegar": "Siéntate. Levanta la vista. El cielo te dará el código.",
@@ -401,7 +401,7 @@
   },
   {
     "id": "LH-051",
-    "zona": "San Telmo",
+    "zona": "san telmo",
     "titulo": "El Pasaje del Tiempo",
     "ubicacion_mapa": "Pasaje San Lorenzo, entre Defensa y Estados Unidos",
     "pista_al_llegar": "Las paredes recuerdan lo que los turistas no ven. Busca el número tallado en la tercera puerta.",
@@ -409,7 +409,7 @@
   },
   {
     "id": "LH-052",
-    "zona": "La Boca",
+    "zona": "la boca",
     "titulo": "El Ojo de Caminito",
     "ubicacion_mapa": "Caminito, altura de la intersección con Magallanes",
     "pista_al_llegar": "No todos los colores son alegría. Encuentra el mural que mira al río y no sonríe.",
@@ -417,7 +417,7 @@
   },
   {
     "id": "LH-053",
-    "zona": "Recoleta",
+    "zona": "recoleta",
     "titulo": "La Estatua que No Descansa",
     "ubicacion_mapa": "Plaza Intendente Alvear (Plaza Francia), frente al cementerio",
     "pista_al_llegar": "Ella vigila desde el banco más frío. Toca su pedestal y escucha el eco.",
@@ -425,7 +425,7 @@
   },
   {
     "id": "LH-054",
-    "zona": "Microcentro",
+    "zona": "microcentro",
     "titulo": "El Reloj de las Sombras",
     "ubicacion_mapa": "Galería Güemes, entrada Rivadavia 1600",
     "pista_al_llegar": "A las 14:00, la luz atraviesa el cielo de vidrieras. Sigue el rayo hasta el suelo.",
@@ -433,7 +433,7 @@
   },
   {
     "id": "LH-055",
-    "zona": "Palermo",
+    "zona": "palermo",
     "titulo": "El Árbol del Poeta",
     "ubicacion_mapa": "Parque Las Heras, sector norte, cerca del lago",
     "pista_al_llegar": "Bajo sus ramas, alguien dejó un verso. Si aún está, léelo. Si no, escribe el tuyo.",
@@ -441,7 +441,7 @@
   },
   {
     "id": "LH-056",
-    "zona": "San Telmo",
+    "zona": "san telmo",
     "titulo": "La Placa Borrada",
     "ubicacion_mapa": "Antiguo edificio en Humberto Primo 300",
     "pista_al_llegar": "La historia se desvanece… pero no del todo. Busca los dígitos que resistieron el tiempo.",
@@ -449,7 +449,7 @@
   },
   {
     "id": "LH-057",
-    "zona": "Puerto Madero",
+    "zona": "puerto madero",
     "titulo": "El Puente que Susurra",
     "ubicacion_mapa": "Puente de la Mujer, lado este",
     "pista_al_llegar": "Cuando el viento sopla del sur, el metal canta. Graba su nota más baja.",
@@ -457,7 +457,7 @@
   },
   {
     "id": "LH-058",
-    "zona": "Congreso",
+    "zona": "congreso",
     "titulo": "El Libro de Piedra",
     "ubicacion_mapa": "Plaza del Congreso, monumento a los Dos Congresos",
     "pista_al_llegar": "Abre el libro de piedra. La página izquierda guarda tu código.",
@@ -465,7 +465,7 @@
   },
   {
     "id": "LH-059",
-    "zona": "Almagro",
+    "zona": "almagro",
     "titulo": "El Banco del Silencio",
     "ubicacion_mapa": "Parque Centenario, sector oeste, bajo el árbol torcido",
     "pista_al_llegar": "Siéntate donde nadie se sienta. La verdad está grabada bajo tus pies.",
@@ -473,7 +473,7 @@
   },
   {
     "id": "LH-060",
-    "zona": "Retiro",
+    "zona": "retiro",
     "titulo": "El Espejo del Andén",
     "ubicacion_mapa": "Estación Retiro, andén principal",
     "pista_al_llegar": "Mírate en el espejo de seguridad. Detrás de ti, hay un número. Envíalo.",
@@ -481,7 +481,7 @@
   },
   {
     "id": "LH-061",
-    "zona": "San Nicolás",
+    "zona": "san nicolás",
     "titulo": "La Torre que No Suena",
     "ubicacion_mapa": "Torre de los Ingleses, Av. Santa Fe y Libertador",
     "pista_al_llegar": "Los relojes marcan la hora… pero no la verdad. Mira la sombra al atardecer.",
@@ -489,7 +489,7 @@
   },
   {
     "id": "LH-062",
-    "zona": "Balvanera",
+    "zona": "balvanera",
     "titulo": "El Muro de los Nombres",
     "ubicacion_mapa": "Pared lateral de mercado en Sánchez de Bustamante 1800",
     "pista_al_llegar": "Tu alias ya está escrito. Encuéntralo entre los que juraron lealtad.",
@@ -497,7 +497,7 @@
   },
   {
     "id": "LH-063",
-    "zona": "Villa Crespo",
+    "zona": "villa crespo",
     "titulo": "El Graffiti del Vigilante",
     "ubicacion_mapa": "Pasaje entre Córdoba y Anchorena",
     "pista_al_llegar": "Solo los que miran dos veces ven el símbolo. Búscalo en la grieta de la pared.",
@@ -505,7 +505,7 @@
   },
   {
     "id": "LH-064",
-    "zona": "Belgrano",
+    "zona": "belgrano",
     "titulo": "El Faro Urbano",
     "ubicacion_mapa": "Plaza Manuel Belgrano, obelisco local",
     "pista_al_llegar": "No emite luz, pero guía. A las 17:00, su sombra señala el camino.",
@@ -513,7 +513,7 @@
   },
   {
     "id": "LH-065",
-    "zona": "Barracas",
+    "zona": "barracas",
     "titulo": "El Puente del Olvido",
     "ubicacion_mapa": "Puente peatonal sobre el Riachuelo, Av. Caseros",
     "pista_al_llegar": "Cuenta los postes desde el cartel roto. El séptimo guarda tu nombre.",
@@ -521,7 +521,7 @@
   },
   {
     "id": "LH-066",
-    "zona": "Microcentro",
+    "zona": "microcentro",
     "titulo": "La Puerta que No Abre",
     "ubicacion_mapa": "Edificio histórico, Florida 200",
     "pista_al_llegar": "La puerta tiene 9 clavos. El quinto esconde tu clave.",
@@ -529,7 +529,7 @@
   },
   {
     "id": "LH-067",
-    "zona": "Palermo",
+    "zona": "palermo",
     "titulo": "El Reloj de Sol",
     "ubicacion_mapa": "Jardín Botánico, sector este",
     "pista_al_llegar": "Cuando el sol toque la punta, el número aparecerá en la piedra.",
@@ -537,7 +537,7 @@
   },
   {
     "id": "LH-068",
-    "zona": "San Telmo",
+    "zona": "san telmo",
     "titulo": "El Eco del Mercado",
     "ubicacion_mapa": "Mercado de San Telmo, pasillo central",
     "pista_al_llegar": "Habla al corazón del mercado. Si te responde, eres de los nuestros.",
@@ -545,7 +545,7 @@
   },
   {
     "id": "LH-069",
-    "zona": "Recoleta",
+    "zona": "recoleta",
     "titulo": "La Banca del Juramento",
     "ubicacion_mapa": "Plaza Francia, banca de mármol sur",
     "pista_al_llegar": "Siéntate donde otros juraron silencio. La verdad está bajo tus pies.",
@@ -553,7 +553,7 @@
   },
   {
     "id": "LH-070",
-    "zona": "La Boca",
+    "zona": "la boca",
     "titulo": "La Huella del Barro",
     "ubicacion_mapa": "Calle estrecha junto a Caminito, Magallanes al 500",
     "pista_al_llegar": "Después de la lluvia, el pasado camina. Sigue sus pasos hasta el final.",
@@ -561,7 +561,7 @@
   },
   {
     "id": "LH-071",
-    "zona": "Puerto Madero",
+    "zona": "puerto madero",
     "titulo": "El Código del Contenedor",
     "ubicacion_mapa": "Dique 2, contenedor azul con grafiti",
     "pista_al_llegar": "Los números no son para barcos. Son para hunters. Encuentra los últimos cuatro.",
@@ -569,7 +569,7 @@
   },
   {
     "id": "LH-072",
-    "zona": "Almagro",
+    "zona": "almagro",
     "titulo": "El Mosaico del Sur",
     "ubicacion_mapa": "Entrada de taller mecánico, Av. Rivadavia 4000",
     "pista_al_llegar": "La ciudad firma su nombre donde nadie mira. Busca las letras BA en el piso.",
@@ -577,7 +577,7 @@
   },
   {
     "id": "LH-073",
-    "zona": "Congreso",
+    "zona": "congreso",
     "titulo": "La Columna Rota",
     "ubicacion_mapa": "Plaza del Congreso, columna norte",
     "pista_al_llegar": "La grieta no es accidente. Es mensaje. Mide su longitud con tus pasos.",
@@ -585,7 +585,7 @@
   },
   {
     "id": "LH-074",
-    "zona": "Villa Urquiza",
+    "zona": "villa urquiza",
     "titulo": "El Árbol del Norte",
     "ubicacion_mapa": "Parque Los Andes, árbol solitario al norte",
     "pista_al_llegar": "Toca su tronco tres veces. Si vibra, tu misión comienza.",
@@ -593,7 +593,7 @@
   },
   {
     "id": "LH-075",
-    "zona": "Flores",
+    "zona": "flores",
     "titulo": "El Reloj Parado",
     "ubicacion_mapa": "Plaza Flores, reloj de sol deteriorado",
     "pista_al_llegar": "El tiempo se detuvo aquí. ¿Qué hora marca el silencio?",
@@ -601,7 +601,7 @@
   },
   {
     "id": "LH-076",
-    "zona": "Microcentro",
+    "zona": "microcentro",
     "titulo": "El Piso que Habla",
     "ubicacion_mapa": "Galería Pacífico, sector central",
     "pista_al_llegar": "Cada baldosa tiene un número. Suma las tres más rotas.",
@@ -609,7 +609,7 @@
   },
   {
     "id": "LH-077",
-    "zona": "San Cristóbal",
+    "zona": "san cristóbal",
     "titulo": "La Tapadera del Vigilante",
     "ubicacion_mapa": "Tapa de cloaca, Av. Caseros y Suárez",
     "pista_al_llegar": "No es basura. Es un mensaje. Lee lo que el metal esconde.",
@@ -617,7 +617,7 @@
   },
   {
     "id": "LH-078",
-    "zona": "Palermo",
+    "zona": "palermo",
     "titulo": "El Muro del Tiempo",
     "ubicacion_mapa": "Pared lateral de escuela, Godoy Cruz 2000",
     "pista_al_llegar": "Los años están escritos en ladrillo. Encuentra el que falta.",
@@ -625,7 +625,7 @@
   },
   {
     "id": "LH-079",
-    "zona": "Retiro",
+    "zona": "retiro",
     "titulo": "La Sombra del Obelisco",
     "ubicacion_mapa": "Plaza Fuerza Aérea Argentina",
     "pista_al_llegar": "A las 16:00, la sombra señala el lugar. Ve donde apunta.",
@@ -633,7 +633,7 @@
   },
   {
     "id": "LH-080",
-    "zona": "Barracas",
+    "zona": "barracas",
     "titulo": "El Alambre que Canta",
     "ubicacion_mapa": "Alambrado cerca del Puente Transbordador",
     "pista_al_llegar": "Con viento, canta. Graba su nota más alta.",
@@ -641,7 +641,7 @@
   },
   {
     "id": "LH-081",
-    "zona": "San Telmo",
+    "zona": "san telmo",
     "titulo": "La Ventana Cerrada",
     "ubicacion_mapa": "Edificio antiguo, Defensa 800",
     "pista_al_llegar": "La ventana no se abre, pero mira. ¿Qué refleja a las 15:00?",
@@ -649,7 +649,7 @@
   },
   {
     "id": "LH-082",
-    "zona": "Recoleta",
+    "zona": "recoleta",
     "titulo": "El Libro Perdido",
     "ubicacion_mapa": "Biblioteca Nacional, entrada lateral",
     "pista_al_llegar": "Entra y busca el libro que no tiene título. Está en el estante del olvido.",
@@ -657,7 +657,7 @@
   },
   {
     "id": "LH-083",
-    "zona": "La Boca",
+    "zona": "la boca",
     "titulo": "La Pelota Perdida",
     "ubicacion_mapa": "Cancha abandonada, Olavarría al 2000",
     "pista_al_llegar": "Él mira al sur. ¿Qué ve? Ve lo que él ve y descifra su mensaje.",
@@ -665,7 +665,7 @@
   },
   {
     "id": "LH-084",
-    "zona": "Almagro",
+    "zona": "almagro",
     "titulo": "El Faro de Hormigón",
     "ubicacion_mapa": "Torre de agua, Sánchez de Bustamante 1700",
     "pista_al_llegar": "No emite luz, pero guía. Mira su sombra al amanecer.",
@@ -673,7 +673,7 @@
   },
   {
     "id": "LH-085",
-    "zona": "Puerto Madero",
+    "zona": "puerto madero",
     "titulo": "El Eco del Dique",
     "ubicacion_mapa": "Dique 3, extremo sur",
     "pista_al_llegar": "Grita tu nombre. Si el agua lo repite, eres digno.",
@@ -681,7 +681,7 @@
   },
   {
     "id": "LH-086",
-    "zona": "Microcentro",
+    "zona": "microcentro",
     "titulo": "La Puerta del Tiempo",
     "ubicacion_mapa": "Casa antigua, Lavalle 500",
     "pista_al_llegar": "La puerta tiene 7 clavos. El tercero esconde tu clave.",
@@ -689,7 +689,7 @@
   },
   {
     "id": "LH-087",
-    "zona": "Villa Crespo",
+    "zona": "villa crespo",
     "titulo": "El Camino del Graffiti",
     "ubicacion_mapa": "Pasaje entre Córdoba y Thames",
     "pista_al_llegar": "Donde el arte se rompe, el código nace. Busca la flecha pintada.",
@@ -697,7 +697,7 @@
   },
   {
     "id": "LH-088",
-    "zona": "Belgrano",
+    "zona": "belgrano",
     "titulo": "La Piedra del Juramento",
     "ubicacion_mapa": "Plaza Manuel Belgrano, sector oeste",
     "pista_al_llegar": "Toca la piedra tres veces. Si vibra, tu misión comienza.",
@@ -705,7 +705,7 @@
   },
   {
     "id": "LH-089",
-    "zona": "Flores",
+    "zona": "flores",
     "titulo": "El Cartel del Olvido",
     "ubicacion_mapa": "Parada de tren, cartel deteriorado",
     "pista_al_llegar": "Las letras faltantes forman tu código. Reconstruye el nombre.",
@@ -713,7 +713,7 @@
   },
   {
     "id": "LH-090",
-    "zona": "Congreso",
+    "zona": "congreso",
     "titulo": "El Último Mensaje",
     "ubicacion_mapa": "Banco de plaza, sector sur de Plaza del Congreso",
     "pista_al_llegar": "Siéntate. Levanta la vista. El cielo te dará el código.",
@@ -721,7 +721,7 @@
   },
   {
     "id": "LH-091",
-    "zona": "San Telmo",
+    "zona": "san telmo",
     "titulo": "El Reloj de Arena Urbano",
     "ubicacion_mapa": "Parada de colectivo, Defensa y Chile",
     "pista_al_llegar": "El tiempo cae en grano. Cuenta los agujeros en el asiento.",
@@ -729,7 +729,7 @@
   },
   {
     "id": "LH-092",
-    "zona": "Recoleta",
+    "zona": "recoleta",
     "titulo": "La Sombra del Monumento",
     "ubicacion_mapa": "Plaza Francia, monumento central",
     "pista_al_llegar": "A las 16:00, la sombra señala el lugar. Ve donde apunta.",
@@ -737,7 +737,7 @@
   },
   {
     "id": "LH-093",
-    "zona": "La Boca",
+    "zona": "la boca",
     "titulo": "El Muro del Sur",
     "ubicacion_mapa": "Pared final del barrio, Pedro de Mendoza al 2200",
     "pista_al_llegar": "Aquí termina el mapa. Pero no tu misión. Busca la flecha pintada.",
@@ -745,7 +745,7 @@
   },
   {
     "id": "LH-094",
-    "zona": "Palermo",
+    "zona": "palermo",
     "titulo": "El Silbato del Viento",
     "ubicacion_mapa": "Entre casas en Honduras al 5000",
     "pista_al_llegar": "El viento llama a los hunters. Graba su canción.",
@@ -753,7 +753,7 @@
   },
   {
     "id": "LH-095",
-    "zona": "Microcentro",
+    "zona": "microcentro",
     "titulo": "La Pared de los Reflejos",
     "ubicacion_mapa": "Calle Lavalle 300, pared de azulejos rotos",
     "pista_al_llegar": "Sigue la luz rota. Donde se detiene, comienza tu camino.",
@@ -761,7 +761,7 @@
   },
   {
     "id": "LH-096",
-    "zona": "Almagro",
+    "zona": "almagro",
     "titulo": "La Hora del Último Tren",
     "ubicacion_mapa": "Estación Once, andén principal",
     "pista_al_llegar": "Mira donde la luz del último tren nace. Solo los nocturnos ven la señal.",
@@ -769,7 +769,7 @@
   },
   {
     "id": "LH-097",
-    "zona": "Barracas",
+    "zona": "barracas",
     "titulo": "La Banca de los Poetas",
     "ubicacion_mapa": "Plaza Olavarría, banca este",
     "pista_al_llegar": "Si hay un papel hoy, léelo. Si no, escribe uno. La ciudad juzgará tu alma.",
@@ -777,7 +777,7 @@
   },
   {
     "id": "LH-098",
-    "zona": "Villa Urquiza",
+    "zona": "villa urquiza",
     "titulo": "El Poste del Mensaje Perdido",
     "ubicacion_mapa": "Frente a la estación Villa Urquiza",
     "pista_al_llegar": "Alguien intentó escribir tu nombre. Completa lo que falta.",
@@ -785,7 +785,7 @@
   },
   {
     "id": "LH-099",
-    "zona": "Flores",
+    "zona": "flores",
     "titulo": "El Pozo de los Susurros",
     "ubicacion_mapa": "Calle Rivadavia 7000, boca de tormenta",
     "pista_al_llegar": "Di ‘hunter’ frente al pozo. Si responde, eres uno de los nuestros.",
@@ -793,7 +793,7 @@
   },
   {
     "id": "LH-100",
-    "zona": "Puerto Madero",
+    "zona": "puerto madero",
     "titulo": "El Faro del Sur",
     "ubicacion_mapa": "Extremo sur del Dique 4",
     "pista_al_llegar": "No hay faro… pero hay una luz. Mira el poste más alto. Tu código está en su base.",
