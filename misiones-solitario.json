@@ -1,7 +1,7 @@
 [
   {
     "id": "LH-001",
-    "zona": "Lomas de Zamora",
+    "zona": "lomas de zamora",
     "titulo": "El Árbol del Juramento",
     "ubicacion_mapa": "Plaza Eva Perón (frente a la Municipalidad)",
     "pista_al_llegar": "Busca el árbol centenario junto al mástil. Tu juramento está en su raíz más antigua.",
@@ -9,7 +9,7 @@
   },
   {
     "id": "LH-002",
-    "zona": "Avellaneda",
+    "zona": "avellaneda",
     "titulo": "El Reloj que Nunca Olvida",
     "ubicacion_mapa": "Palacio Municipal de Avellaneda, Av. Mitre 470",
     "pista_al_llegar": "El tiempo se detuvo aquí. Mira donde la sombra del reloj toca la tierra al atardecer.",
@@ -17,7 +17,7 @@
   },
   {
     "id": "LH-003",
-    "zona": "Valentín Alsina",
+    "zona": "valentín alsina",
     "titulo": "El Ojo del Sur",
     "ubicacion_mapa": "Esquina de Alsina y Lavalle",
     "pista_al_llegar": "Solo los que miran como él ven la verdad. Encuentra el ojo que observa el sur.",
@@ -25,7 +25,7 @@
   },
   {
     "id": "LH-004",
-    "zona": "Lanús",
+    "zona": "lanús",
     "titulo": "El Eco del Puente",
     "ubicacion_mapa": "Puente peatonal sobre las vías, Av. Hipólito Yrigoyen",
     "pista_al_llegar": "Cuenta 14 pasos desde el cartel roto. El metal guardará tu nombre.",
