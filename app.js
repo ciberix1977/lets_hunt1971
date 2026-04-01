@@ -1,6 +1,6 @@
 /**
  * ==========================================================================
-   app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN FINAL)
+   app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN FINAL CORREGIDA)
    ========================================================================== */
 
 // ========== VARIABLES GLOBALES ==========
@@ -283,19 +283,20 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
     restoredData = await restoreProgresoFromFirebase(firebaseUid);
   }
   
+  // ✅ CORREGIDO: Obtener zona del URL PRIMERO (para ambos casos)
+  const zonaFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
+  
   if (!hunterId) {
+    // ========== JUGADOR NUEVO ==========
     const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
     hunterId = 'LH-' + String(nextId).padStart(4, '0');
     localStorage.setItem('lastHunterId', nextId);
-    
-    // ✅ CORREGIDO: Obtener zona del URL y respetarla SIEMPRE
-    const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
     
     jugador = {
       id: hunterId,
       nombre: 'Jugador de Prueba',
       telefono: '+5491112345678',
-      zona: ciudadFromURL,  // ✅ Usar la zona del URL directamente
+      zona: zonaFromURL,  // ✅ Usar la zona del URL directamente
       modo: 'individual'
     };
     
@@ -305,11 +306,12 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
     if (firebaseUid) {
       syncProgresoToFirebase(firebaseUid, {
         hunterId: hunterId,
-        zona: ciudadFromURL,
+        zona: zonaFromURL,
         modo: 'individual'
       });
     }
   } else {
+    // ========== JUGADOR EXISTENTE ==========
     let storedJugador = null;
     
     if (restoredData && restoredData.hunterId === hunterId) {
@@ -327,10 +329,12 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
       }
     }
     
-// ✅ CORREGIDO: Siempre usar la zona del URL (sin verificar misiones)
-jugador = stored || { id: hunterId, zona: 'CABA', modo: 'individual' };
-const zonaUrl = decodeURIComponent((urlParams.get('zona') || '').replace(/\+/g, ' ')).trim();
-if (zonaUrl) jugador.zona = zonaUrl;  // ✅ Siempre asignar, sin verificar misiones
+    jugador = storedJugador || { id: hunterId, zona: 'CABA', modo: 'individual' };
+    
+    // ✅ CORREGIDO: La zona del URL SIEMPRE tiene prioridad (sin verificar misiones)
+    if (zonaFromURL && zonaFromURL !== 'CABA') {
+      jugador.zona = zonaFromURL;
+    }
     
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
@@ -344,9 +348,16 @@ if (zonaUrl) jugador.zona = zonaUrl;  // ✅ Siempre asignar, sin verificar misi
     }
   }
   
-  // ✅ Actualizar UI con la zona correcta
-  document.getElementById('hunterIdDisplay').textContent = jugador.modo === 'equipo' ? ('👥 ' + (jugador.equipo || hunterId)) : ('ID: ' + hunterId);
-  document.getElementById('activation-zone').innerHTML = `Tu señal ha sido detectada en <strong>${jugador.zona}</strong>`;
+  // ✅ ACTUALIZAR UI CON LA ZONA CORRECTA (FUERA del if/else - se ejecuta SIEMPRE)
+  const hunterDisplay = document.getElementById('hunterIdDisplay');
+  if (hunterDisplay) {
+    hunterDisplay.textContent = jugador.modo === 'equipo' ? ('👥 ' + (jugador.equipo || hunterId)) : ('ID: ' + hunterId);
+  }
+  
+  const zoneEl = document.getElementById('activation-zone');
+  if (zoneEl) {
+    zoneEl.innerHTML = `Tu señal ha sido detectada en <strong>${jugador.zona}</strong>`;
+  }
   
   redemptionOffered = false;
   
@@ -666,7 +677,6 @@ function startRadarScan() {
     clearInterval(radarInterval);
     radarInterval = null;
   }
-  
   document.getElementById('radar-section').style.display = 'block';
   const nearbyEl = document.getElementById('nearby-players');
   const urgencyEl = document.getElementById('radar-urgency');
@@ -735,16 +745,13 @@ async function showMissionCompleted() {
   const elapsed = Math.floor((Date.now() - missionStartTime) / 60000);
   const recoveryCode = localStorage.getItem('recovery_' + jugador.id) || '—';
   const title = jugador.modo === 'equipo' ? currentTeamMission?.titulo : currentMission?.titulo;
-  
   const today = new Date().toDateString();
   if (playerProgress.lastPlayed !== today) {
     playerProgress.streak = playerProgress.lastPlayed ? playerProgress.streak + 1 : 1;
     playerProgress.lastPlayed = today;
   }
-  
   await updateProgressDisplay();
   await checkLevelUp();
-  
   document.querySelector('#phase4-completed .mission-card').innerHTML = `
     <h2 style="color:#ffd700;margin-bottom:1rem">✅ Operación Completada</h2>
     <p><strong>${title}</strong></p>
