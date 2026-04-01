@@ -31,7 +31,25 @@ let playerProgress = {
   unlockedZones: ['CABA'],
   badges: []
 };
-
+// ========== FUNCIÓN UNIFICADA PARA ZONA (FUENTE DE VERDAD) ==========
+function getZonaFinal() {
+  // 1. PRIORIDAD: URL (si viene explícita)
+  const params = new URLSearchParams(window.location.search);
+  let zona = params.get('zona');
+  if (zona) {
+    zona = decodeURIComponent(zona).replace(/\+/g, ' ').trim();
+    // ✅ Persistir para futuras sesiones
+    localStorage.setItem('zonaSeleccionada', zona);
+    return zona;
+  }
+  
+  // 2. SEGUNDA: localStorage (persistencia real del usuario)
+  const savedZona = localStorage.getItem('zonaSeleccionada');
+  if (savedZona) return savedZona;
+  
+  // 3. FALLBACK: CABA (solo si no hay nada)
+  return 'CABA';
+}
 // ========== CONSTANTES ==========
 const GPS_ACCURACY_THRESHOLD = 40;
 const MISSION_RADIUS = 50;
@@ -302,7 +320,7 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
     restoredData = await restoreProgresoFromFirebase(firebaseUid);
   }
   
-  // ✅ CORREGIDO: Usar función unificada getZonaFinal()
+  // ✅ CORREGIDO: Usar getZonaFinal() como única fuente de verdad
   const zonaFinal = getZonaFinal();
   
   if (!hunterId) {
@@ -348,9 +366,9 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
       }
     }
     
-    jugador = storedJugador || { id: hunterId, modo: 'individual' };
+    jugador = storedJugador || { id: hunterId, zona: 'CABA', modo: 'individual' };
     
-    // ✅ CORREGIDO: Zona siempre viene de getZonaFinal() (no de URL directo)
+    // ✅ CORREGIDO: Zona siempre viene de getZonaFinal()
     jugador.zona = zonaFinal;
     
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
