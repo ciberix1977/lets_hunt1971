@@ -1,7 +1,27 @@
 /**
  * ==========================================================================
-   app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN PRODUCCIÓN)
+   app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN FINAL CORREGIDA)
    ========================================================================== */
+
+// ========== FIREBASE (INICIALIZACIÓN - AGREGADO PARA CORRIGIR ERROR) ==========
+const firebaseConfig = {
+  apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+  authDomain: "let-s-hunt.firebaseapp.com",
+  databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+  projectId: "let-s-hunt",
+  storageBucket: "let-s-hunt.firebasestorage.app",
+  messagingSenderId: "787017812046",
+  appId: "1:787017812046:web:da098b2361df4dda995b1f",
+  measurementId: "G-07SR9WR8NV"
+};
+
+// ✅ Inicializar Firebase (solo si no está ya inicializado)
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+const auth = firebase.auth();  // ✅ ESTO ES LO QUE FALTABA
+const analytics = firebase.analytics();
 
 // ========== VARIABLES GLOBALES ==========
 let accessibilityMode = localStorage.getItem('lh_accessibility_mode') || 'normal';
@@ -31,49 +51,10 @@ let playerProgress = {
   unlockedZones: ['CABA'],
   badges: []
 };
-// ========== FUNCIÓN UNIFICADA PARA ZONA (FUENTE DE VERDAD) ==========
-function getZonaFinal() {
-  // 1. PRIORIDAD: URL (si viene explícita)
-  const params = new URLSearchParams(window.location.search);
-  let zona = params.get('zona');
-  if (zona) {
-    zona = decodeURIComponent(zona).replace(/\+/g, ' ').trim();
-    // ✅ Persistir para futuras sesiones
-    localStorage.setItem('zonaSeleccionada', zona);
-    return zona;
-  }
-  
-  // 2. SEGUNDA: localStorage (persistencia real del usuario)
-  const savedZona = localStorage.getItem('zonaSeleccionada');
-  if (savedZona) return savedZona;
-  
-  // 3. FALLBACK: CABA (solo si no hay nada)
-  return 'CABA';
-}
+
 // ========== CONSTANTES ==========
 const GPS_ACCURACY_THRESHOLD = 40;
 const MISSION_RADIUS = 50;
-
-// ========== FUNCIÓN UNIFICADA PARA ZONA (NUEVO - FUENTE DE VERDAD) ==========
-function getZonaFinal() {
-  const params = new URLSearchParams(window.location.search);
-  
-  // 1. PRIORIDAD: URL (si viene explícita)
-  let zona = params.get('zona');
-  if (zona) {
-    zona = decodeURIComponent(zona).replace(/\+/g, ' ').trim();
-    // ✅ Persistir para futuras sesiones
-    localStorage.setItem('zonaSeleccionada', zona);
-    return zona;
-  }
-  
-  // 2. SEGUNDA: localStorage (persistencia real del usuario)
-  const savedZona = localStorage.getItem('zonaSeleccionada');
-  if (savedZona) return savedZona;
-  
-  // 3. FALLBACK: CABA (solo si no hay nada)
-  return 'CABA';
-}
 
 // ========== CLEANUP ==========
 function stopGPS() {
@@ -297,7 +278,8 @@ async function restoreProgresoFromFirebase(firebaseUid) {
 
 // ========== CONFIGURACIÓN JUGADOR ==========
 function setupJugador() {
-  let hunterId = new URLSearchParams(window.location.search).get('id') || localStorage.getItem('currentHunterId');
+  const urlParams = new URLSearchParams(window.location.search);
+  let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId');
   
   auth.signInAnonymously().catch(function(error) {
     console.error('Error al iniciar sesión anónima:', error);
@@ -320,20 +302,18 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
     restoredData = await restoreProgresoFromFirebase(firebaseUid);
   }
   
-  // ✅ CORREGIDO: Usar getZonaFinal() como única fuente de verdad
-  const zonaFinal = getZonaFinal();
-  
   if (!hunterId) {
-    // ========== JUGADOR NUEVO ==========
     const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
     hunterId = 'LH-' + String(nextId).padStart(4, '0');
     localStorage.setItem('lastHunterId', nextId);
     
+    // ✅ CORREGIDO: Obtener zona del URL y respetarla SIEMPRE
+    const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
     jugador = {
       id: hunterId,
       nombre: 'Jugador de Prueba',
       telefono: '+5491112345678',
-      zona: zonaFinal,  // ✅ Usar zona unificada
+      zona: ciudadFromURL,
       modo: 'individual'
     };
     
@@ -343,12 +323,11 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
     if (firebaseUid) {
       syncProgresoToFirebase(firebaseUid, {
         hunterId: hunterId,
-        zona: zonaFinal,
+        zona: ciudadFromURL,
         modo: 'individual'
       });
     }
   } else {
-    // ========== JUGADOR EXISTENTE ==========
     let storedJugador = null;
     
     if (restoredData && restoredData.hunterId === hunterId) {
@@ -366,10 +345,12 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
       }
     }
     
+    // ✅ CORREGIDO: Siempre usar la zona del URL (sin verificar misiones)
     jugador = storedJugador || { id: hunterId, zona: 'CABA', modo: 'individual' };
-    
-    // ✅ CORREGIDO: Zona siempre viene de getZonaFinal()
-    jugador.zona = zonaFinal;
+    const zonaUrl = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || '').replace(/\+/g, ' ')).trim();
+    if (zonaUrl) {
+      jugador.zona = zonaUrl;
+    }
     
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
@@ -568,7 +549,6 @@ async function showRedemptionMission() {
     currentMission = redemption;
     jugador.zona = randomZone;
     localStorage.setItem('jugador_' + jugador.id, JSON.stringify(jugador));
-    localStorage.setItem('zonaSeleccionada', randomZone); // ✅ Persistir zona de redención
     missionStartTime = Date.now();
     startTimer();
     guardarProgreso(currentMission.id);
