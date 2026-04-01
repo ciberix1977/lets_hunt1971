@@ -1,218 +1,194 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Codigo Ebel · App</title>
-  <meta name="description" content="Tu cacería urbana en el Gran Buenos Aires" />
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  
-  <!-- Firebase SDK (legacy v8.10.1) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
-  
-  <!-- Librerías externas -->
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-  
-  <!-- Fuentes y estilos -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <meta name="theme-color" content="#000000">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Codigo Ebel · App</title>
+<meta name="description" content="Tu cacería urbana en el Gran Buenos Aires" />
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- Firebase SDK (legacy v8.10.1) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+<!-- Librerías externas -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<meta name="theme-color" content="#000000">
 </head>
 <body>
+<!-- 🔐 PANTALLA DE ACTIVACIÓN -->
+<div id="activation-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a0a12,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:2rem;text-align:center;">
+<div class="logo-container centered" style="margin-bottom:2rem;">
+<img src="code_ebel3.webp" alt="Codigo Ebel" style="max-width:200px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.6));">
+</div>
+<h2 style="color:var(--primary);font-size:1.5rem;margin-bottom:1rem;">🕶️ Bienvenido, cazador</h2>
+<p id="activation-zone" style="color:var(--text-muted);margin-bottom:1.5rem;font-size:1.1rem;">Tu señal ha sido detectada en <strong>CABA</strong></p>
+<div class="activation-status" style="margin-bottom:2rem;">
+<span class="pulse-dot" style="display:inline-block;margin-right:0.5rem;"></span>
+<span id="activation-text">Sincronizando misiones activas...</span>
+</div>
+<button id="enter-system-btn" class="btn-hero" style="opacity:0;pointer-events:none;transition:opacity 0.3s;">
+🎯 Entrar al sistema
+</button>
+</div>
+<!-- HEADER -->
+<header>
+<div class="header-left">
+<div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
+<div id="global-timer" class="global-timer" style="display:none;font-size:0.75rem;color:#ff6b6b;margin-top:0.3rem;">⏰ Expira en: <span id="global-time">12:00</span></div>
+</div>
+<div class="header-center">
+<div class="logo-container centered">
+<img src="code_ebel3.webp" alt="Codigo Ebel" class="app-logo">
+</div>
+</div>
+<div class="header-right">
+<div class="hunter-id" id="hunterIdDisplay">ID: LH-0000</div>
+<div id="level-display" class="level-badge" style="font-size:0.7rem;margin-top:0.3rem;color:var(--primary);">N1</div>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main>
+<div class="container">
+<!-- RADAR DE JUGADORES -->
+<div id="radar-section" class="mission-phase" style="display:none;">
+<div class="mission-card">
+<h3 style="margin-bottom:1rem;">📡 Cazadores cercanos</h3>
+<div id="nearby-players" style="min-height:60px;">
+<p style="color:var(--text-muted);font-size:0.9rem;">Buscando señales...</p>
+</div>
+<div id="radar-urgency" style="margin-top:1rem;font-size:0.85rem;color:#ff6b6b;display:none;">
+⚠️ <span id="urgency-text">2 cazadores en tu zona</span>
+</div>
+</div>
+</div>
+<!-- FASE 0: Intro -->
+<div id="phase0-intro" class="mission-phase" style="display:none;">
+<div class="mission-card">
+<div class="mission-title"><span class="icon">🦁</span><span class="title-text" id="intro-mission-title">Cargando...</span></div>
+<p class="pista" id="intro-mission-desc" style="margin:1rem 0;font-size:0.95rem;line-height:1.4;"></p>
+<div class="actions">
+<button class="btn btn-primary" id="accept-intro-btn">✅ Aceptar</button>
+</div>
+</div>
+</div>
+<!-- FASE 1: Consigna -->
+<div id="phase1-consigna" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+</div>
+<!-- FASE 2: Mapa -->
+<div id="phase2-mapa" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+<div id="proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
+<button id="manual-code-btn" class="btn btn-outline" style="margin-top:1rem;width:100%;">⌨️ Ingresar código manual</button>
+</div>
+<!-- FASE 3: Pista + QR -->
+<div id="phase3-pista" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+</div>
+<!-- FASE 4: Completada -->
+<div id="phase4-completed" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+</div>
+<!-- EQUIPOS -->
+<div id="teamSection" class="mission-phase" style="display:none;">
+<div class="mission-card"></div>
+<div id="team-coordination" style="margin-top:1rem;padding:1rem;background:rgba(168,85,247,0.1);border-radius:12px;display:none;">
+<p style="font-size:0.9rem;margin-bottom:0.5rem;"><strong>👥 Coordinación de equipo:</strong></p>
+<p id="team-task" style="font-size:0.85rem;color:var(--text-muted);"></p>
+<div id="team-timer" style="margin-top:0.5rem;font-size:0.9rem;color:#ff6b6b;font-weight:600;"></div>
+</div>
+<div id="team-proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
+</div>
+<!-- PROGRESO VISUAL -->
+<div id="progress-summary" style="margin-top:2rem;text-align:center;">
+<div style="display:inline-flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+<span style="background:rgba(0,170,255,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+🎯 Misiones: <strong id="missions-count">0</strong>
+</span>
+<span style="background:rgba(168,85,247,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+🔥 Racha: <strong id="streak-count">0</strong> días
+</span>
+<span style="background:rgba(255,215,0,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
+🏆 Nivel: <strong id="current-level">N1</strong>
+</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal invitación -->
+<div id="inviteModal" class="modal-overlay">
+<div class="modal-content">
+<h3>👥 Invitar a tu equipo</h3>
+<p>Compartí este código para que otros se unan:</p>
+<div id="codigoInvitacion">CARGANDO...</div>
+<div class="modal-actions">
+<button id="copyCodeBtn" class="btn btn-outline">📋 Copiar código</button>
+<button id="shareWaBtn" class="btn btn-primary">💬 WhatsApp</button>
+</div>
+<button id="closeModalBtn" class="modal-close">Cerrar</button>
+</div>
+</div>
+<!-- Escáner QR -->
+<div id="scannerOverlay" class="modal-overlay">
+<div class="scanner-container">
+<h3>🔍 Escanea el Código QR</h3>
+<video id="scannerVideo" autoplay playsinline></video>
+<canvas id="scannerCanvas" style="display:none;"></canvas>
+<div class="scanner-frame">
+<div class="scanner-corner tl"></div>
+<div class="scanner-corner tr"></div>
+<div class="scanner-corner bl"></div>
+<div class="scanner-corner br"></div>
+</div>
+<!-- ✅ CORREGIDO: Usar data-action en lugar de onclick inline -->
+<div class="scanner-actions">
+<button id="closeScannerBtn" class="btn btn-outline" data-action="stopScanner">❌ Cancelar</button>
+<button id="manualInputBtn" class="btn btn-primary" data-action="openManualCodeModal">⌨️ Ingresar manualmente</button>
+</div>
+</div>
+</div>
+<!-- Modal código manual -->
+<div id="manualCodeModal" class="modal-overlay">
+<div class="modal-content">
+<h3>⌨️ Ingresar código manualmente</h3>
+<p style="margin-bottom:1rem;font-size:0.9rem;color:var(--text-muted);">Si el QR no funciona, ingresá el código de 6 caracteres:</p>
+<input type="text" id="manual-code-input" maxlength="6" placeholder="Ej: AB12CD" style="width:100%;padding:0.8rem;margin-bottom:1rem;border-radius:8px;border:1px solid var(--surface-border);background:var(--surface);color:var(--text);font-size:1.1rem;text-align:center;letter-spacing:2px;text-transform:uppercase;">
+<div class="modal-actions">
+<button id="submit-manual-code" class="btn btn-primary">✅ Validar</button>
+<button id="cancel-manual-code" class="btn btn-outline">Cancelar</button>
+</div>
+</div>
+</div>
+<!-- NAVEGACIÓN MÓVIL -->
+<nav class="mobile-nav">
+<a href="#radar" id="nav-radar"><i>📡</i>Radar</a>
+<a href="#misiones" id="nav-missions"><i>🎯</i>Misiones</a>
+<a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
+<a href="progreso.html" id="nav-progress"><i>📊</i>Progreso</a>
+</nav>
+<!-- BOTONES FLOTANTES -->
+<div id="floating-controls" style="position:fixed;right:20px;bottom:20px;z-index:999;display:flex;flex-direction:column;gap:10px;">
+<button id="narration-toggle" title="Activar/Desactivar narración" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🔊</button>
+<button id="accessibility-toggle" title="Modo normal" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">👁️</button>
+</div>
+<!-- Banner PWA -->
+<div id="pwa-install-banner"></div>
+<!-- Toast -->
+<div id="toast"></div>
 
-  <!-- 🔐 PANTALLA DE ACTIVACIÓN -->
-  <div id="activation-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0a0a12,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:2rem;text-align:center;">
-    <div class="logo-container centered" style="margin-bottom:2rem;">
-      <img src="code_ebel3.webp" alt="Codigo Ebel" style="max-width:200px;height:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.6));">
-    </div>
-    <h2 style="color:var(--primary);font-size:1.5rem;margin-bottom:1rem;">🕶️ Bienvenido, cazador</h2>
-    <p id="activation-zone" style="color:var(--text-muted);margin-bottom:1.5rem;font-size:1.1rem;">Tu señal ha sido detectada en <strong>CABA</strong></p>
-    <div class="activation-status" style="margin-bottom:2rem;">
-      <span class="pulse-dot" style="display:inline-block;margin-right:0.5rem;"></span>
-      <span id="activation-text">Sincronizando misiones activas...</span>
-    </div>
-    <button id="enter-system-btn" class="btn-hero" style="opacity:0;pointer-events:none;transition:opacity 0.3s;">
-      🎯 Entrar al sistema
-    </button>
-  </div>
-
-  <!-- HEADER -->
-  <header>
-    <div class="header-left">
-      <div class="tension-bar" id="tension-bar">⏳ <span id="timer">Listo</span></div>
-      <div id="global-timer" class="global-timer" style="display:none;font-size:0.75rem;color:#ff6b6b;margin-top:0.3rem;">⏰ Expira en: <span id="global-time">12:00</span></div>
-    </div>
-    <div class="header-center">
-      <div class="logo-container centered">
-        <img src="code_ebel3.webp" alt="Codigo Ebel" class="app-logo">
-      </div>
-    </div>
-    <div class="header-right">
-      <div class="hunter-id" id="hunterIdDisplay">ID: LH-0000</div>
-      <div id="level-display" class="level-badge" style="font-size:0.7rem;margin-top:0.3rem;color:var(--primary);">N1</div>
-    </div>
-  </header>
-
-  <!-- MAIN CONTENT -->
-  <main>
-    <div class="container">
-      
-      <!-- RADAR DE JUGADORES -->
-      <div id="radar-section" class="mission-phase" style="display:none;">
-        <div class="mission-card">
-          <h3 style="margin-bottom:1rem;">📡 Cazadores cercanos</h3>
-          <div id="nearby-players" style="min-height:60px;">
-            <p style="color:var(--text-muted);font-size:0.9rem;">Buscando señales...</p>
-          </div>
-          <div id="radar-urgency" style="margin-top:1rem;font-size:0.85rem;color:#ff6b6b;display:none;">
-            ⚠️ <span id="urgency-text">2 cazadores en tu zona</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FASE 0: Intro -->
-      <div id="phase0-intro" class="mission-phase" style="display:none;">
-        <div class="mission-card">
-          <div class="mission-title"><span class="icon">🦁</span><span class="title-text" id="intro-mission-title">Cargando...</span></div>
-          <p class="pista" id="intro-mission-desc" style="margin:1rem 0;font-size:0.95rem;line-height:1.4;"></p>
-          <div class="actions">
-            <button class="btn btn-primary" id="accept-intro-btn">✅ Aceptar</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- FASE 1: Consigna -->
-      <div id="phase1-consigna" class="mission-phase" style="display:none;">
-        <div class="mission-card"></div>
-      </div>
-
-      <!-- FASE 2: Mapa -->
-      <div id="phase2-mapa" class="mission-phase" style="display:none;">
-        <div class="mission-card"></div>
-        <div id="proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
-        <button id="manual-code-btn" class="btn btn-outline" style="margin-top:1rem;width:100%;">⌨️ Ingresar código manual</button>
-      </div>
-
-      <!-- FASE 3: Pista + QR -->
-      <div id="phase3-pista" class="mission-phase" style="display:none;">
-        <div class="mission-card"></div>
-      </div>
-
-      <!-- FASE 4: Completada -->
-      <div id="phase4-completed" class="mission-phase" style="display:none;">
-        <div class="mission-card"></div>
-      </div>
-
-      <!-- EQUIPOS -->
-      <div id="teamSection" class="mission-phase" style="display:none;">
-        <div class="mission-card"></div>
-        <div id="team-coordination" style="margin-top:1rem;padding:1rem;background:rgba(168,85,247,0.1);border-radius:12px;display:none;">
-          <p style="font-size:0.9rem;margin-bottom:0.5rem;"><strong>👥 Coordinación de equipo:</strong></p>
-          <p id="team-task" style="font-size:0.85rem;color:var(--text-muted);"></p>
-          <div id="team-timer" style="margin-top:0.5rem;font-size:0.9rem;color:#ff6b6b;font-weight:600;"></div>
-        </div>
-        <div id="team-proximity-status" style="text-align:center;margin-top:1rem;color:#64b5f7;font-size:0.9rem;"></div>
-      </div>
-
-      <!-- PROGRESO VISUAL -->
-      <div id="progress-summary" style="margin-top:2rem;text-align:center;">
-        <div style="display:inline-flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
-          <span style="background:rgba(0,170,255,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
-            🎯 Misiones: <strong id="missions-count">0</strong>
-          </span>
-          <span style="background:rgba(168,85,247,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
-            🔥 Racha: <strong id="streak-count">0</strong> días
-          </span>
-          <span style="background:rgba(255,215,0,0.1);padding:0.4rem 0.8rem;border-radius:20px;font-size:0.85rem;">
-            🏆 Nivel: <strong id="current-level">N1</strong>
-          </span>
-        </div>
-      </div>
-
-    </div>
-  </main>
-
-  <!-- Modal invitación -->
-  <div id="inviteModal" class="modal-overlay">
-    <div class="modal-content">
-      <h3>👥 Invitar a tu equipo</h3>
-      <p>Compartí este código para que otros se unan:</p>
-      <div id="codigoInvitacion">CARGANDO...</div>
-      <div class="modal-actions">
-        <button id="copyCodeBtn" class="btn btn-outline">📋 Copiar código</button>
-        <button id="shareWaBtn" class="btn btn-primary">💬 WhatsApp</button>
-      </div>
-      <button id="closeModalBtn" class="modal-close">Cerrar</button>
-    </div>
-  </div>
-
-  <!-- Escáner QR -->
-  <div id="scannerOverlay" class="modal-overlay">
-    <div class="scanner-container">
-      <h3>🔍 Escanea el Código QR</h3>
-      <video id="scannerVideo" autoplay playsinline></video>
-      <canvas id="scannerCanvas" style="display:none;"></canvas>
-      <div class="scanner-frame">
-        <div class="scanner-corner tl"></div>
-        <div class="scanner-corner tr"></div>
-        <div class="scanner-corner bl"></div>
-        <div class="scanner-corner br"></div>
-      </div>
-      <div class="scanner-actions">
-        <button id="closeScannerBtn" class="btn btn-outline">❌ Cancelar</button>
-        <button id="manualInputBtn" class="btn btn-primary">⌨️ Ingresar manualmente</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal código manual -->
-  <div id="manualCodeModal" class="modal-overlay">
-    <div class="modal-content">
-      <h3>⌨️ Ingresar código manualmente</h3>
-      <p style="margin-bottom:1rem;font-size:0.9rem;color:var(--text-muted);">Si el QR no funciona, ingresá el código de 6 caracteres:</p>
-      <input type="text" id="manual-code-input" maxlength="6" placeholder="Ej: AB12CD" style="width:100%;padding:0.8rem;margin-bottom:1rem;border-radius:8px;border:1px solid var(--surface-border);background:var(--surface);color:var(--text);font-size:1.1rem;text-align:center;letter-spacing:2px;text-transform:uppercase;">
-      <div class="modal-actions">
-        <button id="submit-manual-code" class="btn btn-primary">✅ Validar</button>
-        <button id="cancel-manual-code" class="btn btn-outline">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- NAVEGACIÓN MÓVIL -->
-  <nav class="mobile-nav">
-    <a href="#radar" id="nav-radar"><i>📡</i>Radar</a>
-    <a href="#misiones" id="nav-missions"><i>🎯</i>Misiones</a>
-    <a href="#scan" id="nav-scan"><i>🔍</i>Escanear</a>
-    <a href="progreso.html" id="nav-progress"><i>📊</i>Progreso</a>
-  </nav>
-
-  <!-- BOTONES FLOTANTES -->
-  <div id="floating-controls" style="position:fixed;right:20px;bottom:20px;z-index:999;display:flex;flex-direction:column;gap:10px;">
-    <button id="narration-toggle" title="Activar/Desactivar narración" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🔊</button>
-    <button id="accessibility-toggle" title="Modo normal" style="background:rgba(0,0,0,0.7);color:white;border:none;width:50px;height:50px;border-radius:50%;font-size:1.2rem;cursor:pointer;">👁️</button>
-  </div>
-
-  <!-- Banner PWA -->
-  <div id="pwa-install-banner"></div>
-
-  <!-- Toast -->
-  <div id="toast"></div>
-
-  <!-- ========== LÓGICA PRINCIPAL (SOLO CARGA app.js) ========== -->
-  <script src="app.js" defer></script>
+<!-- ========== LÓGICA PRINCIPAL (SOLO CARGA app.js) ========== -->
+<script src="app.js" defer></script>
 </body>
 </html>
