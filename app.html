@@ -1346,15 +1346,15 @@ updateFloatingControlsPosition();
 window.addEventListener('resize', updateFloatingControlsPosition);
 window.addEventListener('beforeunload', cleanupAll);
 window.addEventListener('load', () => {
-loadMisiones().then(() => {
-applyAccessibilityMode();
-setupJugador();
-startRandomEvents();
-console.log('✅ Codigo Ebel App inicializada');
-console.log('🛡️ Anti-cheat GPS activado (threshold: ' + GPS_ACCURACY_THRESHOLD + 'm)');
-console.log('🔐 Firebase: Progreso calculado desde desafios_completados');
-});
-});
-</script>
+  loadMisiones().then(() => {
+    applyAccessibilityMode();
+    setupJugador();
+    startRandomEvents();
+    console.log('✅ Codigo Ebel App inicializada');
+    console.log('🛡️ Anti-cheat GPS activado (threshold: ' + GPS_ACCURACY_THRESHOLD + 'm)');
+    console.log('🔐 Firebase: Progreso calculado desde desafios_completados');
+  });
+}); // ✅ CIERRA addEventListener('load', ...)
+</script> <!-- ✅ CIERRA el bloque script principal -->
 </body>
 </html>
