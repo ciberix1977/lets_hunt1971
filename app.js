@@ -3,7 +3,7 @@
    app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN FINAL CORREGIDA)
    ========================================================================== */
 
-// ========== FIREBASE (INICIALIZACIÓN - AGREGADO PARA CORRIGIR ERROR) ==========
+// ========== FIREBASE (INICIALIZACIÓN) ==========
 const firebaseConfig = {
   apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
   authDomain: "let-s-hunt.firebaseapp.com",
@@ -20,7 +20,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.database();
-const auth = firebase.auth();  // ✅ ESTO ES LO QUE FALTABA
+const auth = firebase.auth();
 const analytics = firebase.analytics();
 
 // ========== VARIABLES GLOBALES ==========
@@ -55,6 +55,26 @@ let playerProgress = {
 // ========== CONSTANTES ==========
 const GPS_ACCURACY_THRESHOLD = 40;
 const MISSION_RADIUS = 50;
+
+// ========== FUNCIÓN UNIFICADA PARA ZONA (FUENTE DE VERDAD) ==========
+function getZonaFinal() {
+  const params = new URLSearchParams(window.location.search);
+  
+  // 1. PRIORIDAD: URL (si viene explícita)
+  let zona = params.get('zona');
+  if (zona) {
+    zona = decodeURIComponent(zona).replace(/\+/g, ' ').trim();
+    localStorage.setItem('zonaSeleccionada', zona);
+    return zona;
+  }
+  
+  // 2. SEGUNDA: localStorage (persistencia real del usuario)
+  const savedZona = localStorage.getItem('zonaSeleccionada');
+  if (savedZona) return savedZona;
+  
+  // 3. FALLBACK: CABA (solo si no hay nada)
+  return 'CABA';
+}
 
 // ========== CLEANUP ==========
 function stopGPS() {
@@ -375,6 +395,65 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
   } else {
     showPhase1();
   }
+}
+
+// ========== PANTALLA ACTIVACIÓN ==========
+function showActivationScreen() {
+  const screen = document.getElementById('activation-screen');
+  const zoneEl = document.getElementById('activation-zone');
+  const textEl = document.getElementById('activation-text');
+  const btn = document.getElementById('enter-system-btn');
+  
+  // ✅ Actualizar zona en UI
+  if (zoneEl && jugador?.zona) {
+    // Formatear zona para mostrar (primera letra mayúscula)
+    const zonaDisplay = jugador.zona.split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+    zoneEl.innerHTML = `Tu señal ha sido detectada en <strong>${zonaDisplay}</strong>`;
+  }
+  
+  // Secuencia de pasos de loading
+  const steps = [
+    { text: 'Sincronizando misiones activas...', delay: 800 },
+    { text: 'Verificando tu zona de juego...', delay: 800 },
+    { text: 'Preparando tu primera cacería...', delay: 800 },
+    { text: '✅ Listo para empezar', delay: 400 }
+  ];
+  
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < steps.length && textEl) {
+      textEl.textContent = steps[i].text;
+      i++;
+    }
+  }, 800);
+  
+  // ✅ Habilitar botón y desbloquear flujo
+  setTimeout(() => {
+    clearInterval(interval);
+    
+    // 🔥 FORZAR texto final
+    if (textEl) textEl.textContent = '✅ Listo para empezar';
+    
+    if (btn) {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+      btn.addEventListener('click', () => {
+        screen.style.display = 'none';
+        
+        // 🔥 INICIAR GEOLOCALIZACIÓN AL ENTRAR
+        if (typeof iniciarGeolocalizacion === 'function') {
+          iniciarGeolocalizacion();
+        }
+        
+        if (jugador.modo === 'equipo') showTeamMission();
+        else showPhase0();
+      }, { once: true });
+    }
+  }, 2500);
+  
+  screen.style.display = 'flex';
 }
 
 // ========== ACTUALIZAR PROGRESO ==========
@@ -1183,6 +1262,63 @@ function generarRecoveryCode() {
   return code;
 }
 
+// ========== GEOLOCALIZACIÓN INDEPENDIENTE (NUEVO) ==========
+async function iniciarGeolocalizacion() {
+  if (!navigator.geolocation) {
+    console.warn('⚠️ Geolocalización no soportada');
+    return;
+  }
+  
+  try {
+    // Obtener ubicación con timeout
+    const posicion = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        resolve,
+        reject,
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+    
+    const { latitude, longitude, accuracy } = posicion.coords;
+    console.log('📍 Ubicación obtenida:', { latitude, longitude, accuracy });
+    
+    // Obtener coordenadas del objetivo según la zona
+    const zona = jugador?.zona || getZonaFinal();
+    const mision = currentMission || selectRandomMission(zona, 'solitario');
+    
+    if (mision?.coordenadas) {
+      const distancia = calculateDistance(
+        latitude,
+        longitude,
+        mision.coordenadas.lat,
+        mision.coordenadas.lng
+      );
+      
+      console.log('📏 Distancia al objetivo:', distancia.toFixed(0) + 'm');
+      
+      // Actualizar UI con la distancia
+      const statusEl = document.getElementById('proximity-status');
+      if (statusEl && distancia <= 50) {
+        statusEl.innerHTML = `✅ ¡Estás en la zona! <button class="btn btn-primary" id="unlock-phase3-btn" style="margin-top:10px">🔓 Acceder</button>`;
+        statusEl.style.color = '#4ade80';
+        document.getElementById('unlock-phase3-btn')?.addEventListener('click', showPhase3);
+      } else if (statusEl) {
+        statusEl.innerHTML = `📍 A ${Math.round(distancia)}m del objetivo (±${Math.round(accuracy)}m). Acércate más.`;
+        statusEl.style.color = '#64b5f7';
+      }
+    }
+    
+    // Iniciar watcher para actualizaciones en tiempo real
+    if (mision?.coordenadas) {
+      startProximityCheck(mision.coordenadas.lat, mision.coordenadas.lng);
+    }
+    
+  } catch (error) {
+    console.error('❌ Error en geolocalización:', error.message);
+    showToast('⚠️ No se pudo obtener tu ubicación');
+  }
+}
+
 // ========== PWA ==========
 function showInstallBanner() {
   const banner = document.getElementById('pwa-install-banner');
@@ -1291,15 +1427,33 @@ window.addEventListener('load', function() {
   }, 100);
 });
 
-// ========== INICIALIZACIÓN PRINCIPAL ==========
+// ========== INICIALIZACIÓN PRINCIPAL (CORREGIDA) ==========
 async function initApp() {
   console.log('🚀 Iniciando Codigo Ebel App...');
-  await loadMisiones();
+  
+  // 1. Cargar misiones (NO bloqueante)
+  loadMisiones().catch(err => console.warn('⚠️ Error cargando misiones:', err));
+  
+  // 2. Aplicar accesibilidad
   if (typeof applyAccessibilityMode === 'function') {
     applyAccessibilityMode();
   }
+  
+  // 3. Configurar jugador (esto muestra la zona)
   setupJugador();
+  
+  // 4. 🔥 INICIAR GEOLOCALIZACIÓN SIEMPRE (no esperar misiones)
+  setTimeout(() => {
+    if (typeof iniciarGeolocalizacion === 'function') {
+      iniciarGeolocalizacion();
+    }
+  }, 1500); // Pequeño delay para que la UI se renderice
+  
+  // 5. Eventos aleatorios
+  startRandomEvents();
+  
   console.log('✅ Codigo Ebel App inicializada');
+  console.log('🛡️ Anti-cheat GPS activado (threshold: ' + GPS_ACCURACY_THRESHOLD + 'm)');
 }
 
 // ========== EXPOSICIÓN DE FUNCIONES AL SCOPE GLOBAL ==========
@@ -1313,6 +1467,8 @@ if (typeof window !== 'undefined') {
   window._showPhase2 = showPhase2;
   window._showPhase3 = showPhase3;
   window._showMissionCompleted = showMissionCompleted;
+  window._showActivationScreen = showActivationScreen;
+  window._iniciarGeolocalizacion = iniciarGeolocalizacion;
   window.scannerActive = false;
   window.stream = null;
 }
