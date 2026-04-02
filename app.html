@@ -14,6 +14,27 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_AUTH_DOMAIN",
+  projectId: "TU_PROJECT_ID",
+  appId: "TU_APP_ID"
+};
+
+// 🔥 Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+
+// 🔒 Analytics seguro (no rompe app)
+let analytics = null;
+try {
+  if (firebase.analytics) {
+    analytics = firebase.analytics();
+  }
+} catch (e) {
+  console.warn('Analytics no disponible');
+}
+</script>
 <!-- Librerías externas -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">

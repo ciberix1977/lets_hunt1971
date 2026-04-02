@@ -664,23 +664,27 @@ async function showPhase0() {
     document.getElementById('phase0-intro').style.display = 'none';
     const firebaseUid = localStorage.getItem('firebaseUid');
     if (firebaseUid && currentMission) {
-      try {
-        const asignarMision = firebase.functions().httpsCallable('asignarMision');
-        await asignarMision({
-          misionId: currentMission.id,
-          zona: jugador.zona
-        });
-      } catch (err) {
-        console.warn('⚠️ Error asignando misión:', err);
-        showToast('⚠️ Error: ' + err.message);
-        return;
-      }
-    }
-    missionStartTime = Date.now();
-    startTimer();
-    startGlobalTimer();
-    guardarProgreso(currentMission.id);
-    showPhase2();
+    try {
+  if (firebase.functions) {
+    const asignarMision = firebase.functions().httpsCallable('asignarMision');
+    await asignarMision({
+      misionId: currentMission.id,
+      zona: jugador.zona
+    });
+  } else {
+    console.warn('⚠️ Firebase Functions no disponible');
+  }
+} catch (err) {
+  console.warn('⚠️ Error asignando misión:', err);
+  showToast('⚠️ Continuando en modo offline');
+}
+
+// 🚀 SIEMPRE CONTINÚA
+missionStartTime = Date.now();
+startTimer();
+startGlobalTimer();
+guardarProgreso(currentMission.id);
+showPhase2();
   };
 }
 
