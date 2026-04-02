@@ -1427,35 +1427,6 @@ window.addEventListener('load', function() {
   }, 100);
 });
 
-// ========== INICIALIZACIÓN PRINCIPAL (CORREGIDA) ==========
-async function initApp() {
-  console.log('🚀 Iniciando Codigo Ebel App...');
-  
-  // 1. Cargar misiones (NO bloqueante)
-  loadMisiones().catch(err => console.warn('⚠️ Error cargando misiones:', err));
-  
-  // 2. Aplicar accesibilidad
-  if (typeof applyAccessibilityMode === 'function') {
-    applyAccessibilityMode();
-  }
-  
-  // 3. Configurar jugador (esto muestra la zona)
-  setupJugador();
-  
-  // 4. 🔥 INICIAR GEOLOCALIZACIÓN SIEMPRE (no esperar misiones)
-  setTimeout(() => {
-    if (typeof iniciarGeolocalizacion === 'function') {
-      iniciarGeolocalizacion();
-    }
-  }, 1500); // Pequeño delay para que la UI se renderice
-  
-  // 5. Eventos aleatorios
-  startRandomEvents();
-  
-  console.log('✅ Codigo Ebel App inicializada');
-  console.log('🛡️ Anti-cheat GPS activado (threshold: ' + GPS_ACCURACY_THRESHOLD + 'm)');
-}
-
 // ========== EXPOSICIÓN DE FUNCIONES AL SCOPE GLOBAL ==========
 if (typeof window !== 'undefined') {
   window._stopScanner = stopScanner;
@@ -1472,3 +1443,48 @@ if (typeof window !== 'undefined') {
   window.scannerActive = false;
   window.stream = null;
 }
+// ========== INIT APP (ORQUESTADOR REAL) ==========
+async function initApp() {
+  console.log('🚀 Iniciando app...');
+
+  try {
+    // 1. Accesibilidad
+    applyAccessibilityMode();
+
+    // 2. UI base
+    updateFloatingControlsPosition();
+
+    // 3. Detectar zona FINAL
+    const zona = getZonaFinal();
+    console.log('📍 Zona detectada:', zona);
+
+    // 4. Cargar misiones (con fallback)
+    await loadMisiones();
+    console.log('📦 Misiones cargadas');
+
+    // 5. Setup jugador (esto dispara todo lo demás)
+    setupJugador();
+
+    // 6. Seguridad: timeout anti-bloqueo
+    setTimeout(() => {
+      const activationScreen = document.getElementById('activation-screen');
+      if (activationScreen && activationScreen.style.display !== 'flex') {
+        console.warn('⚠️ Forzando pantalla de activación (fallback)');
+        showActivationScreen();
+      }
+    }, 4000);
+
+  } catch (err) {
+    console.error('❌ Error en initApp:', err);
+
+    showToast('⚠️ Error inicializando app');
+
+    // fallback extremo
+    showPhase0();
+  }
+}
+
+// ========== ENTRY POINT ==========
+document.addEventListener('DOMContentLoaded', () => {
+  initApp();
+});
