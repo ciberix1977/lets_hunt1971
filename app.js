@@ -664,27 +664,23 @@ async function showPhase0() {
     document.getElementById('phase0-intro').style.display = 'none';
     const firebaseUid = localStorage.getItem('firebaseUid');
     if (firebaseUid && currentMission) {
-    try {
-  if (firebase.functions) {
-    const asignarMision = firebase.functions().httpsCallable('asignarMision');
-    await asignarMision({
-      misionId: currentMission.id,
-      zona: jugador.zona
-    });
-  } else {
-    console.warn('⚠️ Firebase Functions no disponible');
-  }
-} catch (err) {
-  console.warn('⚠️ Error asignando misión:', err);
-  showToast('⚠️ Continuando en modo offline');
-}
-
-// 🚀 SIEMPRE CONTINÚA
-missionStartTime = Date.now();
-startTimer();
-startGlobalTimer();
-guardarProgreso(currentMission.id);
-showPhase2();
+      try {
+        const asignarMision = firebase.functions().httpsCallable('asignarMision');
+        await asignarMision({
+          misionId: currentMission.id,
+          zona: jugador.zona
+        });
+      } catch (err) {
+        console.warn('⚠️ Error asignando misión:', err);
+        showToast('⚠️ Error: ' + err.message);
+        return;
+      }
+    }
+    missionStartTime = Date.now();
+    startTimer();
+    startGlobalTimer();
+    guardarProgreso(currentMission.id);
+    showPhase2();
   };
 }
 
@@ -748,7 +744,9 @@ function showPhase2() {
     <h3>📍 Acércate al objetivo</h3>
     <p style="margin:1rem 0;color:#cbd5e1;line-height:1.4">${currentMission.ubicacion_mapa}</p>
     <div id="mapApprox" style="height:300px;border-radius:12px;margin:1rem 0"></div>
-    <p id="proximity-instructions" style="font-size:0.9rem;color:#94a3b8">Esperando ubicación...</p>
+    <p id="proximity-status" style="font-size:0.9rem;color:#94a3b8">
+  Esperando ubicación...
+</p>
     <button class="btn btn-outline" id="back-to-phase1-btn" style="margin-top:15px;width:100%;padding:12px">🔙 Volver</button>
   `;
   document.getElementById('phase2-mapa').style.display = 'block';
@@ -760,7 +758,8 @@ function showPhase2() {
     document.getElementById('phase2-mapa').style.display = 'none';
     showPhase0();
   };
-  document.getElementById('manual-code-btn').onclick = openManualCodeModal;
+  const manualBtn = document.getElementById('manual-code-btn');
+if (manualBtn) manualBtn.onclick = openManualCodeModal;
 }
 
 // ========== RADAR ==========
@@ -1431,6 +1430,35 @@ window.addEventListener('load', function() {
   }, 100);
 });
 
+// ========== INICIALIZACIÓN PRINCIPAL (CORREGIDA) ==========
+async function initApp() {
+  console.log('🚀 Iniciando Codigo Ebel App...');
+  
+  // 1. Cargar misiones (NO bloqueante)
+  loadMisiones().catch(err => console.warn('⚠️ Error cargando misiones:', err));
+  
+  // 2. Aplicar accesibilidad
+  if (typeof applyAccessibilityMode === 'function') {
+    applyAccessibilityMode();
+  }
+  
+  // 3. Configurar jugador (esto muestra la zona)
+  setupJugador();
+  
+  // 4. 🔥 INICIAR GEOLOCALIZACIÓN SIEMPRE (no esperar misiones)
+  setTimeout(() => {
+    if (typeof iniciarGeolocalizacion === 'function') {
+      iniciarGeolocalizacion();
+    }
+  }, 1500); // Pequeño delay para que la UI se renderice
+  
+  // 5. Eventos aleatorios
+  startRandomEvents();
+  
+  console.log('✅ Codigo Ebel App inicializada');
+  console.log('🛡️ Anti-cheat GPS activado (threshold: ' + GPS_ACCURACY_THRESHOLD + 'm)');
+}
+
 // ========== EXPOSICIÓN DE FUNCIONES AL SCOPE GLOBAL ==========
 if (typeof window !== 'undefined') {
   window._stopScanner = stopScanner;
@@ -1447,48 +1475,3 @@ if (typeof window !== 'undefined') {
   window.scannerActive = false;
   window.stream = null;
 }
-// ========== INIT APP (ORQUESTADOR REAL) ==========
-async function initApp() {
-  console.log('🚀 Iniciando app...');
-
-  try {
-    // 1. Accesibilidad
-    applyAccessibilityMode();
-
-    // 2. UI base
-    updateFloatingControlsPosition();
-
-    // 3. Detectar zona FINAL
-    const zona = getZonaFinal();
-    console.log('📍 Zona detectada:', zona);
-
-    // 4. Cargar misiones (con fallback)
-    await loadMisiones();
-    console.log('📦 Misiones cargadas');
-
-    // 5. Setup jugador (esto dispara todo lo demás)
-    setupJugador();
-
-    // 6. Seguridad: timeout anti-bloqueo
-    setTimeout(() => {
-      const activationScreen = document.getElementById('activation-screen');
-      if (activationScreen && activationScreen.style.display !== 'flex') {
-        console.warn('⚠️ Forzando pantalla de activación (fallback)');
-        showActivationScreen();
-      }
-    }, 4000);
-
-  } catch (err) {
-    console.error('❌ Error en initApp:', err);
-
-    showToast('⚠️ Error inicializando app');
-
-    // fallback extremo
-    showPhase0();
-  }
-}
-
-// ========== ENTRY POINT ==========
-document.addEventListener('DOMContentLoaded', () => {
-  initApp();
-});
