@@ -1,9 +1,9 @@
 /**
  * ==========================================================================
-   app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN FINAL CORREGIDA)
+   app.js - Codigo Ebel | Inicialización y Orquestación (VERSIÓN PRODUCCIÓN)
    ========================================================================== */
 
-// ========== FIREBASE (INICIALIZACIÓN) ==========
+// ========== FIREBASE ==========
 const firebaseConfig = {
   apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
   authDomain: "let-s-hunt.firebaseapp.com",
@@ -15,13 +15,22 @@ const firebaseConfig = {
   measurementId: "G-07SR9WR8NV"
 };
 
-// ✅ Inicializar Firebase (solo si no está ya inicializado)
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+// ✅ CORRECCIÓN #7: Validar inicialización de Firebase
+let db, auth, analytics;
+try {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  db = firebase.database();
+  auth = firebase.auth();
+  analytics = firebase.analytics();
+  console.log('✅ Firebase inicializado correctamente');
+} catch (e) {
+  console.error('🔥 Error inicializando Firebase:', e);
+  db = null;
+  auth = null;
+  analytics = null;
 }
-const db = firebase.database();
-const auth = firebase.auth();
-const analytics = firebase.analytics();
 
 // ========== VARIABLES GLOBALES ==========
 let accessibilityMode = localStorage.getItem('lh_accessibility_mode') || 'normal';
@@ -55,6 +64,7 @@ let playerProgress = {
 // ========== CONSTANTES ==========
 const GPS_ACCURACY_THRESHOLD = 40;
 const MISSION_RADIUS = 50;
+const FIREBASE_TIMEOUT_MS = 3000;
 
 // ========== FUNCIÓN UNIFICADA PARA ZONA (FUENTE DE VERDAD) ==========
 function getZonaFinal() {
@@ -217,6 +227,11 @@ async function loadMisiones() {
     if (!res1.ok || !res2.ok) throw new Error('Error JSON');
     misionesSolitario = await res1.json();
     misionesEquipo = await res2.json();
+    
+    // ✅ CORRECCIÓN #3: Actualizar texto cuando misiones cargan
+    const textEl = document.getElementById('activation-text');
+    if (textEl) textEl.textContent = '✔ Misiones listas';
+    
   } catch (err) {
     console.error('⚠️ Error cargando misiones:', err);
     showToast('⚠️ Usando misiones de prueba');
@@ -228,6 +243,10 @@ async function loadMisiones() {
       pista_al_llegar: 'Busca la pista final.',
       coordenadas: { lat: -34.6037, lng: -58.3816 }
     }];
+    
+    // ✅ CORRECCIÓN #3: Igual actualizar texto aunque falle
+    const textEl = document.getElementById('activation-text');
+    if (textEl) textEl.textContent = '⚠️ Modo offline';
   }
 }
 
@@ -258,26 +277,40 @@ function hideAllPhases() {
   });
 }
 
-// ========== FIREBASE: VERIFICAR MISIÓN ==========
+// ========== FIREBASE: VERIFICAR MISIÓN (CON TIMEOUT) ==========
 async function isMisionDisponible(misionId, zona) {
+  if (!db) return true; // ✅ Fallback si Firebase no está disponible
+  
   try {
     const ref = db.ref('misiones_publicas/' + misionId + '-' + zona);
-    const snap = await ref.once('value');
-    if (!snap.exists()) return false;
+    
+    // Timeout para evitar espera infinita
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Firebase timeout')), FIREBASE_TIMEOUT_MS)
+    );
+    
+    const snap = await Promise.race([
+      ref.once('value'),
+      timeout
+    ]);
+    
+    if (!snap.exists()) return true;
     return snap.val().estado !== 'completada';
+    
   } catch (err) {
-    console.error('Error Firebase:', err);
-    return false;
+    console.warn('⚠️ Firebase lento/falló, permitimos misión:', err.message);
+    return true; // 🔥 FALLBACK CRÍTICO
   }
 }
 
 // ========== FIREBASE: SYNC PROGRESO ==========
 async function syncProgresoToFirebase(firebaseUid, data) {
-  if (!firebaseUid) return;
+  if (!firebaseUid || !db) return;
   try {
     await db.ref('jugadores/' + firebaseUid).update({
       hunterId: data.hunterId || null,
       zona: data.zona || null,
+      zonaManual: data.zonaManual || false,
       modo: data.modo || null
     });
   } catch (err) {
@@ -286,7 +319,7 @@ async function syncProgresoToFirebase(firebaseUid, data) {
 }
 
 async function restoreProgresoFromFirebase(firebaseUid) {
-  if (!firebaseUid) return null;
+  if (!firebaseUid || !db) return null;
   try {
     const snap = await db.ref('jugadores/' + firebaseUid).once('value');
     if (snap.exists()) {
@@ -298,6 +331,12 @@ async function restoreProgresoFromFirebase(firebaseUid) {
 
 // ========== CONFIGURACIÓN JUGADOR ==========
 function setupJugador() {
+  if (!auth) {
+    console.error('❌ Firebase Auth no disponible');
+    _continueSetupJugador(null, null);
+    return;
+  }
+  
   const urlParams = new URLSearchParams(window.location.search);
   let hunterId = urlParams.get('id') || localStorage.getItem('currentHunterId');
   
@@ -322,38 +361,45 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
     restoredData = await restoreProgresoFromFirebase(firebaseUid);
   }
   
+  // ✅ CORRECCIÓN #1: Usar getZonaFinal() para obtener zona correcta
+  const zonaFinal = getZonaFinal();
+  
   if (!hunterId) {
+    // ========== JUGADOR NUEVO ==========
     const nextId = parseInt(localStorage.getItem('lastHunterId') || '0') + 1;
     hunterId = 'LH-' + String(nextId).padStart(4, '0');
     localStorage.setItem('lastHunterId', nextId);
     
-    // ✅ CORREGIDO: Obtener zona del URL y respetarla SIEMPRE
-    const ciudadFromURL = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || 'CABA').replace(/\+/g, ' ')).trim();
     jugador = {
       id: hunterId,
       nombre: 'Jugador de Prueba',
       telefono: '+5491112345678',
-      zona: ciudadFromURL,
+      zona: zonaFinal,
+      zonaManual: !!zonaFromURL,
       modo: 'individual'
     };
     
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
     localStorage.setItem('currentHunterId', hunterId);
+    if (zonaFromURL) localStorage.setItem('zonaSeleccionada', zonaFinal);
     
     if (firebaseUid) {
       syncProgresoToFirebase(firebaseUid, {
         hunterId: hunterId,
-        zona: ciudadFromURL,
+        zona: zonaFinal,
+        zonaManual: !!zonaFromURL,
         modo: 'individual'
       });
     }
   } else {
+    // ========== JUGADOR EXISTENTE ==========
     let storedJugador = null;
     
     if (restoredData && restoredData.hunterId === hunterId) {
       storedJugador = {
         id: restoredData.hunterId,
         zona: restoredData.zona,
+        zonaManual: restoredData.zonaManual,
         modo: restoredData.modo
       };
     } else {
@@ -365,11 +411,13 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
       }
     }
     
-    // ✅ CORREGIDO: Siempre usar la zona del URL (sin verificar misiones)
-    jugador = storedJugador || { id: hunterId, zona: 'CABA', modo: 'individual' };
-    const zonaUrl = decodeURIComponent((new URLSearchParams(window.location.search).get('zona') || '').replace(/\+/g, ' ')).trim();
-    if (zonaUrl) {
-      jugador.zona = zonaUrl;
+    jugador = storedJugador || { id: hunterId, zona: 'CABA', zonaManual: false, modo: 'individual' };
+    
+    // Si viene zona por URL, SIEMPRE tiene prioridad
+    if (zonaFinal && zonaFinal !== 'CABA') {
+      jugador.zona = zonaFinal;
+      jugador.zonaManual = true;
+      localStorage.setItem('zonaSeleccionada', jugador.zona);
     }
     
     localStorage.setItem('jugador_' + hunterId, JSON.stringify(jugador));
@@ -379,14 +427,22 @@ async function _continueSetupJugador(hunterId, firebaseUid) {
       syncProgresoToFirebase(firebaseUid, {
         hunterId: jugador.id,
         zona: jugador.zona,
+        zonaManual: jugador.zonaManual,
         modo: jugador.modo
       });
     }
   }
   
-  // ✅ Actualizar UI con la zona correcta
+  // ✅ CORRECCIÓN #1: Actualizar UI con zona formateada
+  const zoneEl = document.getElementById('activation-zone');
+  if (zoneEl && jugador?.zona) {
+    const zonaDisplay = jugador.zona.split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+    zoneEl.innerHTML = `Tu señal ha sido detectada en <strong>${zonaDisplay}</strong>`;
+  }
+  
   document.getElementById('hunterIdDisplay').textContent = jugador.modo === 'equipo' ? ('👥 ' + (jugador.equipo || hunterId)) : ('ID: ' + hunterId);
-  document.getElementById('activation-zone').innerHTML = `Tu señal ha sido detectada en <strong>${jugador.zona}</strong>`;
   
   redemptionOffered = false;
   
@@ -406,7 +462,6 @@ function showActivationScreen() {
   
   // ✅ Actualizar zona en UI
   if (zoneEl && jugador?.zona) {
-    // Formatear zona para mostrar (primera letra mayúscula)
     const zonaDisplay = jugador.zona.split(' ')
       .map(w => w.charAt(0).toUpperCase() + w.slice(1))
       .join(' ');
@@ -429,7 +484,7 @@ function showActivationScreen() {
     }
   }, 800);
   
-  // ✅ Habilitar botón y desbloquear flujo
+  // ✅ CORRECCIÓN #2: Habilitar botón y desbloquear flujo
   setTimeout(() => {
     clearInterval(interval);
     
@@ -442,9 +497,11 @@ function showActivationScreen() {
       btn.addEventListener('click', () => {
         screen.style.display = 'none';
         
-        // 🔥 INICIAR GEOLOCALIZACIÓN AL ENTRAR
+        // ✅ Iniciar geolocalización
         if (typeof iniciarGeolocalizacion === 'function') {
-          iniciarGeolocalizacion();
+          iniciarGeolocalizacion().catch(err => {
+            console.warn('⚠️ Geolocalización falló, continuando:', err);
+          });
         }
         
         if (jugador.modo === 'equipo') showTeamMission();
@@ -456,11 +513,73 @@ function showActivationScreen() {
   screen.style.display = 'flex';
 }
 
+// ========== GEOLOCALIZACIÓN INDEPENDIENTE ==========
+async function iniciarGeolocalizacion() {
+  if (!navigator.geolocation) {
+    console.warn('⚠️ Geolocalización no soportada');
+    showToast('⚠️ Tu navegador no soporta ubicación');
+    return;
+  }
+  
+  try {
+    const posicion = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        resolve,
+        reject,
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+    
+    const { latitude, longitude, accuracy } = posicion.coords;
+    console.log('📍 Ubicación obtenida:', { latitude, longitude, accuracy });
+    
+    const mision = currentMission || selectRandomMission(jugador.zona, 'solitario');
+    
+    if (mision?.coordenadas) {
+      const distancia = calculateDistance(
+        latitude,
+        longitude,
+        mision.coordenadas.lat,
+        mision.coordenadas.lng
+      );
+      
+      console.log('📏 Distancia al objetivo:', distancia.toFixed(0) + 'm');
+      
+      const statusEl = document.getElementById('proximity-status');
+      if (statusEl && distancia <= 50) {
+        statusEl.innerHTML = `✅ ¡Estás en la zona! <button class="btn btn-primary" id="unlock-phase3-btn" style="margin-top:10px">🔓 Acceder</button>`;
+        statusEl.style.color = '#4ade80';
+        document.getElementById('unlock-phase3-btn')?.addEventListener('click', showPhase3);
+      } else if (statusEl) {
+        statusEl.innerHTML = `📍 A ${Math.round(distancia)}m del objetivo (±${Math.round(accuracy)}m). Acércate más.`;
+        statusEl.style.color = '#64b5f7';
+      }
+    }
+    
+    if (mision?.coordenadas) {
+      startProximityCheck(mision.coordenadas.lat, mision.coordenadas.lng);
+    }
+    
+  } catch (error) {
+    console.error('❌ Error en geolocalización:', error.message);
+    
+    if (error.code === error.PERMISSION_DENIED) {
+      showToast('🔐 Permiso de ubicación denegado');
+    } else if (error.code === error.POSITION_UNAVAILABLE) {
+      showToast('📡 Señal GPS no disponible');
+    } else if (error.code === error.TIMEOUT) {
+      showToast('⏳ Tiempo de espera agotado');
+    } else {
+      showToast('⚠️ Error de ubicación');
+    }
+  }
+}
+
 // ========== ACTUALIZAR PROGRESO ==========
 async function updateProgressDisplay() {
   const firebaseUid = localStorage.getItem('firebaseUid');
   
-  if (firebaseUid) {
+  if (firebaseUid && db) {
     try {
       const snap = await db.ref(`jugadores/${firebaseUid}`).once('value');
       if (snap.exists()) {
@@ -508,7 +627,7 @@ async function updateProgressDisplay() {
 
 async function checkLevelUp() {
   const firebaseUid = localStorage.getItem('firebaseUid');
-  if (firebaseUid) {
+  if (firebaseUid && db) {
     try {
       const desafiosRef = db.ref(`desafios_completados/${firebaseUid}`);
       const desafiosSnap = await desafiosRef.once('value');
@@ -576,6 +695,7 @@ function guardarProgreso(misionId, desafioId) {
     }
   }
   data.zona = jugador.zona;
+  data.zonaManual = jugador.zonaManual;
   data.lastUpdate = Date.now();
   localStorage.setItem(key, JSON.stringify(data));
 }
@@ -627,6 +747,7 @@ async function showRedemptionMission() {
   document.getElementById('accept-redemption-btn').onclick = () => {
     currentMission = redemption;
     jugador.zona = randomZone;
+    jugador.zonaManual = true;
     localStorage.setItem('jugador_' + jugador.id, JSON.stringify(jugador));
     missionStartTime = Date.now();
     startTimer();
@@ -641,7 +762,11 @@ async function showPhase0() {
   cleanupAll();
   currentMission = selectRandomMission(jugador.zona, 'solitario');
   if (!currentMission) { showToast('⚠️ No hay misiones'); return; }
-  analytics.logEvent('mision_aceptada', { zona: jugador.zona, tipo: 'solitario', hunter_id: jugador.id });
+  
+  if (analytics) {
+    analytics.logEvent('mision_aceptada', { zona: jugador.zona, tipo: 'solitario', hunter_id: jugador.id });
+  }
+  
   const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
   if (!disponible) {
     playConsolationNarration('already_completed');
@@ -663,7 +788,7 @@ async function showPhase0() {
   document.getElementById('accept-intro-btn').onclick = async () => {
     document.getElementById('phase0-intro').style.display = 'none';
     const firebaseUid = localStorage.getItem('firebaseUid');
-    if (firebaseUid && currentMission) {
+    if (firebaseUid && currentMission && firebase.functions) {
       try {
         const asignarMision = firebase.functions().httpsCallable('asignarMision');
         await asignarMision({
@@ -689,7 +814,11 @@ async function showPhase1() {
   cleanupAll();
   currentMission = selectRandomMission(jugador.zona, 'solitario');
   if (!currentMission) { showToast('⚠️ No hay misiones'); return; }
-  analytics.logEvent('mision_aceptada', { zona: jugador.zona, tipo: 'solitario', hunter_id: jugador.id });
+  
+  if (analytics) {
+    analytics.logEvent('mision_aceptada', { zona: jugador.zona, tipo: 'solitario', hunter_id: jugador.id });
+  }
+  
   const disponible = await isMisionDisponible(currentMission.id, jugador.zona);
   if (!disponible) {
     playConsolationNarration('already_completed');
@@ -714,7 +843,7 @@ async function showPhase1() {
   document.getElementById('phase1-consigna').style.display = 'block';
   document.getElementById('start-mission-btn').onclick = async () => {
     const firebaseUid = localStorage.getItem('firebaseUid');
-    if (firebaseUid && currentMission) {
+    if (firebaseUid && currentMission && firebase.functions) {
       try {
         const asignarMision = firebase.functions().httpsCallable('asignarMision');
         await asignarMision({
@@ -743,10 +872,7 @@ function showPhase2() {
   document.querySelector('#phase2-mapa .mission-card').innerHTML = `
     <h3>📍 Acércate al objetivo</h3>
     <p style="margin:1rem 0;color:#cbd5e1;line-height:1.4">${currentMission.ubicacion_mapa}</p>
-    <div id="mapApprox" style="height:300px;border-radius:12px;margin:1rem 0"></div>
-    <p id="proximity-status" style="font-size:0.9rem;color:#94a3b8">
-  Esperando ubicación...
-</p>
+    <p id="proximity-status" style="font-size:0.9rem;color:#94a3b8">Esperando ubicación...</p>
     <button class="btn btn-outline" id="back-to-phase1-btn" style="margin-top:15px;width:100%;padding:12px">🔙 Volver</button>
   `;
   document.getElementById('phase2-mapa').style.display = 'block';
@@ -758,8 +884,7 @@ function showPhase2() {
     document.getElementById('phase2-mapa').style.display = 'none';
     showPhase0();
   };
-  const manualBtn = document.getElementById('manual-code-btn');
-if (manualBtn) manualBtn.onclick = openManualCodeModal;
+  document.getElementById('manual-code-btn').onclick = openManualCodeModal;
 }
 
 // ========== RADAR ==========
@@ -819,7 +944,7 @@ function showPhase3() {
 // ========== SHOW PHASE 4 ==========
 async function showMissionCompleted() {
   const firebaseUid = localStorage.getItem('firebaseUid');
-  if (firebaseUid && currentMission) {
+  if (firebaseUid && currentMission && db) {
     try {
       const snap = await db.ref(`verificaciones/${firebaseUid}/${currentMission.id}`).once('value');
       if (!snap.exists() || !snap.val().validado) {
@@ -890,7 +1015,7 @@ async function showTeamMission() {
   document.getElementById('teamSection').style.display = 'block';
   document.getElementById('accept-mission-btn').onclick = async () => {
     const firebaseUid = localStorage.getItem('firebaseUid');
-    if (firebaseUid && currentTeamMission) {
+    if (firebaseUid && currentTeamMission && firebase.functions) {
       try {
         const asignarMision = firebase.functions().httpsCallable('asignarMision');
         await asignarMision({
@@ -971,7 +1096,8 @@ function startTeamProximityCheck() {
 // ========== PROXIMIDAD ==========
 function startProximityCheck(targetLat, targetLng) {
   if (!navigator.geolocation) {
-    document.getElementById('proximity-instructions').textContent = '⚠️ GPS no soportado';
+    const statusEl = document.getElementById('proximity-status');
+    if (statusEl) statusEl.textContent = '⚠️ GPS no soportado';
     return;
   }
   gpsWatchId = navigator.geolocation.watchPosition(
@@ -979,25 +1105,33 @@ function startProximityCheck(targetLat, targetLng) {
       const validation = validateGPSAccuracy(pos);
       if (!validation.valid) {
         const statusEl = document.getElementById('proximity-status');
-        statusEl.innerHTML = `⚠️ Señal GPS imprecisa (±${validation.accuracy.toFixed(0)}m). Busca cielo despejado.`;
-        statusEl.style.color = '#ff9500';
+        if (statusEl) {
+          statusEl.innerHTML = `⚠️ Señal GPS imprecisa (±${validation.accuracy.toFixed(0)}m). Busca cielo despejado.`;
+          statusEl.style.color = '#ff9500';
+        }
         return;
       }
       const statusEl = document.getElementById('proximity-status');
-      statusEl.style.color = '#94a3b8';
+      if (statusEl) statusEl.style.color = '#94a3b8';
       const { latitude, longitude } = validation;
+      console.log('📍 GPS activo:', { latitude, longitude, accuracy: validation.accuracy });
       const distance = calculateDistance(latitude, longitude, targetLat, targetLng);
-      if (distance <= 50) {
-        statusEl.innerHTML = `✅ ¡Estás en la zona! <button class="btn btn-primary" id="unlock-phase3-btn" style="margin-top:10px">🔓 Acceder</button>`;
-        statusEl.style.color = '#4ade80';
-        const btn = document.getElementById('unlock-phase3-btn');
-        if (btn) btn.onclick = showPhase3;
-      } else {
-        statusEl.innerHTML = `📍 A ${Math.round(distance)}m del objetivo (±${validation.accuracy.toFixed(0)}m). Acércate más.`;
-        statusEl.style.color = '#64b5f7';
+      if (statusEl) {
+        if (distance <= 50) {
+          statusEl.innerHTML = `✅ ¡Estás en la zona! <button class="btn btn-primary" id="unlock-phase3-btn" style="margin-top:10px">🔓 Acceder</button>`;
+          statusEl.style.color = '#4ade80';
+          document.getElementById('unlock-phase3-btn')?.addEventListener('click', showPhase3);
+        } else {
+          statusEl.innerHTML = `📍 A ${Math.round(distance)}m del objetivo (±${Math.round(validation.accuracy)}m). Acércate más.`;
+          statusEl.style.color = '#64b5f7';
+        }
       }
     },
-    err => { document.getElementById('proximity-instructions').textContent = '⚠️ Error GPS'; },
+    err => {
+      console.error('⚠️ Error GPS:', err.message);
+      const statusEl = document.getElementById('proximity-status');
+      if (statusEl) statusEl.textContent = '⚠️ Error GPS: ' + err.message;
+    },
     { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
   );
 }
@@ -1163,22 +1297,24 @@ async function openQRScanner() {
               showToast('🔄 Validando misión...');
               navigator.geolocation.getCurrentPosition(async (pos) => {
                 try {
-                  const validarMision = firebase.functions().httpsCallable('validarMision');
-                  const result = await validarMision({
-                    misionId: scannedId,
-                    qrCode: scannedId,
-                    coordenadas: {
-                      lat: pos.coords.latitude,
-                      lng: pos.coords.longitude,
-                      accuracy: pos.coords.accuracy
-                    },
-                    zona: jugador.zona
-                  });
-                  if (result.data.success) {
-                    const completarMision = firebase.functions().httpsCallable('completarMision');
-                    await completarMision({ misionId: scannedId });
-                    showToast('✅ ' + result.data.message);
-                    showMissionCompleted();
+                  if (firebase.functions) {
+                    const validarMision = firebase.functions().httpsCallable('validarMision');
+                    const result = await validarMision({
+                      misionId: scannedId,
+                      qrCode: scannedId,
+                      coordenadas: {
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude,
+                        accuracy: pos.coords.accuracy
+                      },
+                      zona: jugador.zona
+                    });
+                    if (result.data.success) {
+                      const completarMision = firebase.functions().httpsCallable('completarMision');
+                      await completarMision({ misionId: scannedId });
+                      showToast('✅ ' + result.data.message);
+                      showMissionCompleted();
+                    }
                   }
                 } catch (error) {
                   console.error('Error en Cloud Function:', error);
@@ -1263,63 +1399,6 @@ function generarRecoveryCode() {
   let code = 'LH';
   for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
   return code;
-}
-
-// ========== GEOLOCALIZACIÓN INDEPENDIENTE (NUEVO) ==========
-async function iniciarGeolocalizacion() {
-  if (!navigator.geolocation) {
-    console.warn('⚠️ Geolocalización no soportada');
-    return;
-  }
-  
-  try {
-    // Obtener ubicación con timeout
-    const posicion = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        resolve,
-        reject,
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    });
-    
-    const { latitude, longitude, accuracy } = posicion.coords;
-    console.log('📍 Ubicación obtenida:', { latitude, longitude, accuracy });
-    
-    // Obtener coordenadas del objetivo según la zona
-    const zona = jugador?.zona || getZonaFinal();
-    const mision = currentMission || selectRandomMission(zona, 'solitario');
-    
-    if (mision?.coordenadas) {
-      const distancia = calculateDistance(
-        latitude,
-        longitude,
-        mision.coordenadas.lat,
-        mision.coordenadas.lng
-      );
-      
-      console.log('📏 Distancia al objetivo:', distancia.toFixed(0) + 'm');
-      
-      // Actualizar UI con la distancia
-      const statusEl = document.getElementById('proximity-status');
-      if (statusEl && distancia <= 50) {
-        statusEl.innerHTML = `✅ ¡Estás en la zona! <button class="btn btn-primary" id="unlock-phase3-btn" style="margin-top:10px">🔓 Acceder</button>`;
-        statusEl.style.color = '#4ade80';
-        document.getElementById('unlock-phase3-btn')?.addEventListener('click', showPhase3);
-      } else if (statusEl) {
-        statusEl.innerHTML = `📍 A ${Math.round(distancia)}m del objetivo (±${Math.round(accuracy)}m). Acércate más.`;
-        statusEl.style.color = '#64b5f7';
-      }
-    }
-    
-    // Iniciar watcher para actualizaciones en tiempo real
-    if (mision?.coordenadas) {
-      startProximityCheck(mision.coordenadas.lat, mision.coordenadas.lng);
-    }
-    
-  } catch (error) {
-    console.error('❌ Error en geolocalización:', error.message);
-    showToast('⚠️ No se pudo obtener tu ubicación');
-  }
 }
 
 // ========== PWA ==========
@@ -1430,7 +1509,7 @@ window.addEventListener('load', function() {
   }, 100);
 });
 
-// ========== INICIALIZACIÓN PRINCIPAL (CORREGIDA) ==========
+// ========== INICIALIZACIÓN PRINCIPAL ==========
 async function initApp() {
   console.log('🚀 Iniciando Codigo Ebel App...');
   
@@ -1445,14 +1524,7 @@ async function initApp() {
   // 3. Configurar jugador (esto muestra la zona)
   setupJugador();
   
-  // 4. 🔥 INICIAR GEOLOCALIZACIÓN SIEMPRE (no esperar misiones)
-  setTimeout(() => {
-    if (typeof iniciarGeolocalizacion === 'function') {
-      iniciarGeolocalizacion();
-    }
-  }, 1500); // Pequeño delay para que la UI se renderice
-  
-  // 5. Eventos aleatorios
+  // 4. Eventos aleatorios
   startRandomEvents();
   
   console.log('✅ Codigo Ebel App inicializada');
@@ -1470,7 +1542,6 @@ if (typeof window !== 'undefined') {
   window._showPhase2 = showPhase2;
   window._showPhase3 = showPhase3;
   window._showMissionCompleted = showMissionCompleted;
-  window._showActivationScreen = showActivationScreen;
   window._iniciarGeolocalizacion = iniciarGeolocalizacion;
   window.scannerActive = false;
   window.stream = null;
