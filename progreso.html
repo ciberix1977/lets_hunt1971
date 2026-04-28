@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Let’s Hunt · Progreso</title>
+  <title>Let's Hunt · Progreso</title>
   <meta name="description" content="Tu progreso y el de otros cazadores" />
   <meta name="theme-color" content="#000000">
   
@@ -17,13 +17,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 
-   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-
-
-
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
   <header>
@@ -126,7 +123,7 @@
       </div>
       <div class="connection-status">
         <span class="status-dot"></span>
-        Conectado en tiempo real
+        <span id="connection-text">Conectado en tiempo real</span>
       </div>
     </div>
 
@@ -149,21 +146,38 @@
   <div id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    // ========== FIREBASE ==========
-    const firebaseConfig = {
-      apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
-      authDomain: "let-s-hunt.firebaseapp.com",
-      databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
-      projectId: "let-s-hunt",
-      storageBucket: "let-s-hunt.firebasestorage.app",
-      messagingSenderId: "787017812046",
-      appId: "1:787017812046:web:da098b2361df4dda995b1f",
-      measurementId: "G-07SR9WR8NV"
-    };
+    // 🔴 MODO APP - CONFIGURACIÓN PRINCIPAL
+    // ✅ Cambiar a false cuando Firebase esté listo para producción
+    const OFFLINE_MODE = true;
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const analytics = firebase.analytics();
+    // ========== FIREBASE (INICIALIZACIÓN CONDICIONAL) ==========
+    let db = null, analytics = null;
+    
+    if (!OFFLINE_MODE) {
+      try {
+        const firebaseConfig = {
+          apiKey: "AIzaSyDvMo1LPD_FGk-Ahju8oN7WEn9w0B5bqUE",
+          authDomain: "let-s-hunt.firebaseapp.com",
+          databaseURL: "https://let-s-hunt-default-rtdb.firebaseio.com",
+          projectId: "let-s-hunt",
+          storageBucket: "let-s-hunt.firebasestorage.app",
+          messagingSenderId: "787017812046",
+          appId: "1:787017812046:web:da098b2361df4dda995b1f",
+          measurementId: "G-07SR9WR8NV"
+        };
+
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        db = firebase.database?.();
+        analytics = firebase.analytics?.();
+        console.log('✅ Firebase inicializado (modo ONLINE)');
+      } catch (e) {
+        console.warn('⚠️ Firebase no disponible, usando modo offline:', e.message);
+      }
+    } else {
+      console.log('📡 MODO OFFLINE ACTIVO - Firebase deshabilitado');
+    }
 
     // ========== DATOS DEL JUGADOR ==========
     const hunterId = localStorage.getItem('currentHunterId') || 'LH-0000';
@@ -182,83 +196,117 @@
     document.getElementById('ciudad').textContent = progreso.zona;
     document.getElementById('zona-local').textContent = progreso.zona;
 
-    // ========== CARGAR ESTADÍSTICAS COMPLETAS ==========
+    // 🔴 FUNCIÓN AUXILIAR: Verificar si Firebase está listo
+    function isFirebaseReady() {
+      return !OFFLINE_MODE && typeof db !== 'undefined' && db;
+    }
+
+    // ========== CARGAR ESTADÍSTICAS COMPLETAS (CON OFFLINE MODE) ==========
     async function loadAdvancedStats() {
       const hunterId = localStorage.getItem('currentHunterId') || 'LH-0000';
       
-      // Datos de misiones (localStorage)
-      const misionesKey = `misiones_aceptadas_${hunterId}`;
-      const misionesIds = JSON.parse(localStorage.getItem(misionesKey) || '[]');
-      
-      // Datos de desafíos (Firebase)
-      let desafiosCompletados = 0;
-      try {
-        const desafiosSnapshot = await db.ref('misiones_asignadas')
-          .orderByChild('hunterId')
-          .equalTo(hunterId)
-          .once('value');
+      // 🔴 MODO OFFLINE: Usar datos mock
+      if (OFFLINE_MODE) {
+        console.log('📡 Cargando stats offline...');
         
-        if (desafiosSnapshot.exists()) {
-          const desafios = desafiosSnapshot.val();
-          desafiosCompletados = Object.values(desafios).filter(d => d.status === 'approved').length;
-        }
-      } catch (err) {
-        console.error("Error al cargar desafíos:", err);
-      }
-      
-      // Datos de adivinanzas (Firebase)
-      let adivinanzasResueltas = 0;
-      try {
-        const adivinanzasSnapshot = await db.ref('registro_adivinanzas')
-          .orderByChild('adivinanza_id')
-          .once('value');
+        // Datos mock para desarrollo
+        const mockStats = {
+          misiones: 5,
+          desafios: 3,
+          zonasExploradas: 2,
+          tiempoPromedio: '8:30',
+          eficiencia: 85,
+          ultimaActividad: '2h'
+        };
         
-        if (adivinanzasSnapshot.exists()) {
-          const registros = adivinanzasSnapshot.val();
-          // Como no guardamos ID del jugador, contamos aproximadamente
-          // En producción, deberías mejorar esto con Cloud Functions
-          adivinanzasResueltas = Math.min(5, Object.keys(registros).length);
-        }
-      } catch (err) {
-        console.error("Error al cargar adivinanzas:", err);
+        // Actualizar UI con datos mock
+        document.getElementById('misiones').textContent = mockStats.misiones;
+        document.getElementById('desafios').textContent = mockStats.desafios;
+        document.getElementById('zonas-exploradas').textContent = mockStats.zonasExploradas;
+        document.getElementById('tiempo-promedio').textContent = mockStats.tiempoPromedio;
+        document.getElementById('eficiencia').textContent = `${mockStats.eficiencia}%`;
+        document.getElementById('ultima-actividad').textContent = mockStats.ultimaActividad;
+        
+        updateBadges(mockStats.misiones, mockStats.desafios, mockStats.zonasExploradas);
+        return;
       }
       
-      // Actualizar UI
-      document.getElementById('misiones').textContent = misionesIds.length;
-      document.getElementById('desafios').textContent = desafiosCompletados + adivinanzasResueltas;
-      
-      // Cargar misiones para estadísticas
-      let misionesSolitario = [], misionesEquipo = [];
+      // 🔵 MODO ONLINE: Código original con protección
       try {
-        const [solitarioRes, equipoRes] = await Promise.all([
-          fetch('misiones-solitario.json'),
-          fetch('misiones-equipo-local.json')
-        ]);
-        if (solitarioRes.ok) misionesSolitario = await solitarioRes.json();
-        if (equipoRes.ok) misionesEquipo = await equipoRes.json();
+        // Datos de misiones (localStorage)
+        const misionesKey = `misiones_aceptadas_${hunterId}`;
+        const misionesIds = JSON.parse(localStorage.getItem(misionesKey) || '[]');
+        
+        // Datos de desafíos (Firebase)
+        let desafiosCompletados = 0;
+        if (isFirebaseReady()) {
+          const desafiosSnapshot = await db.ref('misiones_asignadas')
+            .orderByChild('hunterId')
+            .equalTo(hunterId)
+            .once('value');
+          
+          if (desafiosSnapshot.exists()) {
+            const desafios = desafiosSnapshot.val();
+            desafiosCompletados = Object.values(desafios).filter(d => d.status === 'approved').length;
+          }
+        }
+        
+        // Datos de adivinanzas (Firebase)
+        let adivinanzasResueltas = 0;
+        if (isFirebaseReady()) {
+          const adivinanzasSnapshot = await db.ref('registro_adivinanzas')
+            .orderByChild('adivinanza_id')
+            .once('value');
+          
+          if (adivinanzasSnapshot.exists()) {
+            const registros = adivinanzasSnapshot.val();
+            adivinanzasResueltas = Math.min(5, Object.keys(registros).length);
+          }
+        }
+        
+        // Actualizar UI
+        document.getElementById('misiones').textContent = misionesIds.length;
+        document.getElementById('desafios').textContent = desafiosCompletados + adivinanzasResueltas;
+        
+        // Cargar misiones para estadísticas
+        let misionesSolitario = [], misionesEquipo = [];
+        try {
+          const [solitarioRes, equipoRes] = await Promise.all([
+            fetch('misiones-solitario.json'),
+            fetch('misiones-equipo-local.json')
+          ]);
+          if (solitarioRes.ok) misionesSolitario = await solitarioRes.json();
+          if (equipoRes.ok) misionesEquipo = await equipoRes.json();
+        } catch (err) {
+          console.error("Error al cargar misiones:", err);
+        }
+        
+        const todasMisiones = [...misionesSolitario, ...misionesEquipo];
+        const zonasExploradas = new Set();
+        misionesIds.forEach(misionId => {
+          const mision = todasMisiones.find(m => m.id === misionId);
+          if (mision) zonasExploradas.add(mision.zona);
+        });
+        
+        document.getElementById('zonas-exploradas').textContent = zonasExploradas.size;
+        document.getElementById('tiempo-promedio').textContent = `${Math.max(5, Math.floor(Math.random() * 20))}m`;
+        document.getElementById('eficiencia').textContent = `${Math.min(100, Math.floor(((misionesIds.length + desafiosCompletados) / (misionesIds.length + desafiosCompletados + 2)) * 100))}%`;
+        
+        const lastUpdate = new Date(progreso.lastUpdate);
+        const now = new Date();
+        const diffHours = Math.floor((now - lastUpdate) / (1000 * 60 * 60));
+        document.getElementById('ultima-actividad').textContent = 
+          diffHours < 1 ? 'Ahora' : 
+          diffHours < 24 ? `${diffHours}h` : `${Math.floor(diffHours / 24)}d`;
+        
+        updateBadges(misionesIds.length, desafiosCompletados, zonasExploradas.size);
+        
       } catch (err) {
-        console.error("Error al cargar misiones:", err);
+        console.error("Error al cargar estadísticas:", err);
+        // Fallback a datos básicos
+        document.getElementById('misiones').textContent = progreso.misiones;
+        document.getElementById('desafios').textContent = progreso.desafios;
       }
-      
-      const todasMisiones = [...misionesSolitario, ...misionesEquipo];
-      const zonasExploradas = new Set();
-      misionesIds.forEach(misionId => {
-        const mision = todasMisiones.find(m => m.id === misionId);
-        if (mision) zonasExploradas.add(mision.zona);
-      });
-      
-      document.getElementById('zonas-exploradas').textContent = zonasExploradas.size;
-      document.getElementById('tiempo-promedio').textContent = `${Math.max(5, Math.floor(Math.random() * 20))}m`;
-      document.getElementById('eficiencia').textContent = `${Math.min(100, Math.floor(((misionesIds.length + desafiosCompletados) / (misionesIds.length + desafiosCompletados + 2)) * 100))}%`;
-      
-      const lastUpdate = new Date(progreso.lastUpdate);
-      const now = new Date();
-      const diffHours = Math.floor((now - lastUpdate) / (1000 * 60 * 60));
-      document.getElementById('ultima-actividad').textContent = 
-        diffHours < 1 ? 'Ahora' : 
-        diffHours < 24 ? `${diffHours}h` : `${Math.floor(diffHours / 24)}d`;
-      
-      updateBadges(misionesIds.length, desafiosCompletados, zonasExploradas.size);
     }
 
     function updateBadges(misiones, desafios, zonas) {
@@ -281,9 +329,41 @@
       });
     }
 
-    // ========== CARGAR RANKING LOCAL ==========
+    // ========== CARGAR RANKING LOCAL (CON OFFLINE MODE) ==========
     async function loadLocalRanking(zona) {
+      // 🔴 MODO OFFLINE: Usar datos mock
+      if (OFFLINE_MODE) {
+        console.log('📡 Cargando ranking local offline...');
+        
+        const mockRanking = [
+          { hunterId: 'LH-0001', zona: zona, points: 450 },
+          { hunterId: 'LH-0042', zona: zona, points: 380 },
+          { hunterId: 'LH-0123', zona: zona, points: 320 },
+          { hunterId: hunterId, zona: zona, points: 280 }, // Jugador actual
+          { hunterId: 'LH-0456', zona: zona, points: 210 }
+        ];
+        
+        const list = document.getElementById('ranking-local-list');
+        list.innerHTML = '';
+        
+        mockRanking.forEach((player, index) => {
+          const isCurrent = player.hunterId === hunterId;
+          const item = document.createElement('div');
+          item.className = `ranking-item ${isCurrent ? 'current-player' : ''}`;
+          item.innerHTML = `
+            <span class="ranking-rank">${index + 1}</span>
+            <span class="ranking-name">${player.hunterId}${isCurrent ? ' (Tú)' : ''}</span>
+            <span class="ranking-points">${player.points} pts</span>
+          `;
+          list.appendChild(item);
+        });
+        return;
+      }
+      
+      // 🔵 MODO ONLINE: Firebase (con protección)
       try {
+        if (!isFirebaseReady()) return;
+        
         const snapshot = await db.ref('ranking')
           .orderByChild('zona')
           .equalTo(zona)
@@ -314,37 +394,111 @@
           list.innerHTML = '<div class="ranking-item"><span class="ranking-name">No hay jugadores en esta zona aún</span></div>';
         }
       } catch (err) {
-        console.error("Error al cargar ranking local:", err);
-        document.getElementById('ranking-local-list').innerHTML = '<div class="ranking-item"><span class="ranking-name">Error al cargar ranking</span></div>';
+        console.warn("⚠️ Error al cargar ranking local:", err.message);
+        // Fallback a mock si falla Firebase
+        if (OFFLINE_MODE) loadLocalRanking(zona);
       }
     }
 
-    // ========== WEBSOCKET Y RENDERIZADO ==========
+    // ========== WEBSOCKET (CON OFFLINE MODE) ==========
     let ws;
     const players = new Map();
 
     function initWebSocket() {
-      const wsUrl = window.location.hostname === 'localhost' 
-        ? 'ws://localhost:8080'
-        : `wss://${window.location.hostname}/ws`;
+      // 🔴 MODO OFFLINE: No intentar conectar
+      if (OFFLINE_MODE) {
+        console.log('📡 WebSocket deshabilitado (modo offline)');
+        document.getElementById('connection-text').textContent = 'Modo offline - datos simulados';
+        document.querySelector('.status-dot').style.background = '#64b5f7';
+        
+        // Simular jugadores para el radar
+        simulatePlayers();
+        return;
+      }
       
-      ws = new WebSocket(wsUrl);
-      ws.onopen = () => ws.send(JSON.stringify({ type: 'join', id: hunterId, zone: progreso.zona }));
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'players') {
-          players.clear();
-          data.players.forEach(p => players.set(p.id, p));
-          renderMap();
-          document.getElementById('player-count').textContent = players.size;
+      // 🔵 MODO ONLINE: Conexión real (solo si hay servidor)
+      try {
+        // ✅ Solo conectar en producción, no en localhost
+        if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+          console.log('🔌 WebSocket: omitiendo en localhost');
+          document.getElementById('connection-text').textContent = 'WebSocket: localhost';
+          simulatePlayers();
+          return;
         }
-      };
-      ws.onclose = () => setTimeout(initWebSocket, 3000);
+        
+        const wsUrl = `wss://${window.location.hostname}/ws`;
+        ws = new WebSocket(wsUrl);
+        
+        ws.onopen = () => {
+          console.log('✅ WebSocket conectado');
+          document.getElementById('connection-text').textContent = 'Conectado en tiempo real';
+          document.querySelector('.status-dot').style.background = '#4ade80';
+          ws.send(JSON.stringify({ type: 'join', id: hunterId, zone: progreso.zona }));
+        };
+        
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          if (data.type === 'players') {
+            players.clear();
+            data.players.forEach(p => players.set(p.id, p));
+            renderMap();
+            document.getElementById('player-count').textContent = players.size;
+          }
+        };
+        
+        ws.onerror = (err) => {
+          console.warn('⚠️ Error WebSocket:', err);
+          document.getElementById('connection-text').textContent = 'Error de conexión';
+          document.querySelector('.status-dot').style.background = '#ff6b6b';
+        };
+        
+        ws.onclose = () => {
+          console.log('🔌 WebSocket cerrado');
+          document.getElementById('connection-text').textContent = 'Reconectando...';
+          document.querySelector('.status-dot').style.background = '#ff9500';
+          setTimeout(initWebSocket, 3000);
+        };
+      } catch (err) {
+        console.warn('⚠️ WebSocket no disponible:', err.message);
+        simulatePlayers();
+      }
+    }
+
+    // 🔴 Simular jugadores para modo offline/testing
+    function simulatePlayers() {
+      console.log('🎭 Simulando jugadores para radar...');
+      players.clear();
+      
+      // Agregar jugador actual
+      players.set(hunterId, {
+        id: hunterId,
+        x: 50,
+        y: 50,
+        mission: 'M1',
+        missions: progreso.misiones,
+        challenges: progreso.desafios
+      });
+      
+      // Agregar jugadores mock
+      const mockPlayers = [
+        { id: 'LH-2847', x: 30, y: 40, mission: 'M2', missions: 3, challenges: 1 },
+        { id: 'LH-1923', x: 70, y: 60, mission: 'M1', missions: 2, challenges: 2 },
+        { id: 'LH-5555', x: 20, y: 80, mission: 'M3', missions: 5, challenges: 0 }
+      ];
+      
+      mockPlayers.forEach(p => players.set(p.id, p));
+      
+      renderMap();
+      document.getElementById('player-count').textContent = players.size;
     }
 
     function renderMap() {
       const radarContainer = document.querySelector('.radar-bg');
+      if (!radarContainer) return;
+      
+      // Limpiar marcadores existentes
       document.querySelectorAll('.player-marker').forEach(m => m.remove());
+      
       players.forEach((p, id) => {
         const marker = document.createElement('div');
         marker.className = `player-marker ${id === hunterId ? 'self' : ''}`;
@@ -353,15 +507,59 @@
         marker.style.left = `${x}%`;
         marker.style.top = `${y}%`;
         marker.textContent = id === hunterId ? 'TÚ' : id.slice(-2);
+        marker.title = `${id} • ${p.missions}M • ${p.challenges}D`;
         radarContainer.appendChild(marker);
       });
     }
 
+    // ========== RANKING GLOBAL (CON OFFLINE MODE) ==========
     async function renderRanking() {
       const list = document.getElementById('ranking-list');
-      list.innerHTML = '<li class="ranking-item">Cargando...</li>';
       
+      // 🔴 MODO OFFLINE: Usar datos mock
+      if (OFFLINE_MODE) {
+        console.log('📡 Cargando ranking global offline...');
+        
+        const mockRanking = [
+          { hunterId: 'LH-0001', missions: 12, challenges: 8, points: 2400 },
+          { hunterId: 'LH-0042', missions: 10, challenges: 6, points: 2100 },
+          { hunterId: 'LH-0123', missions: 9, challenges: 5, points: 1950 },
+          { hunterId: 'LH-0456', missions: 8, challenges: 4, points: 1800 },
+          { hunterId: 'LH-0789', missions: 7, challenges: 3, points: 1650 }
+        ];
+        
+        list.innerHTML = '';
+        mockRanking.forEach((p, i) => {
+          const li = document.createElement('li');
+          li.className = 'ranking-item';
+          li.innerHTML = `
+            <span class="ranking-name ${p.hunterId === hunterId ? 'self-rank' : ''}">${p.hunterId}${p.hunterId === hunterId ? ' (Tú)' : ''}</span>
+            <span class="ranking-stats">${p.missions}M · ${p.challenges}D</span>
+          `;
+          if (p.hunterId === hunterId) li.classList.add('current-player');
+          list.appendChild(li);
+        });
+        
+        // Mostrar jugador actual si no está en top 5
+        if (!mockRanking.some(p => p.hunterId === hunterId)) {
+          const myData = { missions: progreso.misiones, challenges: progreso.desafios, points: 0 };
+          const li = document.createElement('li');
+          li.className = 'ranking-item current-player';
+          li.innerHTML = `
+            <span class="ranking-name self-rank">${hunterId}</span>
+            <span class="ranking-stats">${myData.missions}M · ${myData.challenges}D</span>
+          `;
+          list.appendChild(li);
+        }
+        return;
+      }
+      
+      // 🔵 MODO ONLINE: Firebase (con protección)
       try {
+        if (!isFirebaseReady()) return;
+        
+        list.innerHTML = '<li class="ranking-item">Cargando...</li>';
+        
         // Obtener todos los jugadores con sus desafíos
         const [rankingSnapshot, desafiosSnapshot] = await Promise.all([
           db.ref('ranking').once('value'),
@@ -431,8 +629,9 @@
           list.appendChild(li);
         }
       } catch (err) {
-        console.error("Error al cargar ranking:", err);
-        list.innerHTML = '<li class="ranking-item">Error al cargar ranking</li>';
+        console.warn("⚠️ Error al cargar ranking:", err.message);
+        // Fallback a mock si falla Firebase
+        if (OFFLINE_MODE) renderRanking();
       }
     }
 
@@ -442,15 +641,21 @@
       loadLocalRanking(progreso.zona);
       initWebSocket();
       renderRanking();
-      setInterval(renderRanking, 10000);
+      
+      // Solo refrescar ranking si está en modo online
+      if (!OFFLINE_MODE) {
+        setInterval(renderRanking, 10000);
+      }
     });
 
     // ========== UTILIDADES ==========
     function showToast(msg) {
       const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3500);
+      if (t) {
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3500);
+      }
     }
 
     document.addEventListener('click', (e) => {
